@@ -5,12 +5,23 @@
   - According to ARM's [infocenter](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.100095_0003_06_en/Chunk905102933.html) this chip uses the MESI protocol for its L1 cache
 - More information on [Intel's cache hierarchy](https://stackoverflow.com/questions/28891349/how-are-the-modern-intel-cpu-l3-caches-organized)
 - Cache coherence [microbenchmarks](https://pdfs.semanticscholar.org/1d32/09cc498254eac8fc1fea0afd8a4d285b0be9.pdf)
+- Cache coherence [implementation notes](http://lastweek.io/notes/cache_coherence/)
+- Cache coherence protocols [evaluation](https://dl.acm.org/citation.cfm?id=6514)
 
 ### Milestones
-- [ ] (31st October): Choose range of platforms to verify end system on (1 ARM, 2 Intel)
+- [ ] (31st October): Choose range of platforms to verify end system on (1 ARM, 2 Intel):
+    * Linux machine: Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
+    * RSP Model 3B: ARM Cortex A53 clocked at 1.2 GHz
+       * [Datasheet](http://infocenter.arm.com/help/topic/com.arm.doc.ddi0500d/DDI0500D_cortex_a53_r0p2_trm.pdf)
 - [ ] (31st October): Choose main investigative architecture (RSP, BBB, Intel Core-i5)
+    * Linux Machine (86)
+    * RSP Model 3B (ARM)
+       * [Some slides on RSP cache](https://cseweb.ucsd.edu/classes/wi17/cse237A-a/handouts/03.mem.pdf)
 - [ ] (31st October): Devise which μ-architectural features we want to extract
+  - [Intel's Smart Cache](https://software.intel.com/en-us/articles/software-techniques-for-shared-cache-multi-core-systems/?wapkw=smart+cache) outlines useful cache design choices
   - Replacement policies, protocol type, etc.
+  - Directory-based, snooping, etc.
+  - Invalidation-based, update-based, etc.
 - [ ] (31st October): Devise which microbenchmarks could uncover above features
 - [ ] (2nd November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
 
