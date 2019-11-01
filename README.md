@@ -25,6 +25,15 @@
 - [ ] (31st October): Devise which microbenchmarks could uncover above features
 - [ ] (2nd November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
 
+### Specification (due 5th November)
+* Project idea
+  * Objectives (main research qustion you are trying to solve)
+* Survey of related work
+* Methodology
+  * Specific tools
+  * Plan on how you will evaluate your project or idea
+* Timeline of execution
+
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)
 - [Arduino ARM Cortex-A8](https://www.arduino.cc/en/Main/ArduinoBoardTre)
