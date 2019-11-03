@@ -19,13 +19,13 @@
     * [RSP Model 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/specifications/)
        * [Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz](http://infocenter.arm.com/help/topic/com.arm.doc.100095_0003_06_en/cortex_a72_mpcore_trm_100095_0003_06_en.pdf)
        * [Some slides on RSP cache](https://cseweb.ucsd.edu/classes/wi17/cse237A-a/handouts/03.mem.pdf)
-- [ ] (31st October): Devise which μ-architectural features we want to extract
+- [ ] (4th November): Devise which μ-architectural features we want to extract
   - [Intel's Smart Cache](https://software.intel.com/en-us/articles/software-techniques-for-shared-cache-multi-core-systems/?wapkw=smart+cache) outlines useful cache design choices
   - Replacement policies, protocol type, etc.
   - Directory-based, snooping, etc.
   - Invalidation-based, update-based, etc.
-- [ ] (31st October): Devise which microbenchmarks could uncover above features
-- [ ] (2nd November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
+- [ ] (4th November): Devise which microbenchmarks could uncover above features
+- [ ] (4th November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
 
 ### Specification (due 5th November)
 * Project idea
