@@ -9,6 +9,7 @@
 - Cache coherence protocols [evaluation](https://dl.acm.org/citation.cfm?id=6514)
 - Info on [ARM Cortex Coherence](https://www.blackhat.com/docs/eu-16/materials/eu-16-Lipp-ARMageddon-How-Your-Smartphone-CPU-Breaks-Software-Level-Security-And-Privacy-wp.pdf)
 - [Microbenchmarking GPU Memory architecture](https://arxiv.org/pdf/1509.02308.pdf)
+- [Demystifying GPU Memory Hierarchy](https://ieeexplore.ieee.org/abstract/document/5452013/)
 
 ### Milestones
 - [x] (31st October): Choose range of platforms to verify end system on
