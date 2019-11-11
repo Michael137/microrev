@@ -1,0 +1,86 @@
+\documentclass[11pt]{article}
+\usepackage{a4wide}
+\usepackage{parskip}
+%\usepackage{times}
+\usepackage[inline]{enumitem} % inline numbered lists
+
+\begin{document}
+\frenchspacing
+
+\centerline{\Large Systematic Reverse Engineering of Cache Coherence }
+\vspace{0.2em}
+\centerline{\Large Protocols Through Synthetic $\mu$-benchmarks }
+\vspace{2em}
+\centerline{\Large \emph{CS246 Project Proposal}}
+\vspace{2em}
+\centerline{\large Michael Buch, Yeongil Ko}
+
+\begin{abstract}
+The world is multi-core. Reasoning about multi-core systems is hard. Multiprocessors rely on cache-coherence protocols (CCP) to coordinate private and shared memory. While these protocols are simple to reason about through finite-state machines, their implementation often is critical to the performance capabilities of a chip since they dictate the data movement of the entire system. Unfortunately, the details of how a processor maintains cache coherence is often hidden in incomprehensible prose or completely left out from its manuals. To aid the wider community of architecture researchers and system developers, our work describes a methodology to reverse engineer CCPs through micro-benchmarking and profiling multicore architectures; we do so on the following three platforms: 
+\begin{enumerate*}[label=(\arabic*)]
+    \item Intel Xeon Platinum
+    \item Intel Core i5
+    \item ARM Cortex-A72
+\end{enumerate*}
+\end{abstract}
+
+\section{Introduction}
+Generally chip manufacturers reveal very little about the micro-architectural details in newer generation processors and mostly describe micro-architecture in the abstract. For example the Intel Architecture Optimization Manual \cite{guide2011intel} describes coherence only in the context of their TSX extensions or for their \textit{Knight's Landing} architecture and other micro-architectures completely lack discussion of a CCP. The only obvious mention of managing coherence is that ``a directory is used for cache coherence'' without elaboration of implementation details. Understanding cache coherence is critical for architecture researchers and application and system developers in our increasingly multi-core world. Management of caches is management of data-movement and locality which are pillar-stones of modern-day system optimization. More formal studies, such as Peter Sewell's work \cite{sewell2010x86,boehm2011multi}, have repeatedly shown the inability of architecture manuals to correctly describe coherence and memory system guarantees (including ARM, AMD and x86 architectures).
+
+Cache-coherence is not the only micro-architectural feature that is mystified within architecture manuals. Another example is the branch-prediction unit. Recent reverse engineering efforts due to Google's Project Zero\footnote{https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html} and Maurice et al. \cite{maurice2015reverse} uncovered serious vulnerabilities in the processor branch predictor on Intel's Haswell, ARM Cortex, and AMD FX architectures and Intel's memory coherence respectively.
+
+Instead of relying on manufacturers to provide cache-coherence details in the future, we propose a systematic approach to reverse engineering under-specified cache-coherence of modern processors: use micro-benchmarks to stress and map out a coherence protocol given specifications of the chip's memory hierarchy. Extensive work has been done on this in the security community for individual architectures. We hope to collate the approaches into a survey, apply these techniques to a number of processors and think about a generalized methodology that would work across processor types.
+
+The \textbf{aim of our project} is to reverse engineer and describe a close approximation of Intel Xeon Platinum's cache-coherence protocol. We will do so by writing micro-microbenchmarks and measuring performance counter events of the interconnects and memory subsystems. From this we will map out a finite state machine that approximates the cache-coherence protocol. We validate our benchmarking methodology by reverse-engineering an ARM processor for which a cache-coherence protocol specification is available.
+
+\section{Deliverables}
+\begin{itemize}
+    \item Gain insight into inner workings of cache coherence protocols (CCP) of ARM and Intel
+    \item Create a set of micro-benchmarks that stress CCPs
+    \item Evaluation of how viable our methodology is when applied to a wider range of platforms
+    \item A proposal of how CCP micro-benchmarks could be generalized
+\end{itemize}
+
+\section{Methodology}
+We follow the methodology described by Molka et al. \cite{molka2009memory,molka2015cache} in their investigation of cache coherence on the Intel Nehalem and Haswell architectures. The details we are after are inter-core communication latencies, inter-core communication bandwidth and, if possible, the actual CCP transition diagram.
+
+Our methodology will consist of:
+\begin{itemize}
+    \item Collect all reference data about memory hierarchies of Intel's Xeon and Core processors and ARM's Cortex processors. This will guide the structure of the workload in our benchmarks and what events we will be measuring. From preliminary research this looks to be a simple MESI or MESIF protocol \cite{molka2009memory,molka2015cache}.
+    \item Develop following types of benchmarks (measurements are done through performance counters/perf):
+    \begin{enumerate}
+        \item Bandwidth Test: measure the total amount of data read/written across N number of threads to shared and private memory. Additionally, use different types of locks for synchronization to stress coherence. E.g., ones with stampede, single-reader, multiple-reader, with local or global locks, etc.
+        \item Latency Test: measure the read/write time when accessing data on thread X from another thread Y
+        \item State transition tests: if time allows, create benchmarks which will allow us to map out a state transition diagram. The benchmark should put caches into a known state (as done in \cite{molka2009memory}) and send data explicitly between core caches or force cache evicitions. Then perform the same set of data reads or writes and confirm, through latency and bus traffic measurements, whether/how the states of the caches changed
+    \end{enumerate}
+    \item We run our benchmarks on following three platforms:
+    \begin{enumerate}
+        \item Intel Xeon Platinum\footnote{https://www.hashrates.com/cpus/intel(r)-xeon(r)-platinum-8275cl-48-3.00/}
+        \item Intel Core i5\cite{lempel20112nd}
+        \item ARM Cortex-A72\cite{armcortex}
+    \end{enumerate}
+    \item We use the ARM Cortex-A72 as a test oracle for our methodology since details of its coherence protocol are readily available
+    \item Evaluate whether our methodology could be mechanized or be applied to a wider range of coherence protocols such as the Dragon Protocol \cite{atkinson1987dragon}, GPU CCPs \cite{singh2013cache} or even data movement/cache coherence between accelerators on an SoC \cite{boroumand2018google}
+\end{itemize}
+
+\section{Workplan}
+\begin{itemize}
+    \item \textbf{November 5th - November 8th}: Set up infrastructure for developing and running benchmarks. This includes ensuring the necessary tooling such as \textit{perf} and Pin is installed on RPI 4, our Linux machine and the condor server. Make sure performance counters are enabled on these machines. Also prepare and understand gem5's coherence models for the ARM Cortex series.
+    \item \textbf{November 9th - November 16th}:
+    Collect all publicly available information on coherence management in Intel Xeon, Intel Core i5 and ARM Cortex-A72 architectures. Make sure the benchmark methodology as described in Molka et al. \cite{molka2009memory} works on our infrastructure. This involves writing small benchmarks that successfully initializes caches on individual cores into the states we want. The states we choose will be dictated by the information we find about the cache hierarchy.
+
+    Finalize the micro-architectural features we intend to measure in this period too.
+    \item \textbf{November 17th - November 22nd}:
+    Develop a micro-benchmark suite that stresses the cache hierarchy for the ARM and Intel Xeon processor. This work can be done in parallel between the two team members. Evaluate the performance of the memory subsystems and validate the results against publicly available data.
+    \item \textbf{November 23rd - November 28th}: Infer a CCP and its micro-architectural details from the results and validate our approximation against official manuals (for ARM). Develop a plan to generate such micro-benchmarks automatically or make them more generalizable to work for a wider range of platforms.
+    
+    \textit{This workplan accounts for 10 days of contingency}
+\end{itemize}
+
+\newpage
+\appendix
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
