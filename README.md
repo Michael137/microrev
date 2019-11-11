@@ -8,6 +8,7 @@
 - Cache coherence [implementation notes](http://lastweek.io/notes/cache_coherence/)
 - Cache coherence protocols [evaluation](https://dl.acm.org/citation.cfm?id=6514)
 - Info on [ARM Cortex Coherence](https://www.blackhat.com/docs/eu-16/materials/eu-16-Lipp-ARMageddon-How-Your-Smartphone-CPU-Breaks-Software-Level-Security-And-Privacy-wp.pdf)
+- [Microbenchmarking GPU Memory architecture](https://arxiv.org/pdf/1509.02308.pdf)
 
 ### Milestones
 - [x] (31st October): Choose range of platforms to verify end system on
@@ -29,15 +30,6 @@
 - [ ] (17th November):
   - Able to set coherence state programmatically
   - Benchmark suite for profiling coherence information
-
-### Specification (due 5th November)
-* Project idea
-  * Objectives (main research qustion you are trying to solve)
-* Survey of related work
-* Methodology
-  * Specific tools
-  * Plan on how you will evaluate your project or idea
-* Timeline of execution
 
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)
