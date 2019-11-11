@@ -31,6 +31,10 @@
 - [ ] (17th November):
   - Able to set coherence state programmatically
   - Benchmark suite for profiling coherence information
+  
+# Notes
+- Can we take inspiration from Fuzzers? E.g., [CSmith](https://github.com/csmith-project/csmith)
+- Can we take insipration from multi-core litmus tests? E.g., [Herd](https://github.com/herd/herdtools/)
 
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)
