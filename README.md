@@ -10,6 +10,7 @@
 - Info on [ARM Cortex Coherence](https://www.blackhat.com/docs/eu-16/materials/eu-16-Lipp-ARMageddon-How-Your-Smartphone-CPU-Breaks-Software-Level-Security-And-Privacy-wp.pdf)
 - [Microbenchmarking GPU Memory architecture](https://arxiv.org/pdf/1509.02308.pdf)
 - [Demystifying GPU Memory Hierarchy](https://ieeexplore.ieee.org/abstract/document/5452013/)
+- [Intel’s CLDEMOTE instruction](https://sites.utexas.edu/jdm4372/category/computer-hardware/cache-coherence-implementations/)
 
 ### Milestones
 - [x] (31st October): Choose range of platforms to verify end system on
@@ -35,6 +36,10 @@
 # Notes
 - Can we take inspiration from Fuzzers? E.g., [CSmith](https://github.com/csmith-project/csmith)
 - Can we take insipration from multi-core litmus tests? E.g., [Herd](https://github.com/herd/herdtools/)
+
+# Tools
+- [Emon](https://software.intel.com/sites/default/files/emon_user_guide_2019u3.pdf)
+- [Herd](https://github.com/herd/herdtools/)
 
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)
