@@ -36,3 +36,6 @@ Depending on the virtual-to-physical address mapping scheme, different arrayaddr
 
 # References
 - [Thesis on micro-benchmarking memory systems](https://pdfs.semanticscholar.org/1d32/09cc498254eac8fc1fea0afd8a4d285b0be9.pdf)
+- Reading Intel's PMCs programmatically
+  - [StackOverflow Post](https://stackoverflow.com/questions/49179295/how-to-read-pmc-performance-monitoring-counter-of-intel-processor)
+  - [Intel Forum](https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214)
