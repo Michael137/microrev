@@ -22,11 +22,13 @@
     * [RSP Model 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/specifications/)
        * [Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz](http://infocenter.arm.com/help/topic/com.arm.doc.100095_0003_06_en/cortex_a72_mpcore_trm_100095_0003_06_en.pdf)
        * [Some slides on RSP cache](https://cseweb.ucsd.edu/classes/wi17/cse237A-a/handouts/03.mem.pdf)
-- [ ] (12th November): Devise which μ-architectural features we want to extract
+- [x] (12th November): Devise which μ-architectural features we want to extract
   - [Intel's Smart Cache](https://software.intel.com/en-us/articles/software-techniques-for-shared-cache-multi-core-systems/?wapkw=smart+cache) outlines useful cache design choices
-  - Replacement policies, protocol type, etc.
-  - Directory-based, snooping, etc.
-  - Invalidation-based, update-based, etc.
+  - State machine: does cache behaviour conform to MESIF/MESI? How can the benchmark be useful while assuming an incorrect protocol?
+  - Replacement policies: LRU? Custom?
+  - How does the coherence protocol change with numbers of cores? (4 on RPI vs. 22 on server)
+  - How does the coherence protocol change with OS? (Linux vs. FreeBSD)
+  - Implementation: Directory-based, snooping, invalidation-based, update-based, write-allocation, bus-system, inclusion policy, lock-up free etc.
 - [ ] (12th November): Devise which microbenchmarks could uncover above features
 - [ ] (12th November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
 - [ ] (17th November):
