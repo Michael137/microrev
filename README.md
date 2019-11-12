@@ -29,7 +29,13 @@
   - How does the coherence protocol change with numbers of cores? (4 on RPI vs. 22 on server)
   - How does the coherence protocol change with OS? (Linux vs. FreeBSD)
   - Implementation: Directory-based, snooping, invalidation-based, update-based, write-allocation, bus-system, inclusion policy, lock-up free etc.
-- [ ] (12th November): Devise which microbenchmarks could uncover above features
+  - Smart cache:
+    - "Intel Smart Cache also features a new power-saving mechanism that enables the L2 Intel Smart Cache to dynamically flush its ways into system memory, based on demand, or during periods of inactivity"
+      - Can we test this?
+  - Are there any optimizations for common cache access patterns, e.g., false sharing, stampede, deadlocks, data contention etc.
+  - Are there optimizations for excessive amounts of consecutive misses?
+  - Are there optimizations for misses that come in a pattern. E.g., H M M M H M M M H ...
+- [x] (12th November): Devise which microbenchmarks could uncover above features
 - [ ] (12th November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
 - [ ] (17th November):
   - Able to set coherence state programmatically
