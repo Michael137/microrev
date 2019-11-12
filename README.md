@@ -11,6 +11,7 @@
 - [Microbenchmarking GPU Memory architecture](https://arxiv.org/pdf/1509.02308.pdf)
 - [Demystifying GPU Memory Hierarchy](https://ieeexplore.ieee.org/abstract/document/5452013/)
 - [Intel’s CLDEMOTE instruction](https://sites.utexas.edu/jdm4372/category/computer-hardware/cache-coherence-implementations/)
+- [Intel's HitME cache](https://patents.google.com/patent/US8631210)
 
 ### Milestones
 - [x] (31st October): Choose range of platforms to verify end system on
