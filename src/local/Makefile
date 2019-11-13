@@ -21,8 +21,8 @@ setup:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(INCL_DIR)
 	mkdir -p $(LIB_DIR)
-	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then \
-		sudo kldload hwpmc;					\
+	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
+		sudo kldload hwpmc;								\
 	fi
 
 .PHONY:
