@@ -4,6 +4,7 @@
 #include <string>
 
 #include "pmc_utils.h"
+#include "constants.h"
 
 namespace pmc_utils
 {
@@ -16,8 +17,8 @@ Counter::Counter()
 {
 }
 
-Counter::Counter(CounterSet const& cset)
-    : cset(cset)
+Counter::Counter( CounterSet const& cset )
+    : cset( cset )
     , pmc_values()
     , pmcid()
     , mode( PMC_MODE_TC )
@@ -30,6 +31,9 @@ void Counter::start()
 {
 	if( pmc_init() < 0 )
 		err( EX_OSERR, "Cannot initialize pmc(3)" );
+
+	if( this->cset.size() > pmc_utils::max_pmc_num )
+		err( EX_OSERR, "Too many pmc counters specified" );
 
 	for( auto& ctr: this->cset )
 	{
@@ -75,6 +79,16 @@ void Counter::read()
 			err( EX_OSERR, "Cannot read pmc" );
 		this->pmc_values.push_back( v );
 	}
+}
+
+void Counter::add( CounterSet const& cset )
+{
+	this->cset.insert( this->cset.end(), cset.begin(), cset.end() );
+}
+
+void pmc_add_counters( Counter& counter, CounterSet const& cset )
+{
+	counter.add( cset );
 }
 
 } // namespace pmc_utils

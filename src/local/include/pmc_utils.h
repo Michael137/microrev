@@ -12,7 +12,7 @@
 
 namespace pmc_utils
 {
-using PMCValues  = std::vector<pmc_value_t>;
+using PMCValues = std::vector<pmc_value_t>;
 
 // List of counters: `pmccontrol -L`
 class Counter
@@ -25,14 +25,16 @@ class Counter
 
    public:
 	Counter();
-	explicit Counter(CounterSet const& cset);
+	explicit Counter( CounterSet const& cset );
 	void add( std::string counter_name );
+	void add( CounterSet const& cset );
 	void read();
 	void stats();
 	void start();
 };
 
 void pmc_begin( Counter& counter );
+void pmc_add_counters( Counter& counter, CounterSet const& cset );
 void pmc_end( Counter& counter );
 void cset_push( Counter& counter );
 void cset_from_config( Counter& counter );
