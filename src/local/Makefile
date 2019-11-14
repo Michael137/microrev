@@ -11,7 +11,7 @@ OBJS := $(patsubst $(LIB_DIR)/%.cpp,$(LIB_DIR)/%.o,$(LIB_SOURCES))
 EXES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.out,$(SOURCES))
 
 LDFLAGS := -lpmc -lpthread
-CXXFLAGS += -g -std=c++11 -I$(INCL_DIR)
+CXXFLAGS += -g -std=c++17 -I$(INCL_DIR)
 
 all: setup $(OBJS) $(EXES)
 

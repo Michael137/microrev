@@ -16,6 +16,14 @@ Counter::Counter()
 {
 }
 
+Counter::Counter(CounterSet const& cset)
+    : cset(cset)
+    , pmc_values()
+    , pmcid()
+    , mode( PMC_MODE_TC )
+{
+}
+
 void pmc_begin( Counter& counter ) { counter.start(); }
 
 void Counter::start()

@@ -8,9 +8,10 @@
 #include <pmc.h>
 #include <sysexits.h>
 
+#include "pmc_counters.h"
+
 namespace pmc_utils
 {
-using CounterSet = std::vector<std::string>;
 using PMCValues  = std::vector<pmc_value_t>;
 
 // List of counters: `pmccontrol -L`
@@ -24,6 +25,7 @@ class Counter
 
    public:
 	Counter();
+	explicit Counter(CounterSet const& cset);
 	void add( std::string counter_name );
 	void read();
 	void stats();
