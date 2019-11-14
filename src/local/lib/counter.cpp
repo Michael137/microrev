@@ -3,31 +3,43 @@
 #include <iostream>
 #include <string>
 
-#include "pmc_utils.h"
 #include "constants.h"
+#include "counter.h"
 
-namespace pmc_utils
+namespace pcnt
 {
-// PMC_MODE_TC: Per-processor counter
-Counter::Counter()
+
+template<typename CntResult>
+Counter<CntResult>::Counter()
     : cset()
-    , pmc_values()
-    , pmcid()
-    , mode( PMC_MODE_TC )
+    , measured()
 {
 }
 
-Counter::Counter( CounterSet const& cset )
+template<typename CntResult>
+Counter<CntResult>::Counter( CounterSet const& cset )
     : cset( cset )
-    , pmc_values()
+    , measured()
+{
+}
+
+#ifdef WITH_PMC
+PMCCounter::Counter()
+    : Counter<pmc_value_t>()
     , pmcid()
     , mode( PMC_MODE_TC )
 {
 }
 
-void pmc_begin( Counter& counter ) { counter.start(); }
+PMCCounter::Counter( CounterSet const& cset )
+    : Counter<pmc_value_t>( cset )
+    , pmcid()
+    , mode( PMC_MODE_TC )
+{
+}
 
-void Counter::start()
+// PMC_MODE_TC: Per-processor counter
+void PMCCounter::start()
 {
 	if( pmc_init() < 0 )
 		err( EX_OSERR, "Cannot initialize pmc(3)" );
@@ -49,13 +61,7 @@ void Counter::start()
 		err( EX_OSERR, "Cannot start pmc" );
 }
 
-void pmc_end( Counter& counter )
-{
-	counter.read();
-	counter.stats();
-}
-
-void Counter::stats()
+void PMCCounter::stats()
 {
 	assert( this->cset.size() == this->pmc_values.size() );
 	for( int i = 0; i < this->cset.size(); ++i )
@@ -65,12 +71,12 @@ void Counter::stats()
 	std::cout << std::endl;
 }
 
-void Counter::add( std::string counter_name )
+void PMCCounter::add( std::string counter_name )
 {
 	this->cset.push_back( counter_name );
 }
 
-void Counter::read()
+void PMCCounter::read()
 {
 	uint64_t v;
 	for( auto& e: this->cset )
@@ -81,14 +87,10 @@ void Counter::read()
 	}
 }
 
-void Counter::add( CounterSet const& cset )
+void PMCCounter::add( CounterSet const& cset )
 {
 	this->cset.insert( this->cset.end(), cset.begin(), cset.end() );
 }
+#endif // WITH_PMC
 
-void pmc_add_counters( Counter& counter, CounterSet const& cset )
-{
-	counter.add( cset );
-}
-
-} // namespace pmc_utils
+} // namespace pcnt

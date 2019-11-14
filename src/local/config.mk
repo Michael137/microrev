@@ -1,4 +1,5 @@
 ROOT_DIR ?= .
 CXXFLAGS ?=
 CXX = clang++
-SHELL = /usr/local/bin/bash
+SHELL = /bin/bash
+UNAME := $(shell uname)

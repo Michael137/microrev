@@ -1,15 +1,16 @@
-#ifndef PMC_COUNTERS_H_IN
-#define PMC_COUNTERS_H_IN
+#ifndef COUNTERS_H_IN
+#define COUNTERS_H_IN
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-namespace pmc_utils
+namespace pcnt
 {
 using CounterSet = std::vector<std::string>;
 
 // Maps OS to ready-to-use performance-counter sets
+// pmc
 static std::unordered_map<std::string,
                                 std::unordered_map<std::string, CounterSet>>
     CounterMap
@@ -18,6 +19,6 @@ static std::unordered_map<std::string,
          {"dcache",
           {"mem_load_uops_retired.l1_hit", "mem_load_uops_retired.l1_miss"}}}}};
 
-} // namespace pmc_utils
+} // namespace pcnt
 
-#endif // PMC_COUNTERS_H_IN
+#endif // COUNTERS_H_IN

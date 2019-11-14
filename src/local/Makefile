@@ -10,10 +10,18 @@ LIB_SOURCES := $(wildcard $(LIB_DIR)/*.cpp)
 OBJS := $(patsubst $(LIB_DIR)/%.cpp,$(LIB_DIR)/%.o,$(LIB_SOURCES))
 EXES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.out,$(SOURCES))
 
-LDFLAGS := -lpmc -lpthread
+LDFLAGS := -lpthread
 CXXFLAGS += -g -std=c++17 -I$(INCL_DIR)
 
 all: setup $(OBJS) $(EXES)
+
+ifeq "$(UNAME)" "FreeBSD"
+	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
+		sudo kldload hwpmc;								\
+	fi
+
+	LDFLAGS += -lpmc
+endif
 
 .PHONY:
 setup:
@@ -21,9 +29,6 @@ setup:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(INCL_DIR)
 	mkdir -p $(LIB_DIR)
-	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
-		sudo kldload hwpmc;								\
-	fi
 
 .PHONY:
 clean:

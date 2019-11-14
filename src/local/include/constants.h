@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H_IN
 #define CONSTANTS_H_IN
 
-namespace pmc_utils
+namespace pcnt
 {
 
 #ifdef __FreeBSD__
@@ -12,6 +12,6 @@ constexpr int max_pmc_num = 4;
 constexpr int max_pmc_num = 8;
 #endif
 
-} // namespace pmc_utils
+} // namespace pcnt
 
 #endif // CONSTANTS_H_IN
