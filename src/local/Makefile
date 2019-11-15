@@ -16,12 +16,26 @@ CXXFLAGS += -g -std=c++17 -I$(INCL_DIR)
 all: setup $(OBJS) $(EXES)
 
 ifeq "$(UNAME)" "FreeBSD"
-	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
-		sudo kldload hwpmc;								\
-	fi
+  @if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
+  	sudo kldload hwpmc;								\
+  fi
+  
+  LDFLAGS += -lpmc
+else
+  ifdef WITH_PFM
+    LDFLAGS += -lpfm
+  else
+    PAPI_DIR ?= $(HOME)/papi/src
+    export LD_LIBRARY_PATH=$(PAPI_DIR)
+    LDFLAGS += -L$(PAPI_DIR) -lpapi
+    CXXFLAGS += -I$(PAPI_DIR)
 
-	LDFLAGS += -lpmc
+	# https://superuser.com/questions/980632/run-perf-without-root-rights
+	# if PAPI is complaining about no available hwcntrs then run following command:
+	#     sudo sysctl -w kernel.perf_event_paranoid=1
+  endif
 endif
+
 
 .PHONY:
 setup:

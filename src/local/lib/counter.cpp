@@ -6,33 +6,34 @@
 #include "constants.h"
 #include "counter.h"
 
+#include <papi.h>
+
 namespace pcnt
 {
-
-template<typename CntResult>
-Counter<CntResult>::Counter()
+template<typename CntResult, typename Events>
+Counter<CntResult, Events>::Counter()
     : cset()
     , measured()
 {
 }
 
-template<typename CntResult>
-Counter<CntResult>::Counter( CounterSet const& cset )
+template<typename CntResult, typename Events>
+Counter<CntResult, Events>::Counter( Events const& cset )
     : cset( cset )
     , measured()
 {
 }
 
 #ifdef WITH_PMC
-PMCCounter::Counter()
-    : Counter<pmc_value_t>()
+PMCCounter::PMCCounter()
+    : Counter<std::vector<pmc_value_t>>()
     , pmcid()
     , mode( PMC_MODE_TC )
 {
 }
 
-PMCCounter::Counter( CounterSet const& cset )
-    : Counter<pmc_value_t>( cset )
+PMCCounter::PMCCounter( CounterSet const& cset )
+    : Counter<std::vector<pmc_value_t>>( cset )
     , pmcid()
     , mode( PMC_MODE_TC )
 {
@@ -92,5 +93,50 @@ void PMCCounter::add( CounterSet const& cset )
 	this->cset.insert( this->cset.end(), cset.begin(), cset.end() );
 }
 #endif // WITH_PMC
+
+PAPIHLCounter::PAPIHLCounter( std::vector<int> const& cset )
+    : Counter<std::vector<long_long>, std::vector<int>>( cset )
+{
+}
+
+PAPIHLCounter::PAPIHLCounter()
+    : Counter<std::vector<long_long>, std::vector<int>>()
+{
+}
+
+void PAPIHLCounter::add( std::string counter_name ) {}
+void PAPIHLCounter::add( std::vector<int> const& cset ) {}
+void PAPIHLCounter::read()
+{
+	this->measured.resize( this->cset.size() );
+	if( PAPI_stop_counters( this->measured.data(), this->cset.size() )
+	    != PAPI_OK )
+	{
+		PAPI_perror( "failed to read counters" );
+		exit( 1 );
+	}
+}
+
+void PAPIHLCounter::stats()
+{
+	assert( this->cset.size() == this->measured.size() );
+	for( int i = 0; i < this->cset.size(); ++i )
+	{
+		std::cout << this->cset[i] << ": " << this->measured[i] << '\n';
+	}
+	std::cout << std::endl;
+}
+
+void PAPIHLCounter::start()
+{
+	// check for return of init
+	PAPI_library_init( PAPI_VER_CURRENT );
+	// check perf counter number supported by HW
+	if( PAPI_start_counters( this->cset.data(), this->cset.size() ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to start counters" );
+		exit( 1 );
+	}
+}
 
 } // namespace pcnt
