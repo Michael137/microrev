@@ -8,7 +8,7 @@
 #if defined( __FreeBSD__ ) && defined( WITH_PMC )
 #	include <pmc.h>
 #	include <sysexits.h>
-#else
+#elif defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
 #endif
 
@@ -49,8 +49,7 @@ class PMCCounter : public Counter<std::vector<pmc_value_t>>
 	void stats() = 0;
 	void start();
 };
-#endif // WITH_PMC
-
+#elif defined( WITH_PAPI_HL ) // !WITH_PMC
 class PAPIHLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 {
    private:
@@ -63,6 +62,24 @@ class PAPIHLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 	void stats();
 	void start();
 };
+#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+// NOTE: run `papi_avail -a` to get details of PAPI counters that are supported on HW
+class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
+{
+   private:
+	int event_set;
+
+   public:
+	PAPILLCounter();
+	explicit PAPILLCounter( std::vector<int> cset );
+	void add( std::string counter_name );
+	void add( std::vector<int> const& cset );
+	void read();
+	void stats();
+	void start();
+	void init();
+};
+#endif                        // WITH_PAPI_LL
 
 } // namespace pcnt
 

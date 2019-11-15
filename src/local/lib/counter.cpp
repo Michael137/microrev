@@ -6,7 +6,12 @@
 #include "constants.h"
 #include "counter.h"
 
-#include <papi.h>
+#if defined( __FreeBSD__ ) && defined( WITH_PMC )
+#	include <pmc.h>
+#	include <sysexits.h>
+#elif defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
+#	include <papi.h>
+#endif
 
 namespace pcnt
 {
@@ -92,7 +97,7 @@ void PMCCounter::add( CounterSet const& cset )
 {
 	this->cset.insert( this->cset.end(), cset.begin(), cset.end() );
 }
-#endif // WITH_PMC
+#elif defined( WITH_PAPI_HL ) // !WITH_PMC
 
 PAPIHLCounter::PAPIHLCounter( std::vector<int> const& cset )
     : Counter<std::vector<long_long>, std::vector<int>>( cset )
@@ -138,5 +143,76 @@ void PAPIHLCounter::start()
 		exit( 1 );
 	}
 }
+#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+PAPILLCounter::PAPILLCounter( std::vector<int> cset )
+    : Counter<std::vector<long_long>, std::vector<int>>( cset )
+    , event_set()
+{
+}
+
+PAPILLCounter::PAPILLCounter()
+    : Counter<std::vector<long_long>, std::vector<int>>()
+    , event_set()
+{
+}
+
+void PAPILLCounter::add( std::string counter_name ) {}
+void PAPILLCounter::add( std::vector<int> const& events )
+{
+	this->cset.insert( this->cset.end(), events.begin(), events.end() );
+	if( PAPI_add_events( this->event_set, const_cast<int*>( events.data() ),
+	                     events.size() )
+	    != PAPI_OK )
+	{
+		PAPI_perror( "failed to add events" );
+		exit( 1 );
+	}
+}
+void PAPILLCounter::read()
+{
+	this->measured.resize( this->cset.size() );
+	if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to read counters" );
+		exit( 1 );
+	}
+}
+
+void PAPILLCounter::stats()
+{
+	assert( this->cset.size() == this->measured.size() );
+	for( int i = 0; i < this->cset.size(); ++i )
+	{
+		std::cout << this->measured[i] << '\n';
+	}
+	std::cout << std::endl;
+}
+
+void PAPILLCounter::start()
+{
+	if( PAPI_start( this->event_set ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to start counters" );
+		exit( 1 );
+	}
+}
+
+void PAPILLCounter::init()
+{
+	int retval = PAPI_library_init( PAPI_VER_CURRENT );
+	if( retval != PAPI_VER_CURRENT )
+	{
+		PAPI_perror( "PAPI library init error!" );
+		exit( 1 );
+	}
+
+	this->event_set = PAPI_NULL;
+	if( PAPI_create_eventset( &( this->event_set ) ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to create eventset" );
+		exit( 1 );
+	}
+}
+#endif                        // !WITH_PAPI_LL
 
 } // namespace pcnt
