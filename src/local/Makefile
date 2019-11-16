@@ -16,11 +16,13 @@ CXXFLAGS += -g -std=c++17 -I$(INCL_DIR) -D$(PC_TYPE)
 all: setup $(OBJS) $(EXES)
 
 ifeq "$(UNAME)" "FreeBSD"
-  @if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
-  	sudo kldload hwpmc;								\
-  fi
-  
-  LDFLAGS += -lpmc
+  ifeq "$(PC_TYPE)" "WITH_PMC"
+	@if [ -z "$(shell kldstat | grep hwpmc)" ]; then	\
+		sudo kldload hwpmc;								\
+	fi
+
+    LDFLAGS += -lpmc
+  endif
 else
   ifdef WITH_PFM
     LDFLAGS += -lpfm

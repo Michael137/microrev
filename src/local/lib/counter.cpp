@@ -31,14 +31,14 @@ Counter<CntResult, Events>::Counter( Events const& cset )
 
 #ifdef WITH_PMC
 PMCCounter::PMCCounter()
-    : Counter<std::vector<pmc_value_t>>()
+    : Counter<std::vector<pmc_value_t>, CounterSet>()
     , pmcid()
     , mode( PMC_MODE_TC )
 {
 }
 
 PMCCounter::PMCCounter( CounterSet const& cset )
-    : Counter<std::vector<pmc_value_t>>( cset )
+    : Counter<std::vector<pmc_value_t>, CounterSet>( cset )
     , pmcid()
     , mode( PMC_MODE_TC )
 {
@@ -50,7 +50,7 @@ void PMCCounter::start()
 	if( pmc_init() < 0 )
 		err( EX_OSERR, "Cannot initialize pmc(3)" );
 
-	if( this->cset.size() > pmc_utils::max_pmc_num )
+	if( this->cset.size() > pcnt::max_pmc_num )
 		err( EX_OSERR, "Too many pmc counters specified" );
 
 	for( auto& ctr: this->cset )
@@ -69,10 +69,10 @@ void PMCCounter::start()
 
 void PMCCounter::stats()
 {
-	assert( this->cset.size() == this->pmc_values.size() );
+	assert( this->cset.size() == this->measured.size() );
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
-		std::cout << this->cset[i] << ": " << this->pmc_values[i] << '\n';
+		std::cout << this->cset[i] << ": " << this->measured[i] << '\n';
 	}
 	std::cout << std::endl;
 }
@@ -89,7 +89,7 @@ void PMCCounter::read()
 	{
 		if( pmc_read( this->pmcid, &v ) < 0 )
 			err( EX_OSERR, "Cannot read pmc" );
-		this->pmc_values.push_back( v );
+		this->measured.push_back( v );
 	}
 }
 
@@ -148,12 +148,14 @@ PAPILLCounter::PAPILLCounter( std::vector<int> cset )
     : Counter<std::vector<long_long>, std::vector<int>>( cset )
     , event_set()
 {
+	this->init();
 }
 
 PAPILLCounter::PAPILLCounter()
     : Counter<std::vector<long_long>, std::vector<int>>()
     , event_set()
 {
+	this->init();
 }
 
 void PAPILLCounter::add( std::string counter_name ) {}

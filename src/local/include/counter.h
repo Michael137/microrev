@@ -34,7 +34,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 };
 
 #ifdef WITH_PMC
-class PMCCounter : public Counter<std::vector<pmc_value_t>>
+class PMCCounter : public Counter<std::vector<pmc_value_t>, CounterSet>
 {
    private:
 	pmc_id_t pmcid;
@@ -45,8 +45,8 @@ class PMCCounter : public Counter<std::vector<pmc_value_t>>
 	explicit PMCCounter( CounterSet const& cset );
 	void add( std::string counter_name );
 	void add( CounterSet const& cset );
-	void read()  = 0;
-	void stats() = 0;
+	void read();
+	void stats();
 	void start();
 };
 #elif defined( WITH_PAPI_HL ) // !WITH_PMC
