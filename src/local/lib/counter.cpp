@@ -1,7 +1,9 @@
 #include <sysexits.h>
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <thread>
 
 #include "constants.h"
 #include "counter.h"
@@ -161,6 +163,20 @@ PAPILLCounter::PAPILLCounter()
 void PAPILLCounter::add( std::string counter_name ) {}
 void PAPILLCounter::add( std::vector<int> const& events )
 {
+	this->event_set = PAPI_NULL;
+	int retval      = 0;
+	if( ( retval = PAPI_register_thread() ) != PAPI_OK )
+	{
+		PAPI_perror( "PAPI couldn't register thread" );
+		exit( 1 );
+	}
+
+	if( PAPI_create_eventset( &( this->event_set ) ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to create eventset" );
+		exit( 1 );
+	}
+
 	this->cset.insert( this->cset.end(), events.begin(), events.end() );
 	if( PAPI_add_events( this->event_set, const_cast<int*>( events.data() ),
 	                     events.size() )
@@ -176,6 +192,19 @@ void PAPILLCounter::read()
 	if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
 	{
 		PAPI_perror( "failed to read counters" );
+		exit( 1 );
+	}
+
+	int retval = 0;
+	if( ( retval = PAPI_cleanup_eventset( this->event_set ) ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to clean up eventset" );
+		exit( 1 );
+	}
+
+	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to unregister thread" );
 		exit( 1 );
 	}
 }
@@ -199,6 +228,15 @@ void PAPILLCounter::start()
 	}
 }
 
+unsigned long current_thread_id()
+{
+	std::stringstream id_stream;
+	id_stream << std::this_thread::get_id();
+	unsigned long id;
+	id_stream >> id;
+	return id;
+}
+
 void PAPILLCounter::init()
 {
 	int retval = PAPI_library_init( PAPI_VER_CURRENT );
@@ -208,10 +246,9 @@ void PAPILLCounter::init()
 		exit( 1 );
 	}
 
-	this->event_set = PAPI_NULL;
-	if( PAPI_create_eventset( &( this->event_set ) ) != PAPI_OK )
+	if( PAPI_thread_init( current_thread_id ) != PAPI_OK )
 	{
-		PAPI_perror( "failed to create eventset" );
+		PAPI_perror( "PAPI thread library init error!" );
 		exit( 1 );
 	}
 }

@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <vector>
+#include <functional>
 
 #if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
@@ -49,10 +50,10 @@ int main( int argc, char* argv[] )
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
 	std::vector<int> events{PAPI_TOT_INS};
-	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench{
+	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench{
 	    std::function<void( void )>{do_flops}};
 
-	cbench.schedule_bench_with_counters<std::vector<int>>( events );
+	cbench.schedule_bench_with_counters<std::vector<int>&>( events );
 
 #endif // !WITH_PAPI_LL
 }
