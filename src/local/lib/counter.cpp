@@ -212,9 +212,11 @@ void PAPILLCounter::read()
 void PAPILLCounter::stats()
 {
 	assert( this->cset.size() == this->measured.size() );
+	char name[PAPI_MAX_STR_LEN];
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
-		std::cout << this->measured[i] << '\n';
+		PAPI_event_code_to_name(cset[i], name);
+		std::cout << name << ": " << this->measured[i] << '\n';
 	}
 	std::cout << std::endl;
 }
