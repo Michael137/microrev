@@ -149,6 +149,7 @@ void PAPIHLCounter::start()
 PAPILLCounter::PAPILLCounter( std::vector<int> cset )
     : Counter<std::vector<long_long>, std::vector<int>>( cset )
     , event_set()
+    , max_hw_cntrs()
 {
 	this->init();
 }
@@ -156,6 +157,7 @@ PAPILLCounter::PAPILLCounter( std::vector<int> cset )
 PAPILLCounter::PAPILLCounter()
     : Counter<std::vector<long_long>, std::vector<int>>()
     , event_set()
+    , max_hw_cntrs()
 {
 	this->init();
 }
@@ -165,6 +167,13 @@ void PAPILLCounter::add( std::vector<int> const& events )
 {
 	this->event_set = PAPI_NULL;
 	int retval      = 0;
+
+	if( events.size() > this->max_hw_cntrs )
+	{
+		PAPI_perror( "Number of events exceeds available HW counters" );
+		exit( 1 );
+	}
+
 	if( ( retval = PAPI_register_thread() ) != PAPI_OK )
 	{
 		PAPI_perror( "PAPI couldn't register thread" );
@@ -215,7 +224,7 @@ void PAPILLCounter::stats()
 	char name[PAPI_MAX_STR_LEN];
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
-		PAPI_event_code_to_name(cset[i], name);
+		PAPI_event_code_to_name( cset[i], name );
 		std::cout << name << ": " << this->measured[i] << '\n';
 	}
 	std::cout << std::endl;
@@ -242,9 +251,17 @@ unsigned long current_thread_id()
 void PAPILLCounter::init()
 {
 	int retval = PAPI_library_init( PAPI_VER_CURRENT );
+
 	if( retval != PAPI_VER_CURRENT )
 	{
 		PAPI_perror( "PAPI library init error!" );
+		exit( 1 );
+	}
+
+	if( ( this->max_hw_cntrs = PAPI_num_counters() ) == 0 )
+	{
+		fprintf( stderr,
+		         "Info:: This machine does not provide hardware counters.\n" );
 		exit( 1 );
 	}
 

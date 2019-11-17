@@ -17,6 +17,8 @@
 #include <functional>
 #include <shared_mutex>
 #include <thread>
+#include <tuple>
+#include <vector>
 
 #ifdef __FreeBSD__
 #	define CPUSET_T cpuset_t
@@ -26,15 +28,22 @@
 
 namespace pcnt
 {
-void pin_self_to_core( int core_id )
-{
-	// Master thread on core 0
-	CPUSET_T cpuset;
-	CPU_ZERO( &cpuset );
-	CPU_SET( core_id, &cpuset );
+void pin_self_to_core( int core_id );
 
-	pthread_setaffinity_np( pthread_self(), sizeof( CPUSET_T ), &cpuset );
-}
+template<typename EventTyp> struct Schedule
+{
+	int core_id;
+	std::function<void( void )> benchmark;
+	EventTyp events;
+
+	Schedule( int core_id, std::function<void( void )> benchmark,
+	          EventTyp events )
+	    : core_id( core_id )
+	    , benchmark( benchmark )
+	    , events( events )
+	{
+	}
+};
 
 template<typename CntTyp> struct CounterBenchmark
 {
@@ -50,6 +59,7 @@ template<typename CntTyp> struct CounterBenchmark
 	    , cv()
 	    , benchmark_cores( std::thread::hardware_concurrency() - 1 )
 	    , threads()
+
 	{
 		pin_self_to_core( 0 );
 	}
@@ -80,8 +90,7 @@ template<typename CntTyp> struct CounterBenchmark
 		counter.read();
 	}
 
-	template<typename EventTyp>
-	void schedule_bench_with_counters( EventTyp& events )
+	template<typename EventTyp> void counters_on_cores( EventTyp& events )
 	{
 		std::vector<CntTyp> counters{ this->benchmark_cores };
 		for( unsigned int i = 0; i < this->benchmark_cores; ++i )
@@ -91,6 +100,28 @@ template<typename CntTyp> struct CounterBenchmark
 				    this->counter_thread_fn<EventTyp>( counters[i], events, i,
 				                                       i + 1 );
 			    } ) );
+		}
+
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+		this->cv.notify_all();
+
+		for( auto& th: this->threads )
+			th.join();
+
+		for( auto& cnt: counters )
+			cnt.stats();
+	}
+
+	template<typename EventTyp>
+	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
+	{
+		std::vector<CntTyp> counters{ this->benchmark_cores };
+		for( int i = 0; i < svec.size(); ++i )
+		{
+			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
+				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
+				                                   i, svec[i].core_id );
+			} ) );
 		}
 
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );

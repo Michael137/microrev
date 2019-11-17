@@ -68,6 +68,7 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 {
    private:
 	int event_set;
+	int max_hw_cntrs;
 
    public:
 	PAPILLCounter();
