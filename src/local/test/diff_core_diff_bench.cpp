@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
+#include <random>
 
 #include "counter.h"
 #include "counters.h"
@@ -17,17 +18,36 @@
 #	include <papi.h>
 #endif
 
+struct RandomInt
+{
+	std::random_device rd;
+	std::mt19937 mt;
+	std::uniform_int_distribution<int> dist;
+
+	RandomInt()
+	    : rd()
+	    , mt( rd() )
+	    , dist( 1, 1000000 )
+	{
+	}
+
+	int gen() { return dist( this->mt ); }
+};
+
+static RandomInt rand_gen;
+static const int rand_g = rand_gen.gen();
+
 void do_flops()
 {
-	float x = 0.0;
-	for( int i = 0; i < 100000000; ++i )
+	float x  = 0.0;
+	for( int i = 0; i < rand_g; ++i )
 		x *= 0.2;
 }
 
 void do_ints()
 {
-	float x = 0;
-	for( int i = 0; i < 100000000; ++i )
+	int x  = 0;
+	for( int i = 0; i < rand_g; ++i )
 		x *= 0;
 }
 
