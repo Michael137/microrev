@@ -23,6 +23,14 @@ void do_flops()
 	for( int i = 0; i < 100000000; ++i )
 		x *= 0.2;
 }
+
+void do_ints()
+{
+	float x = 0;
+	for( int i = 0; i < 100000000; ++i )
+		x *= 0;
+}
+
 int main( int argc, char* argv[] )
 {
 	std::cout << ">>>> TEST: different benchmarks on different cores "
@@ -38,18 +46,18 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
-	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench{
-	    std::function<void( void )>{ do_flops } };
+	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 
 	using Sched = pcnt::Schedule<std::vector<int>>;
 
-	Sched core_1 = Sched{
-	    1, std::function<decltype( do_flops )>{ do_flops }, { PAPI_TOT_INS } };
+	Sched core_1 = Sched{ 1,
+	                      std::function<decltype( do_flops )>{ do_flops },
+	                      { PAPI_FP_INS, PAPI_TOT_INS } };
 	Sched core_2 = Sched{ 2,
-	                      std::function<decltype( do_flops )>{ do_flops },
-	                      { PAPI_FP_INS, PAPI_TOT_CYC } };
+	                      std::function<decltype( do_ints )>{ do_ints },
+	                      { PAPI_FP_INS, PAPI_TOT_INS } };
 	Sched core_3 = Sched{ 2,
-	                      std::function<decltype( do_flops )>{ do_flops },
+	                      std::function<decltype( do_ints )>{ do_ints },
 	                      { PAPI_L3_TCW, PAPI_L2_DCH, PAPI_TOT_CYC } };
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };

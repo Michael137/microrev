@@ -57,10 +57,11 @@ int main( int argc, char* argv[] )
 	    PAPI_FP_INS,
 	    PAPI_TOT_CYC,
 	};
-	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench{
-	    std::function<void( void )>{ do_flops } };
 
-	cbench.counters_on_cores<std::vector<int>&>( events );
+	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
+
+	cbench.counters_on_cores<std::vector<int>&>(
+	    events, std::function<void( void )>{ do_flops } );
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;

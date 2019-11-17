@@ -47,15 +47,13 @@ template<typename EventTyp> struct Schedule
 
 template<typename CntTyp> struct CounterBenchmark
 {
-	std::function<void( void )> benchmark;
 	std::shared_mutex mtx;
 	std::condition_variable_any cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
 
-	CounterBenchmark( std::function<void( void )> benchmark )
-	    : benchmark( benchmark )
-	    , mtx()
+	CounterBenchmark()
+	    : mtx()
 	    , cv()
 	    , benchmark_cores( std::thread::hardware_concurrency() - 1 )
 	    , threads()
@@ -76,7 +74,8 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_idx,
-	                        int core_idx )
+	                        int core_idx,
+	                        std::function<void( void )> benchmark )
 	{
 		pin_to_core( th_idx, core_idx );
 		counter.add( events );
@@ -85,20 +84,22 @@ template<typename CntTyp> struct CounterBenchmark
 		std::shared_lock lck( this->mtx );
 		this->cv.wait( lck );
 
-		this->benchmark();
+		benchmark();
 
 		counter.read();
 	}
 
-	template<typename EventTyp> void counters_on_cores( EventTyp& events )
+	template<typename EventTyp>
+	void counters_on_cores( EventTyp& events,
+	                        std::function<void( void )> benchmark )
 	{
 		std::vector<CntTyp> counters{ this->benchmark_cores };
 		for( unsigned int i = 0; i < this->benchmark_cores; ++i )
 		{
 			this->threads.push_back(
-			    std::thread( [this, &counters, i, &events] {
+			    std::thread( [this, &counters, i, &events, benchmark] {
 				    this->counter_thread_fn<EventTyp>( counters[i], events, i,
-				                                       i + 1 );
+				                                       i + 1, benchmark );
 			    } ) );
 		}
 
@@ -120,7 +121,8 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
-				                                   i, svec[i].core_id );
+				                                   i, svec[i].core_id,
+				                                   svec[i].benchmark );
 			} ) );
 		}
 
