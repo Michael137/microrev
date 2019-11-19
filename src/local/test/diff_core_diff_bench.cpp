@@ -59,17 +59,18 @@ int main( int argc, char* argv[] )
 #ifdef WITH_PMC
 
 	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench;
-	cbench.set_core_num(2); // FreeBSD machine that our tests run on has 2 cores
+	cbench.set_core_num(
+	    2 ); // FreeBSD machine that our tests run on has 2 cores
 
 	using Sched          = pcnt::Schedule<std::vector<std::string>>;
 	auto FreeBSDCounters = pcnt::CounterMap["FreeBSD"];
 
-	Sched core_0 = Sched{0, std::function<decltype( do_flops )>{do_flops},
-	                     FreeBSDCounters["dcache"]};
-	Sched core_1 = Sched{1, std::function<decltype( do_ints )>{do_ints},
-	                     FreeBSDCounters["dcache"]};
+	Sched core_0 = Sched{ 0, std::function<decltype( do_flops )>{ do_flops },
+	                      FreeBSDCounters["dcache"] };
+	Sched core_1 = Sched{ 1, std::function<decltype( do_ints )>{ do_ints },
+	                      FreeBSDCounters["dcache"] };
 
-	std::vector<Sched> vec{core_0,core_1};
+	std::vector<Sched> vec{ core_0, core_1 };
 
 	cbench.counters_with_schedule<std::vector<std::string>>( vec );
 
@@ -83,17 +84,17 @@ int main( int argc, char* argv[] )
 
 	using Sched = pcnt::Schedule<std::vector<int>>;
 
-	Sched core_1 = Sched{1,
-	                     std::function<decltype( do_flops )>{do_flops},
-	                     {PAPI_FP_INS, PAPI_TOT_INS}};
-	Sched core_2 = Sched{2,
-	                     std::function<decltype( do_ints )>{do_ints},
-	                     {PAPI_FP_INS, PAPI_TOT_INS}};
-	Sched core_3 = Sched{2,
-	                     std::function<decltype( do_ints )>{do_ints},
-	                     {PAPI_L3_TCW, PAPI_L2_DCH, PAPI_TOT_CYC}};
+	Sched core_1 = Sched{ 1,
+	                      std::function<decltype( do_flops )>{ do_flops },
+	                      { PAPI_FP_INS, PAPI_TOT_INS, PAPI_TOT_CYC } };
+	Sched core_2 = Sched{ 2,
+	                      std::function<decltype( do_ints )>{ do_ints },
+	                      { PAPI_FP_INS, PAPI_TOT_INS, PAPI_TOT_CYC } };
+	Sched core_3 = Sched{ 2,
+	                      std::function<decltype( do_ints )>{ do_ints },
+	                      { PAPI_L3_TCW, PAPI_L2_DCH, PAPI_TOT_CYC } };
 
-	std::vector<Sched> vec{core_1, core_2, core_3};
+	std::vector<Sched> vec{ core_1, core_2, core_3 };
 
 	cbench.counters_with_schedule<std::vector<int>>( vec );
 
