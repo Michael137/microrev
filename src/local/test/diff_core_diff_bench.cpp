@@ -63,6 +63,7 @@ int main( int argc, char* argv[] )
 	using Sched          = pcnt::Schedule<std::vector<std::string>>;
 	auto FreeBSDCounters = pcnt::CounterMap["FreeBSD"];
 
+<<<<<<< HEAD
 	Sched core_1 = Sched{1, std::function<decltype( do_flops )>{do_flops},
 	                     FreeBSDCounters["icache"]};
 	Sched core_2 = Sched{2, std::function<decltype( do_ints )>{do_ints},
@@ -86,17 +87,17 @@ int main( int argc, char* argv[] )
 
 	using Sched = pcnt::Schedule<std::vector<int>>;
 
-	Sched core_1 = Sched{1,
-	                     std::function<decltype( do_flops )>{do_flops},
-	                     {PAPI_FP_INS, PAPI_TOT_INS}};
-	Sched core_2 = Sched{2,
-	                     std::function<decltype( do_ints )>{do_ints},
-	                     {PAPI_FP_INS, PAPI_TOT_INS}};
-	Sched core_3 = Sched{2,
-	                     std::function<decltype( do_ints )>{do_ints},
-	                     {PAPI_L3_TCW, PAPI_L2_DCH, PAPI_TOT_CYC}};
+	Sched core_1 = Sched{ 1,
+	                      std::function<decltype( do_flops )>{ do_flops },
+	                      { PAPI_FP_INS, PAPI_TOT_INS, PAPI_TOT_CYC } };
+	Sched core_2 = Sched{ 2,
+	                      std::function<decltype( do_ints )>{ do_ints },
+	                      { PAPI_FP_INS, PAPI_TOT_INS, PAPI_TOT_CYC } };
+	Sched core_3 = Sched{ 2,
+	                      std::function<decltype( do_ints )>{ do_ints },
+	                      { PAPI_L3_TCW, PAPI_L2_DCH, PAPI_TOT_CYC } };
 
-	std::vector<Sched> vec{core_1, core_2, core_3};
+	std::vector<Sched> vec{ core_1, core_2, core_3 };
 
 	cbench.counters_with_schedule<std::vector<int>>( vec );
 
