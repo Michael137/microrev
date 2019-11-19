@@ -77,7 +77,7 @@ $(TEST_BIN_DIR)/%.out: $(TEST_DIR)/%.cpp
 .PHONY: test
 test: $(TEST_BIN_DIR)/*
 	@for file in $^; do 	\
-		./$${file} ;	\
+		sudo ./$${file} ;	\
 	done
 
 .PHONY:

@@ -22,6 +22,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
    protected:
 	EventsVec cset;
 	ResultVec measured;
+	int core_id;
 
    public:
 	Counter();
@@ -32,6 +33,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	virtual void stats()                         = 0;
 	virtual void start()                         = 0;
 	size_t num_events() { return cset.size(); }
+	void set_core_id( int id ) { this->core_id = id; }
 };
 
 #ifdef WITH_PMC

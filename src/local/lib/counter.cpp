@@ -21,6 +21,7 @@ template<typename CntResult, typename Events>
 Counter<CntResult, Events>::Counter()
     : cset()
     , measured()
+    , core_id()
 {
 }
 
@@ -28,6 +29,7 @@ template<typename CntResult, typename Events>
 Counter<CntResult, Events>::Counter( Events const& cset )
     : cset( cset )
     , measured()
+    , core_id()
 {
 }
 
@@ -35,14 +37,14 @@ Counter<CntResult, Events>::Counter( Events const& cset )
 PMCCounter::PMCCounter()
     : Counter<std::vector<pmc_value_t>, CounterSet>()
     , pmcid()
-    , mode( PMC_MODE_TC )
+    , mode( PMC_MODE_SC )
 {
 }
 
 PMCCounter::PMCCounter( CounterSet const& cset )
     : Counter<std::vector<pmc_value_t>, CounterSet>( cset )
     , pmcid()
-    , mode( PMC_MODE_TC )
+    , mode( PMC_MODE_SC )
 {
 }
 
@@ -57,7 +59,7 @@ void PMCCounter::start()
 
 	for( auto& ctr: this->cset )
 	{
-		if( pmc_allocate( ctr.c_str(), mode, 0, PMC_CPU_ANY, &( this->pmcid ),
+		if( pmc_allocate( ctr.c_str(), mode, 0, this->core_id, &( this->pmcid ),
 		                  0 )
 		    < 0 )
 		{
@@ -93,6 +95,8 @@ void PMCCounter::read()
 			err( EX_OSERR, "Cannot read pmc" );
 		this->measured.push_back( v );
 	}
+
+	pmc_release( this->pmcid );
 }
 
 void PMCCounter::add( CounterSet const& cset )
