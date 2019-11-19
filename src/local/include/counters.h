@@ -12,7 +12,7 @@ using CounterSet = std::vector<std::string>;
 // Maps OS to ready-to-use performance-counter sets
 // pmc
 static std::unordered_map<std::string,
-                                std::unordered_map<std::string, CounterSet>>
+                          std::unordered_map<std::string, CounterSet>>
     CounterMap
     = {{"FreeBSD",
         {{"icache", {"icache.hit", "icache.misses", "icache.ifetch_stall"}},

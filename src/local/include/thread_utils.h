@@ -15,10 +15,13 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
+#include <iostream>
 #include <shared_mutex>
 #include <thread>
 #include <tuple>
 #include <vector>
+
+#include "constants.h"
 
 #ifdef __FreeBSD__
 #	define CPUSET_T cpuset_t
@@ -55,12 +58,17 @@ template<typename CntTyp> struct CounterBenchmark
 	CounterBenchmark()
 	    : mtx()
 	    , cv()
-	    , benchmark_cores( std::thread::hardware_concurrency() - 1 )
+	    , benchmark_cores( default_phys_core_count )
 	    , threads()
 
 	{
 		pin_self_to_core( 0 );
 	}
+
+	void set_core_num( unsigned int benchmark_cores )
+	{
+		this->benchmark_cores = benchmark_cores;
+	};
 
 	void pin_to_core( int th_idx, int core_id )
 	{
@@ -93,7 +101,7 @@ template<typename CntTyp> struct CounterBenchmark
 	void counters_on_cores( EventTyp& events,
 	                        std::function<void( void )> benchmark )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores };
+		std::vector<CntTyp> counters{this->benchmark_cores};
 		for( unsigned int i = 0; i < this->benchmark_cores; ++i )
 		{
 			this->threads.push_back(
@@ -116,7 +124,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores };
+		std::vector<CntTyp> counters{this->benchmark_cores};
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {

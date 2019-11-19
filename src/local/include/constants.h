@@ -12,6 +12,8 @@ constexpr int max_pmc_num = 4;
 constexpr int max_pmc_num = 8;
 #endif
 
+constexpr unsigned int default_phys_core_count = 4;
+
 } // namespace pcnt
 
 #endif // CONSTANTS_H_IN

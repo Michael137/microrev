@@ -14,6 +14,10 @@ OBJS := $(patsubst $(LIB_DIR)/%.cpp,$(LIB_DIR)/%.o,$(LIB_SOURCES))
 EXES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.out,$(SOURCES))
 TEST_EXES := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_BIN_DIR)/%.out,$(SOURCES))
 
+#DEPS := $(SOURCES:.c=.d)
+#-include $(DEPS)
+DEPFLAGS := -MD
+
 LDFLAGS := -lpthread
 CXXFLAGS += -g -std=c++17 -I$(INCL_DIR) -D$(PC_TYPE)
 
@@ -42,7 +46,6 @@ else
   endif
 endif
 
-
 .PHONY:
 setup:
 	mkdir -p $(SRC_DIR)
@@ -56,10 +59,13 @@ setup:
 clean:
 	rm -f $(ROOT_DIR)/*.out
 	rm -f $(LIB_DIR)/*.o
+	rm -f $(ROOT_DIR)/*.d
+	rm -f $(LIB_DIR)/*.d
+	rm -f $(SRC_DIR)/*.d
 	rm -rf $(BIN_DIR)
 	rm -rf $(TEST_BIN_DIR)
 
-$(LIB_DIR)/%.o: $(SRC_DIR)/%.cpp
+(LIB_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 $(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp

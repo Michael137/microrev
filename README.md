@@ -46,6 +46,59 @@
 - Can we take inspiration from Fuzzers? E.g., [CSmith](https://github.com/csmith-project/csmith)
 - Can we take insipration from multi-core litmus tests? E.g., [Herd](https://github.com/herd/herdtools/)
 
+# CPU Info
+## Server
+```
+$> lscpu
+
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              96
+On-line CPU(s) list: 0-95
+Thread(s) per core:  2
+Core(s) per socket:  24
+Socket(s):           2
+NUMA node(s):        2
+Vendor ID:           GenuineIntel
+CPU family:          6
+Model:               85
+Model name:          Intel(R) Xeon(R) Platinum 8275CL CPU @ 3.00GHz
+Stepping:            7
+CPU MHz:             1200.021
+CPU max MHz:         3900.0000
+CPU min MHz:         1200.0000
+BogoMIPS:            6000.00
+Virtualization:      VT-x
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            1024K
+L3 cache:            36608K
+NUMA node0 CPU(s):   0-23,48-71
+NUMA node1 CPU(s):   24-47,72-95
+Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear flush_l1d arch_capabilities
+```
+
+### Flag Index
+Legend can be found [here](https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean)
+- clflush: supports cache line flush instruction
+- dca: direct cache access
+- cat_l3: Cache Allocation Technology L3
+- cdp_l3: Code and Data Prioritization L3
+- cqm: Cache QoS Monitoring
+- cqm_llc: LLC QoS
+- cqm_occup_llc: LLC occupancy monitoring
+- cqm_mbm_total: LLC total MBM monitoring
+- cqm_mbm_local: LLC local MBM monitoring
+
+### Implications
+This processor is based on the [Cascade Lake](https://en.wikichip.org/wiki/intel/xeon_platinum#8200-Series_.28Cascade_Lake.29) micro-architecture (see [manual]()).
+
+According to the IA64 optimization manual section 7.3.3.3 Cascade Lake processor with 2 sockets contains **two CL advanced performance packages where each package is made of two processor dies connected via a Intel Ultra Path Interconnect creating four NUMA domains**
+
+This architecture has a larger than usual L2 and L3 cache and its L1 cache is split into data and instruction cache of 32KB each. The processor has 2 sockets with 24 cores each. In the Intel Xeon architecture this implies that 
+
+
 # Tools
 - [Emon](https://software.intel.com/sites/default/files/emon_user_guide_2019u3.pdf)
 - [Herd](https://github.com/herd/herdtools/)

@@ -23,6 +23,7 @@ void do_flops()
 	for( int i = 0; i < 100000000; ++i )
 		x *= 0.2;
 }
+
 int main( int argc, char* argv[] )
 {
 	std::cout
@@ -32,15 +33,16 @@ int main( int argc, char* argv[] )
 
 	auto FreeBSDCounters = pcnt::CounterMap["FreeBSD"];
 
-	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench{
-	    std::function<void( void )>{ do_flops } };
+	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench;
+
+	cbench.set_core_num(2); // FreeBSD machine that our tests run on has 2 cores
 
 	cbench.counters_on_cores<std::vector<std::string>>(
-	    FreeBSDCounters["dcache"] );
+	    FreeBSDCounters["dcache"], std::function<void( void )>{do_flops} );
 
 #elif defined( WITH_PAPI_HL ) // !WITH_PMC
 
-	std::vector<int> events{ PAPI_TOT_INS };
+	std::vector<int> events{PAPI_TOT_INS};
 	pcnt::PAPIHLCounter pcounter( events );
 
 	/* Start counting events */
@@ -61,7 +63,7 @@ int main( int argc, char* argv[] )
 	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 
 	cbench.counters_on_cores<std::vector<int>&>(
-	    events, std::function<void( void )>{ do_flops } );
+	    events, std::function<void( void )>{do_flops} );
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;

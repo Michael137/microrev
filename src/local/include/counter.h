@@ -31,6 +31,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	virtual void read()                          = 0;
 	virtual void stats()                         = 0;
 	virtual void start()                         = 0;
+	size_t num_events() { return cset.size(); }
 };
 
 #ifdef WITH_PMC
@@ -63,7 +64,8 @@ class PAPIHLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 	void start();
 };
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
-// NOTE: run `papi_avail -a` to get details of PAPI counters that are supported on HW
+// NOTE: run `papi_avail -a` to get details of PAPI counters that are supported
+// on HW
 class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 {
    private:
