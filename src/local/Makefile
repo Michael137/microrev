@@ -18,8 +18,12 @@ TEST_EXES := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_BIN_DIR)/%.out,$(SOURCES))
 #-include $(DEPS)
 DEPFLAGS := -MD
 
-LDFLAGS := -lpthread
-CXXFLAGS += -g -std=$(CXX_VERSION) -I$(INCL_DIR) -D$(PC_TYPE)
+ifeq "$(PC_TYPE)" "WITH_PAPI_LL"
+  LDFLAGS := -Xlinker --no-as-needed
+else
+  LDFLAGS :=
+endif
+CXXFLAGS += -g -std=$(CXX_VERSION) -I$(INCL_DIR) -D$(PC_TYPE) -pthread
 
 all: setup $(OBJS) $(EXES) $(TEST_EXES)
 
@@ -35,10 +39,8 @@ else
   ifdef WITH_PFM
     LDFLAGS += -lpfm
   else
-    PAPI_DIR ?= $(HOME)/papi/src
-    export LD_LIBRARY_PATH=$(PAPI_DIR)
-    LDFLAGS += -L$(PAPI_DIR) -lpapi
-    CXXFLAGS += -I$(PAPI_DIR)
+    LDFLAGS += -L$(PAPI_DIR)/lib -lpapi
+    CXXFLAGS += -I$(PAPI_DIR)/include
 
 	# https://superuser.com/questions/980632/run-perf-without-root-rights
 	# if PAPI is complaining about no available hwcntrs then run following command:
@@ -65,7 +67,7 @@ clean:
 	rm -rf $(BIN_DIR)
 	rm -rf $(TEST_BIN_DIR)
 
-(LIB_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(LIB_DIR)/%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 $(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp

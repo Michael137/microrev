@@ -5,3 +5,5 @@ tmp/
 *.core
 *.swp
 *.tmp
+
+config.mk
