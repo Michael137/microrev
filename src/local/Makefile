@@ -67,7 +67,7 @@ clean:
 	rm -rf $(BIN_DIR)
 	rm -rf $(TEST_BIN_DIR)
 
-$(LIB_DIR)/%.o: %.cpp
+$(LIB_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 $(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp
