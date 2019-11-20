@@ -19,7 +19,7 @@ TEST_EXES := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_BIN_DIR)/%.out,$(SOURCES))
 DEPFLAGS := -MD
 
 LDFLAGS := -lpthread
-CXXFLAGS += -g -std=c++17 -I$(INCL_DIR) -D$(PC_TYPE)
+CXXFLAGS += -g -std=$(CXX_VERSION) -I$(INCL_DIR) -D$(PC_TYPE)
 
 all: setup $(OBJS) $(EXES) $(TEST_EXES)
 

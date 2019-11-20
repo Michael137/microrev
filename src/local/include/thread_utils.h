@@ -16,7 +16,7 @@
 #include <condition_variable>
 #include <functional>
 #include <iostream>
-#include <shared_mutex>
+#include <mutex>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -50,8 +50,8 @@ template<typename EventTyp> struct Schedule
 
 template<typename CntTyp> struct CounterBenchmark
 {
-	std::shared_mutex mtx;
-	std::condition_variable_any cv;
+	std::mutex  mtx;
+	std::condition_variable cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
 
@@ -92,7 +92,7 @@ template<typename CntTyp> struct CounterBenchmark
 		counter.add( events );
 		counter.start();
 
-		std::shared_lock lck( this->mtx );
+		std::unique_lock<std::mutex> lck( this->mtx );
 		this->cv.wait( lck );
 
 		benchmark();
