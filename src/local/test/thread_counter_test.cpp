@@ -35,10 +35,8 @@ int main( int argc, char* argv[] )
 
 	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench;
 
-	cbench.set_core_num(2); // FreeBSD machine that our tests run on has 2 cores
-
 	cbench.counters_on_cores<std::vector<std::string>>(
-	    FreeBSDCounters["dcache"], std::function<void( void )>{do_flops} );
+	    FreeBSDCounters["icache"], std::function<void( void )>{do_flops} );
 
 #elif defined( WITH_PAPI_HL ) // !WITH_PMC
 

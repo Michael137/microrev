@@ -22,6 +22,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
    protected:
 	EventsVec cset;
 	ResultVec measured;
+	int core_id;
 	uint64_t cycles_measured;
 
    public:
@@ -34,6 +35,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	virtual void stats()                         = 0;
 	virtual void start()                         = 0;
 	size_t num_events() { return cset.size(); }
+	void set_core_id( int id ) { this->core_id = id; }
 	void set_cycles_measured( uint64_t c ) { this->cycles_measured = c; }
 };
 

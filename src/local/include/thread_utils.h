@@ -16,7 +16,7 @@
 #include <condition_variable>
 #include <functional>
 #include <iostream>
-#include <shared_mutex>
+#include <mutex>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -51,8 +51,8 @@ template<typename EventTyp> struct Schedule
 
 template<typename CntTyp> struct CounterBenchmark
 {
-	std::shared_mutex mtx;
-	std::condition_variable_any cv;
+	std::mutex mtx;
+	std::condition_variable cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
 
@@ -71,7 +71,7 @@ template<typename CntTyp> struct CounterBenchmark
 		this->benchmark_cores = benchmark_cores;
 	};
 
-	void pin_to_core( int th_idx, int core_id )
+	CPUSET_T pin_to_core( int th_idx, int core_id )
 	{
 		CPUSET_T cpuset;
 		CPU_ZERO( &cpuset );
@@ -79,6 +79,8 @@ template<typename CntTyp> struct CounterBenchmark
 
 		pthread_setaffinity_np( this->threads[th_idx].native_handle(),
 		                        sizeof( CPUSET_T ), &cpuset );
+
+		return cpuset;
 	}
 
 	template<typename EventTyp>
@@ -86,14 +88,15 @@ template<typename CntTyp> struct CounterBenchmark
 	                        int core_idx, std::function<void( void )> benchmark,
 	                        bool warmup = true )
 	{
+		counter.set_core_id( core_idx );
 		pin_to_core( th_idx, core_idx );
 		counter.add( events );
 		counter.start();
 
-		if(warmup)
+		if( warmup )
 			benchmark();
+		std::unique_lock<std::mutex> lck( this->mtx );
 
-		std::shared_lock lck( this->mtx );
 		this->cv.wait( lck );
 
 		uint64_t start = rdtsc();
@@ -110,8 +113,8 @@ template<typename CntTyp> struct CounterBenchmark
 	void counters_on_cores( EventTyp& events,
 	                        std::function<void( void )> benchmark )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores };
-		for( unsigned int i = 0; i < this->benchmark_cores; ++i )
+		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
+		for( unsigned int i = 0; i < this->benchmark_cores - 1; ++i )
 		{
 			this->threads.push_back(
 			    std::thread( [this, &counters, i, &events, benchmark] {
@@ -133,7 +136,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores };
+		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
@@ -149,10 +152,10 @@ template<typename CntTyp> struct CounterBenchmark
 		for( auto& th: this->threads )
 			th.join();
 
-		for( int i = 0; i < svec.size(); ++i )
+		for( auto& cnt: counters )
 		{
-			std::cout << "Core " << svec[i].core_id << ":" << std::endl;
-			counters[i].stats();
+			std::cout << "Core " << cnt.core_id << ":" << std::endl;
+			cnt.stats();
 		}
 	}
 };
