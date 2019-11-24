@@ -20,7 +20,7 @@
 void do_flops()
 {
 	float x = 0.0;
-	for( int i = 0; i < 100000000; ++i )
+	for( int i = 0; i < 100000; ++i )
 		x *= 0.2;
 }
 
@@ -54,15 +54,15 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
-	std::vector<int> events{
-	    PAPI_TOT_INS,
-	    PAPI_FP_INS,
-	    PAPI_TOT_CYC,
+	std::vector<std::string> events{
+	    "PAPI_TOT_INS",
+	    "PAPI_FP_INS",
+	    "PAPI_TOT_CYC",
 	};
 
 	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 
-	cbench.counters_on_cores<std::vector<int>&>(
+	cbench.counters_on_cores<std::vector<std::string>&>(
 	    events, std::function<void( void )>{do_flops} );
 
 #endif // !WITH_PAPI_LL

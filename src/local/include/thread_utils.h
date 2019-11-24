@@ -32,6 +32,7 @@
 namespace pcnt
 {
 void pin_self_to_core( int core_id );
+uint64_t rdtsc();
 
 template<typename EventTyp> struct Schedule
 {
@@ -82,26 +83,34 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_idx,
-	                        int core_idx,
-	                        std::function<void( void )> benchmark )
+	                        int core_idx, std::function<void( void )> benchmark,
+	                        bool warmup = true )
 	{
 		pin_to_core( th_idx, core_idx );
 		counter.add( events );
 		counter.start();
 
+		if(warmup)
+			benchmark();
+
 		std::shared_lock lck( this->mtx );
 		this->cv.wait( lck );
 
+		uint64_t start = rdtsc();
+
 		benchmark();
 
+		uint64_t end = rdtsc();
+
 		counter.read();
+		counter.set_cycles_measured( end - start );
 	}
 
 	template<typename EventTyp>
 	void counters_on_cores( EventTyp& events,
 	                        std::function<void( void )> benchmark )
 	{
-		std::vector<CntTyp> counters{this->benchmark_cores};
+		std::vector<CntTyp> counters{ this->benchmark_cores };
 		for( unsigned int i = 0; i < this->benchmark_cores; ++i )
 		{
 			this->threads.push_back(
@@ -124,7 +133,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{this->benchmark_cores};
+		std::vector<CntTyp> counters{ this->benchmark_cores };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
@@ -140,8 +149,11 @@ template<typename CntTyp> struct CounterBenchmark
 		for( auto& th: this->threads )
 			th.join();
 
-		for( auto& cnt: counters )
-			cnt.stats();
+		for( int i = 0; i < svec.size(); ++i )
+		{
+			std::cout << "Core " << svec[i].core_id << ":" << std::endl;
+			counters[i].stats();
+		}
 	}
 };
 
