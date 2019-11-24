@@ -22,6 +22,7 @@ Counter<CntResult, Events>::Counter()
     : cset()
     , measured()
     , core_id()
+    , cycles_measured()
 {
 }
 
@@ -30,6 +31,7 @@ Counter<CntResult, Events>::Counter( Events const& cset )
     : cset( cset )
     , measured()
     , core_id()
+    , cycles_measured()
 {
 }
 
@@ -166,8 +168,7 @@ PAPILLCounter::PAPILLCounter()
 	this->init();
 }
 
-void PAPILLCounter::add( std::string counter_name ) {}
-void PAPILLCounter::add( std::vector<int> const& events )
+void PAPILLCounter::add( std::vector<std::string> const& events )
 {
 	this->event_set = PAPI_NULL;
 	int retval      = 0;
@@ -190,9 +191,24 @@ void PAPILLCounter::add( std::vector<int> const& events )
 		exit( 1 );
 	}
 
-	this->cset.insert( this->cset.end(), events.begin(), events.end() );
-	if( PAPI_add_events( this->event_set, const_cast<int*>( events.data() ),
-	                     events.size() )
+	std::vector<int> codes;
+	for( int i = 0; i < events.size(); ++i )
+	{
+		int code = 0;
+		retval   = PAPI_event_name_to_code( events[i].c_str(), &code );
+		if( retval != PAPI_OK )
+		{
+			PAPI_perror( "couldn't convert event name to code" );
+			exit( 1 );
+		}
+
+		codes.push_back( code );
+	}
+	assert( codes.size() == events.size() );
+
+	this->cset.insert( this->cset.end(), codes.begin(), codes.end() );
+	if( PAPI_add_events( this->event_set, const_cast<int*>( codes.data() ),
+	                     codes.size() )
 	    != PAPI_OK )
 	{
 		PAPI_perror( "failed to add events" );
@@ -215,6 +231,12 @@ void PAPILLCounter::read()
 		exit( 1 );
 	}
 
+	if( ( retval = PAPI_destroy_eventset( &( this->event_set ) ) ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to destroy eventset" );
+		exit( 1 );
+	}
+
 	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
 	{
 		PAPI_perror( "failed to unregister thread" );
@@ -231,6 +253,8 @@ void PAPILLCounter::stats()
 		PAPI_event_code_to_name( cset[i], name );
 		std::cout << name << ": " << this->measured[i] << '\n';
 	}
+	std::cout << "Cycles: " << this->cycles_measured << '\n';
+
 	std::cout << std::endl;
 }
 

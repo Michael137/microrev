@@ -22,10 +22,13 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
    protected:
 	EventsVec cset;
 	ResultVec measured;
+   public:
+	uint64_t cycles_measured;
 	int core_id;
 
    public:
 	Counter();
+	virtual ~Counter() {}
 	explicit Counter( EventsVec const& cset );
 	virtual void add( std::string counter_name ) = 0;
 	virtual void add( EventsVec const& cset )    = 0;
@@ -33,7 +36,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	virtual void stats()                         = 0;
 	virtual void start()                         = 0;
 	size_t num_events() { return cset.size(); }
-	void set_core_id( int id ) { this->core_id = id; }
+	void set_cycles_measured( uint64_t c ) { this->cycles_measured = c; }
 };
 
 #ifdef WITH_PMC
@@ -68,6 +71,8 @@ class PAPIHLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 // NOTE: run `papi_avail -a` to get details of PAPI counters that are supported
 // on HW
+// NOTE: run `papi_native_avail` to get a more complete list of events supported
+// by chip
 class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 {
    private:
@@ -77,8 +82,11 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
    public:
 	PAPILLCounter();
 	explicit PAPILLCounter( std::vector<int> cset );
-	void add( std::string counter_name );
-	void add( std::vector<int> const& cset );
+	void add( std::string counter_name ) {}
+	void add( std::vector<int> const& cset ) {
+	} // TODO: event_set could be std::string; then don't need this empty
+	  // virtual method impl
+	void add( std::vector<std::string> const& cset );
 	void read();
 	void stats();
 	void start();

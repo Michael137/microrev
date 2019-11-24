@@ -32,6 +32,7 @@
 namespace pcnt
 {
 void pin_self_to_core( int core_id );
+uint64_t rdtsc();
 
 template<typename EventTyp> struct Schedule
 {
@@ -50,7 +51,7 @@ template<typename EventTyp> struct Schedule
 
 template<typename CntTyp> struct CounterBenchmark
 {
-	std::mutex  mtx;
+	std::mutex mtx;
 	std::condition_variable cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
@@ -83,28 +84,36 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_idx,
-	                        int core_idx,
-	                        std::function<void( void )> benchmark )
+	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
+	                        int core_id, std::function<void( void )> benchmark,
+	                        bool warmup = true )
 	{
-		counter.set_core_id( core_idx );
-		pin_to_core( th_idx, core_idx );
+		counter.core_id = core_id;
+		pin_to_core( th_id, core_id );
 		counter.add( events );
 		counter.start();
 
+		if( warmup )
+			benchmark();
 		std::unique_lock<std::mutex> lck( this->mtx );
+
 		this->cv.wait( lck );
+
+		uint64_t start = rdtsc();
 
 		benchmark();
 
+		uint64_t end = rdtsc();
+
 		counter.read();
+		counter.cycles_measured = end - start;
 	}
 
 	template<typename EventTyp>
 	void counters_on_cores( EventTyp& events,
 	                        std::function<void( void )> benchmark )
 	{
-		std::vector<CntTyp> counters{this->benchmark_cores - 1};
+		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
 		for( unsigned int i = 0; i < this->benchmark_cores - 1; ++i )
 		{
 			this->threads.push_back(
@@ -127,7 +136,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{this->benchmark_cores - 1};
+		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
@@ -144,7 +153,10 @@ template<typename CntTyp> struct CounterBenchmark
 			th.join();
 
 		for( auto& cnt: counters )
+		{
+			std::cout << "Core " << cnt.core_id << ":" << std::endl;
 			cnt.stats();
+		}
 	}
 };
 
