@@ -84,12 +84,12 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_idx,
-	                        int core_idx, std::function<void( void )> benchmark,
+	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
+	                        int core_id, std::function<void( void )> benchmark,
 	                        bool warmup = true )
 	{
-		counter.set_core_id( core_idx );
-		pin_to_core( th_idx, core_idx );
+		counter.core_id = core_id;
+		pin_to_core( th_id, core_id );
 		counter.add( events );
 		counter.start();
 
@@ -106,7 +106,7 @@ template<typename CntTyp> struct CounterBenchmark
 		uint64_t end = rdtsc();
 
 		counter.read();
-		counter.set_cycles_measured( end - start );
+		counter.cycles_measured = end - start;
 	}
 
 	template<typename EventTyp>
