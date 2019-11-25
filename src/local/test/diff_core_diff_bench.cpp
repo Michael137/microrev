@@ -1,18 +1,16 @@
 #include <err.h>
 #include <inttypes.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <functional>
 #include <iostream>
 #include <random>
+#include <vector>
 
 #include "counter.h"
 #include "counters.h"
 #include "thread_utils.h"
-
-#include <pthread.h>
-#include <stdlib.h>
-#include <functional>
-#include <vector>
 
 #if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
@@ -63,16 +61,16 @@ int main( int argc, char* argv[] )
 	using Sched          = pcnt::Schedule<std::vector<std::string>>;
 	auto FreeBSDCounters = pcnt::CounterMap["FreeBSD"];
 
-	Sched core_1 = Sched{1, std::function<decltype( do_flops )>{do_flops},
-	                     FreeBSDCounters["icache"]};
-	Sched core_2 = Sched{2, std::function<decltype( do_ints )>{do_ints},
-	                     FreeBSDCounters["dcache"]};
+	Sched core_1 = Sched{ 1, std::function<decltype( do_flops )>{ do_flops },
+	                      FreeBSDCounters["icache"] };
+	Sched core_2 = Sched{ 2, std::function<decltype( do_ints )>{ do_ints },
+	                      FreeBSDCounters["dcache"] };
 	Sched core_3 = Sched{
 	    3,
-	    std::function<decltype( do_ints )>{do_ints},
-	    {"arith.fpu_div_active", "arith.fpu_div", "fp_comp_ops_exe.x87"}};
+	    std::function<decltype( do_ints )>{ do_ints },
+	    { "arith.fpu_div_active", "arith.fpu_div", "fp_comp_ops_exe.x87" } };
 
-	std::vector<Sched> vec{core_1, core_2, core_3};
+	std::vector<Sched> vec{ core_1, core_2, core_3 };
 
 	cbench.counters_with_schedule<std::vector<std::string>>( vec );
 
