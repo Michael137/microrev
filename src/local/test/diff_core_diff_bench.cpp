@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
 	Sched core_2 = Sched{ 2,
 	                      std::function<decltype( do_ints )>{ do_ints },
 	                      { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } };
-	Sched core_3 = Sched{ 2,
+	Sched core_3 = Sched{ 3,
 	                      std::function<decltype( do_ints )>{ do_ints },
 	                      { "PAPI_L3_TCW", "PAPI_L2_DCH", "PAPI_TOT_CYC" } };
 

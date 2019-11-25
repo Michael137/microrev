@@ -173,17 +173,21 @@ template<typename CntTyp> struct CounterBenchmark
 			counters[i].collect = svec[i].collect;
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(
-				    counters[i], svec[i].events, i, svec[i].core_id,
-				    svec[i].benchmark, false /* sync */ );
+				    counters[i], svec[i].events, 0 /* thread id */,
+				    svec[i].core_id, svec[i].benchmark, true /* warmup */, false /* sync */ );
 			} );
 			auto fut = task.get_future();
 
-			std::thread th( std::move( task ) );
+			this->threads.push_back( std::thread( std::move( task ) ) );
 
-			auto status = fut.wait_for( std::chrono::minutes( 1 ) );
+			auto status = fut.wait_for( std::chrono::seconds( 5 ) );
 
 			if( status == std::future_status::ready )
+			{
+				this->threads[0].join();
+				this->threads.erase( this->threads.begin() );
 				continue;
+			}
 		}
 
 		for( auto& cnt: counters )

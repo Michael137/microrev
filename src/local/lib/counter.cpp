@@ -172,12 +172,6 @@ PAPILLCounter::PAPILLCounter()
 
 PAPILLCounter::~PAPILLCounter()
 {
-	int retval;
-	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to unregister thread" );
-		exit( 1 );
-	}
 }
 
 void PAPILLCounter::add( std::vector<std::string> const& events )
@@ -246,6 +240,13 @@ void PAPILLCounter::read()
 	if( ( retval = PAPI_destroy_eventset( &( this->event_set ) ) ) != PAPI_OK )
 	{
 		PAPI_perror( "failed to destroy eventset" );
+		exit( 1 );
+	}
+
+	// TODO: should be moved to destructor
+	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
+	{
+		PAPI_perror( "failed to unregister thread" );
 		exit( 1 );
 	}
 }

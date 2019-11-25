@@ -17,7 +17,9 @@
 #	include <papi.h>
 #endif
 
-void func( void ) {}
+void func( void ) {
+	std::cout << "Test Func" << std::endl;
+}
 
 int main( int argc, char* argv[] )
 {
