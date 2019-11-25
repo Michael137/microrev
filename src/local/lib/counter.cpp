@@ -23,6 +23,7 @@ Counter<CntResult, Events>::Counter()
     , measured()
     , core_id()
     , cycles_measured()
+    , collect( true )
 {
 }
 
@@ -32,6 +33,7 @@ Counter<CntResult, Events>::Counter( Events const& cset )
     , measured()
     , core_id()
     , cycles_measured()
+    , collect( true )
 {
 }
 
@@ -168,6 +170,10 @@ PAPILLCounter::PAPILLCounter()
 	this->init();
 }
 
+PAPILLCounter::~PAPILLCounter()
+{
+}
+
 void PAPILLCounter::add( std::vector<std::string> const& events )
 {
 	this->event_set = PAPI_NULL;
@@ -237,6 +243,7 @@ void PAPILLCounter::read()
 		exit( 1 );
 	}
 
+	// TODO: should be moved to destructor
 	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
 	{
 		PAPI_perror( "failed to unregister thread" );

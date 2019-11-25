@@ -22,9 +22,11 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
    protected:
 	EventsVec cset;
 	ResultVec measured;
+
    public:
 	uint64_t cycles_measured;
 	int core_id;
+	bool collect;
 
    public:
 	Counter();
@@ -81,6 +83,7 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 
    public:
 	PAPILLCounter();
+	~PAPILLCounter();
 	explicit PAPILLCounter( std::vector<int> cset );
 	void add( std::string counter_name ) {}
 	void add( std::vector<int> const& cset ) {
