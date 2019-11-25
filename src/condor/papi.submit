@@ -21,12 +21,12 @@ error = measure.err
 log = measure.log
 
 # need exclusive use of execution host with 96 logical processors
-request_cpus = 1
+request_cpus = 96
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-#transfer_input_files =
-#transfer_output_files =
+transfer_input_files = out.txt
+transfer_output_files = out.txt
 
 # submit a job with the parameters given above
 queue
