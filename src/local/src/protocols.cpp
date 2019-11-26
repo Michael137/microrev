@@ -42,19 +42,19 @@ int main( int argc, char* argv[] )
 	Sched core_1 = Sched{
 	    1 /* core id */,
 	    std::function<decltype( func )>{ func },
-	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    false /* collect */
 	};
 	Sched core_2 = Sched{
 	    2 /* core id */,
 	    std::function<decltype( func )>{ func },
-	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    true /* collect */
 	};
 	Sched core_3 = Sched{
 	    3 /* core id */,
 	    std::function<decltype( func )>{ func },
-	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    false /* collect */
 	};
 

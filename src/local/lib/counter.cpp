@@ -217,7 +217,12 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 	                     codes.size() )
 	    != PAPI_OK )
 	{
-		PAPI_perror( "failed to add events" );
+		std::stringstream ss;
+		ss << "failed to add events:\n";
+		for(auto& e : events)
+			ss << '\t' << e << std::endl;
+
+		PAPI_perror( ss.str().c_str() );
 		exit( 1 );
 	}
 }
