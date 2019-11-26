@@ -124,8 +124,6 @@ template<typename CntTyp> struct CounterBenchmark
 
 		uint64_t end = rdtsc();
 
-		std::cout << core_id << std::endl;
-
 		if( collect )
 		{
 			counter.read();
