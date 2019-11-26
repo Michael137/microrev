@@ -35,8 +35,9 @@ void reader()
 
 int main( int argc, char* argv[] )
 {
-	std::cout << ">>>> TEST: force caches into M/E/S/I and measure performance"
-	          << std::endl;
+	std::cout
+	    << ">>>> TEST: force caches into M/E/S/I/F and measure performance"
+	    << std::endl;
 #ifdef WITH_PMC
 
 #	error "TODO: implement this test using PAPI's HL interface"
@@ -47,6 +48,12 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
+	/* thread 1: write to shared_data
+	 * thread 2: read from shared_data (now cache in core 1 and 2 should be in S
+state)
+	 * thread 3 to N: read from shared_data (in MESIF protocol the traffic
+produced should be the same as if only a single core is asking for the data) */
+
 	// 256-bit shared array
 	shared_data = (char*)malloc( sizeof( char ) * shared_data_size );
 
@@ -54,21 +61,22 @@ int main( int argc, char* argv[] )
 	using Sched = pcnt::Schedule<std::vector<std::string>>;
 
 	Sched core_1 = Sched{
-	    1 /* core id */,
-	    std::function{ writer },
-	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    1 /* core id */
+	    ,
+	    std::function<decltype( writer )>{ writer },
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    true /* collect */
 	};
 	Sched core_2 = Sched{
 	    2 /* core id */,
-	    std::function{ reader },
-	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    std::function<decltype( writer )>{ reader },
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    true /* collect */
 	};
 	Sched core_3 = Sched{
 	    3 /* core id */,
-	    std::function{ reader },
-	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    std::function<decltype( writer )>{ reader },
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    true /* collect */
 	};
 
