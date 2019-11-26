@@ -97,7 +97,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
 	                        int core_id, std::function<void( void )> benchmark,
-	                        bool warmup = true, bool sync = true )
+	                        int warmup = 3, bool sync = true )
 	{
 		bool collect    = counter.collect;
 		counter.core_id = core_id;
@@ -109,7 +109,7 @@ template<typename CntTyp> struct CounterBenchmark
 			counter.start();
 		}
 
-		if( warmup )
+		for(int i = 0; i < warmup; ++i)
 			benchmark();
 
 		if( sync )
@@ -172,7 +172,7 @@ template<typename CntTyp> struct CounterBenchmark
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(
 				    counters[i], svec[i].events, 0 /* thread id */,
-				    svec[i].core_id, svec[i].benchmark, true /* warmup */, false /* sync */ );
+				    svec[i].core_id, svec[i].benchmark, 0 /* warmup */, false /* sync */ );
 			} );
 			auto fut = task.get_future();
 
