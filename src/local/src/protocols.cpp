@@ -17,8 +17,20 @@
 #	include <papi.h>
 #endif
 
-void func( void ) {
-	std::cout << "Test Func" << std::endl;
+volatile char* shared_data    = nullptr;
+volatile int shared_data_size = 256;
+
+void writer()
+{
+	for( int i = 0; i < shared_data_size; ++i )
+		shared_data[i] = ( i % 26 ) + '0';
+}
+
+void reader()
+{
+	char tmp;
+	for( int i = 1; i < shared_data_size; ++i )
+		tmp = shared_data[i] - shared_data[i - 1];
 }
 
 int main( int argc, char* argv[] )
@@ -35,27 +47,29 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
-	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
+	// 256-bit shared array
+	shared_data = (char*)malloc( sizeof( char ) * shared_data_size );
 
+	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 	using Sched = pcnt::Schedule<std::vector<std::string>>;
 
 	Sched core_1 = Sched{
 	    1 /* core id */,
-	    std::function<decltype( func )>{ func },
+	    std::function{ writer },
 	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	    false /* collect */
+	    true /* collect */
 	};
 	Sched core_2 = Sched{
 	    2 /* core id */,
-	    std::function<decltype( func )>{ func },
+	    std::function{ reader },
 	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    true /* collect */
 	};
 	Sched core_3 = Sched{
 	    3 /* core id */,
-	    std::function<decltype( func )>{ func },
+	    std::function{ reader },
 	    { "FP_ARITH:SCALAR_DOUBLE", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	    false /* collect */
+	    true /* collect */
 	};
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
