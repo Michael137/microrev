@@ -19,7 +19,7 @@
 using namespace pcnt;
 
 void __attribute__( ( optimize( "0" ) ) )
-doloops( uint64_t wset_sz, uint64_t stride = 4096, uint64_t repeat = 100000 )
+doloops( uint64_t wset_sz, uint64_t stride = 32, uint64_t repeat = 100 )
 {
 	char c;
 	char arr[wset_sz];
@@ -64,19 +64,16 @@ int main( int argc, char* argv[] )
 
 	Sched core_1
 	    = Sched{ 1,
-	             std::function<decltype( test_wset32 )>{ test_wset32 },
+	             std::function<decltype( test_wset32 )>{ test_wset2048 },
 	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
-	//"CYCLE_ACTIVITY:CYCLES_L1D_PENDING" } };
 	Sched core_2
 	    = Sched{ 2,
-	             std::function<decltype( test_wset32 )>{ test_wset256 },
+	             std::function<decltype( test_wset32 )>{ test_wset1024 },
 	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
-	//"CYCLE_ACTIVITY:CYCLES_L1D_PENDING" } };
 	Sched core_3
 	    = Sched{ 3,
 	             std::function<decltype( test_wset32 )>{ test_wset512 },
 	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
-	//"CYCLE_ACTIVITY:CYCLES_L1D_PENDING" } };
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
 	cbench.counters_with_schedule<std::vector<std::string>>( vec );

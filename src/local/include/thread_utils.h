@@ -103,12 +103,6 @@ template<typename CntTyp> struct CounterBenchmark
 		counter.core_id = core_id;
 		pin_to_core( th_id, core_id );
 
-		if( collect )
-		{
-			counter.add( events );
-			counter.start();
-		}
-
 		for(int i = 0; i < warmup; ++i)
 			benchmark();
 
@@ -116,6 +110,12 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			std::unique_lock<std::mutex> lck( this->mtx );
 			this->cv.wait( lck );
+		}
+
+		if( collect )
+		{
+			counter.add( events );
+			counter.start();
 		}
 
 		uint64_t start = rdtsc();

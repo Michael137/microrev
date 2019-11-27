@@ -25,8 +25,8 @@ request_cpus = 96
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = out.txt,../local/bin
-transfer_output_files = out.txt
+transfer_input_files = ../local/bin
+transfer_output_files = 
 
 # submit a job with the parameters given above
 queue
