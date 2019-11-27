@@ -155,7 +155,6 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			if( cnt.collect )
 			{
-				std::cout << "Core " << cnt.core_id << ":" << std::endl;
 				cnt.stats();
 			}
 		}
@@ -192,7 +191,6 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			if( cnt.collect )
 			{
-				std::cout << "Core " << cnt.core_id << ":" << std::endl;
 				cnt.stats();
 			}
 		}

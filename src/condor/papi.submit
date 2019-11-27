@@ -25,7 +25,7 @@ request_cpus = 96
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = out.txt,../local/bin/protocols.out
+transfer_input_files = out.txt,../local/bin
 transfer_output_files = out.txt
 
 # submit a job with the parameters given above

@@ -16,11 +16,11 @@
 #	include <papi.h>
 #endif
 
-void doloops( int stride )
+void doloops( uint64_t stride )
 {
 	char arr[MB4];
-	for( int i = 0; i < MB4; i += stride )
-		for( int j = 0; j < stride; ++j )
+	for( uint64_t i = 0; i < MB4; i += stride )
+		for( uint64_t j = 0; j < stride; ++j )
 			arr[j + i] = ( j % 9 ) + 'A' - 1;
 }
 
@@ -58,10 +58,10 @@ int main( int argc, char* argv[] )
 	                      std::function<decltype(test_wset32)>{ test_wset32 },
 	                      { "PAPI_TOT_CYC", "PAPI_L2_DCA", "PAPI_L3_DCA" } };
 	Sched core_2 = Sched{ 2,
-	                      std::function<decltype(test_wset32)>{ test_wset64 },
+	                      std::function<decltype(test_wset32)>{ test_wset256 },
 	                      { "PAPI_TOT_CYC", "PAPI_L2_DCA", "PAPI_L3_DCA" } };
 	Sched core_3 = Sched{ 3,
-	                      std::function<decltype(test_wset32)>{ test_wset128 },
+	                      std::function<decltype(test_wset32)>{ test_wset1024 },
 	                      { "PAPI_TOT_CYC", "PAPI_L2_DCA", "PAPI_L3_DCA" } };
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
 	cbench.counters_with_schedule<std::vector<std::string>>( vec );
