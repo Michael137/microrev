@@ -3,7 +3,6 @@
 
 namespace pcnt
 {
-
 #ifdef __FreeBSD__
 // Number of simultaneous PMCs that
 // platform permits
@@ -14,19 +13,19 @@ constexpr int max_pmc_num = 8;
 
 constexpr unsigned int default_phys_core_count = 4;
 
-#define KB1 1024
-#define KB2 2048
-#define KB4 4096
-#define KB8 8192
-#define KB16 16384
-#define KB32 32768
-#define KB64 65536
-#define KB128 131072
-#define KB256 262144
-#define KB512 524288
-#define MB1 1048576
-#define MB2 2097152
-#define MB4 4194304
+constexpr uint64_t _1KB   = 1024;
+constexpr uint64_t _2KB   = 2048;
+constexpr uint64_t _4KB   = 4096;
+constexpr uint64_t _8KB   = 8192;
+constexpr uint64_t _16KB  = 16384;
+constexpr uint64_t _32KB  = 32768;
+constexpr uint64_t _64KB  = 65536;
+constexpr uint64_t _128KB = 131072;
+constexpr uint64_t _256KB = 262144;
+constexpr uint64_t _512KB = 524288;
+constexpr uint64_t _1MB   = 1048576;
+constexpr uint64_t _2MB   = 2097152;
+constexpr uint64_t _4MB   = 4194304;
 
 } // namespace pcnt
 

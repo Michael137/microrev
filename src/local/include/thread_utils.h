@@ -97,7 +97,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
 	                        int core_id, std::function<void( void )> benchmark,
-	                        int warmup = 3, bool sync = true )
+	                        int warmup = 5, bool sync = true )
 	{
 		bool collect    = counter.collect;
 		counter.core_id = core_id;

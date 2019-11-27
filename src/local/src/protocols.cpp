@@ -17,19 +17,21 @@
 #	include <papi.h>
 #endif
 
+using namespace pcnt;
+
 volatile char* shared_data    = nullptr;
-volatile int shared_data_size = 256;
+volatile uint64_t shared_data_size = _16KB;
 
 void writer()
 {
-	for( int i = 0; i < shared_data_size; ++i )
+	for( uint64_t i = 0; i < shared_data_size; ++i )
 		shared_data[i] = ( i % 26 ) + '0';
 }
 
 void reader()
 {
 	char tmp;
-	for( int i = 1; i < shared_data_size; ++i )
+	for( uint64_t i = 1; i < shared_data_size; ++i )
 		tmp = shared_data[i] - shared_data[i - 1];
 }
 
@@ -54,11 +56,10 @@ state)
 	 * thread 3 to N: read from shared_data (in MESIF protocol the traffic
 produced should be the same as if only a single core is asking for the data) */
 
-	// 256-bit shared array
 	shared_data = (char*)malloc( sizeof( char ) * shared_data_size );
 
-	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
-	using Sched = pcnt::Schedule<std::vector<std::string>>;
+	CounterBenchmark<PAPILLCounter> cbench;
+	using Sched = Schedule<std::vector<std::string>>;
 
 	Sched core_1 = Sched{
 	    1 /* core id */

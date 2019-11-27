@@ -154,6 +154,12 @@ void PAPIHLCounter::start()
 	}
 }
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+inline void exit_with_err( std::string msg, int exit_code = 1 )
+{
+	PAPI_perror( "msg" );
+	exit( exit_code );
+}
+
 PAPILLCounter::PAPILLCounter( std::vector<int> cset )
     : Counter<std::vector<long_long>, std::vector<int>>( cset )
     , event_set()
@@ -170,9 +176,7 @@ PAPILLCounter::PAPILLCounter()
 	this->init();
 }
 
-PAPILLCounter::~PAPILLCounter()
-{
-}
+PAPILLCounter::~PAPILLCounter() {}
 
 void PAPILLCounter::add( std::vector<std::string> const& events )
 {
@@ -180,22 +184,13 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 	int retval      = 0;
 
 	if( events.size() > this->max_hw_cntrs )
-	{
-		PAPI_perror( "Number of events exceeds available HW counters" );
-		exit( 1 );
-	}
+		exit_with_err( "Number of events exceeds available HW counters" );
 
 	if( ( retval = PAPI_register_thread() ) != PAPI_OK )
-	{
-		PAPI_perror( "PAPI couldn't register thread" );
-		exit( 1 );
-	}
+		exit_with_err( "PAPI couldn't register thread" );
 
 	if( PAPI_create_eventset( &( this->event_set ) ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to create eventset" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to create eventset" );
 
 	std::vector<int> codes;
 	for( int i = 0; i < events.size(); ++i )
@@ -203,10 +198,7 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 		int code = 0;
 		retval   = PAPI_event_name_to_code( events[i].c_str(), &code );
 		if( retval != PAPI_OK )
-		{
-			PAPI_perror( "couldn't convert event name to code" );
-			exit( 1 );
-		}
+			exit_with_err( "couldn't convert event name to code" );
 
 		codes.push_back( code );
 	}
@@ -219,41 +211,28 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 	{
 		std::stringstream ss;
 		ss << "failed to add events:\n";
-		for(auto& e : events)
+		for( auto& e: events )
 			ss << '\t' << e << std::endl;
 
-		PAPI_perror( ss.str().c_str() );
-		exit( 1 );
+		exit_with_err( ss.str().c_str() );
 	}
 }
 void PAPILLCounter::read()
 {
 	this->measured.resize( this->cset.size() );
 	if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to read counters" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to read counters" );
 
 	int retval = 0;
 	if( ( retval = PAPI_cleanup_eventset( this->event_set ) ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to clean up eventset" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to clean up eventset" );
 
 	if( ( retval = PAPI_destroy_eventset( &( this->event_set ) ) ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to destroy eventset" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to destroy eventset" );
 
 	// TODO: should be moved to destructor
 	if( ( retval = PAPI_unregister_thread() ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to unregister thread" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to unregister thread" );
 }
 
 void PAPILLCounter::stats()
@@ -273,10 +252,7 @@ void PAPILLCounter::stats()
 void PAPILLCounter::start()
 {
 	if( PAPI_start( this->event_set ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to start counters" );
-		exit( 1 );
-	}
+		exit_with_err( "failed to start counters" );
 }
 
 unsigned long current_thread_id()
@@ -293,23 +269,14 @@ void PAPILLCounter::init()
 	int retval = PAPI_library_init( PAPI_VER_CURRENT );
 
 	if( retval != PAPI_VER_CURRENT )
-	{
-		PAPI_perror( "PAPI library init error!" );
-		exit( 1 );
-	}
+		exit_with_err( "PAPI library init error!" );
 
 	if( ( this->max_hw_cntrs = PAPI_num_counters() ) == 0 )
-	{
-		fprintf( stderr,
-		         "Info:: This machine does not provide hardware counters.\n" );
-		exit( 1 );
-	}
+		exit_with_err(
+		    "Info:: This machine does not provide hardware counters." );
 
 	if( PAPI_thread_init( current_thread_id ) != PAPI_OK )
-	{
-		PAPI_perror( "PAPI thread library init error!" );
-		exit( 1 );
-	}
+		exit_with_err( "PAPI thread library init error!" );
 }
 #endif                        // !WITH_PAPI_LL
 

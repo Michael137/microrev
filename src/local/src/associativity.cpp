@@ -16,13 +16,13 @@
 #	include <papi.h>
 #endif
 
-void __attribute__( ( optimize( "0" ) ) )
-doloops( int stride, int accesses, int repeat );
+using namespace pcnt;
 
-void doloops( int stride, int accesses, int repeat = 1000000 )
+void __attribute__( ( optimize( "0" ) ) )
+doloops( int stride, int accesses, int repeat = 1000000 )
 {
 	char c;
-	char arr[4194304];
+	char arr[_4MB];
 
 	// Touch elements
 	for( int i = 0; i < accesses; i += stride )
@@ -34,16 +34,16 @@ void doloops( int stride, int accesses, int repeat = 1000000 )
 			c = arr[j];
 }
 
-void test_wset2() { doloops( KB2, 50 ); }
-void test_wset4() { doloops( KB4, 50 ); }
-void test_wset8() { doloops( KB8, 50 ); }
-void test_wset16() { doloops( KB16, 50 ); }
-void test_wset32() { doloops( KB32, 50 ); }
-void test_wset64() { doloops( KB64, 50 ); }
-void test_wset128() { doloops( KB128, 50 ); }
-void test_wset256() { doloops( KB256, 50 ); }
-void test_wset512() { doloops( KB512, 50 ); }
-void test_wset1024() { doloops( MB1, 50 ); }
+void test_wset2() { doloops( _2KB, 64 ); }
+void test_wset4() { doloops( _4KB, 64 ); }
+void test_wset8() { doloops( _8KB, 64 ); }
+void test_wset16() { doloops( _16KB, 64 ); }
+void test_wset32() { doloops( _32KB, 64 ); }
+void test_wset64() { doloops( _64KB, 64 ); }
+void test_wset128() { doloops( _128KB, 64 ); }
+void test_wset256() { doloops( _256KB, 64 ); }
+void test_wset512() { doloops( _512KB, 64 ); }
+void test_wset1024() { doloops( _1MB, 64 ); }
 
 int main( int argc, char* argv[] )
 {
@@ -61,8 +61,8 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
-	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
-	using Sched = pcnt::Schedule<std::vector<std::string>>;
+	CounterBenchmark<PAPILLCounter> cbench;
+	using Sched = Schedule<std::vector<std::string>>;
 
 	Sched core_1 = Sched{
 	    1,
@@ -76,7 +76,7 @@ int main( int argc, char* argv[] )
 	};
 	Sched core_3 = Sched{
 	    3,
-	    std::function<decltype( test_wset8 )>{ test_wset64 },
+	    std::function<decltype( test_wset8 )>{ test_wset1024 },
 	    { "perf::CACHE-MISSES", "perf::L1-DCACHE-LOAD-MISSES", "PAPI_TOT_CYC" },
 	};
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
