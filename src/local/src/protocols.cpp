@@ -19,20 +19,30 @@
 
 using namespace pcnt;
 
-volatile char* shared_data    = nullptr;
+volatile char* shared_data         = nullptr;
 volatile uint64_t shared_data_size = _16KB;
 
-void writer()
+void writer( PAPILLCounter& pc )
 {
+	uint64_t start, end;
+	pc.start();
+	start = rdtsc();
 	for( uint64_t i = 0; i < shared_data_size; ++i )
 		shared_data[i] = ( i % 26 ) + '0';
+	end = rdtsc();
+	pc.read();
 }
 
-void reader()
+void reader( PAPILLCounter& pc )
 {
+	uint64_t start, end;
+	pc.start();
+	start = rdtsc();
 	char tmp;
 	for( uint64_t i = 1; i < shared_data_size; ++i )
 		tmp = shared_data[i] - shared_data[i - 1];
+	end = rdtsc();
+	pc.read();
 }
 
 int main( int argc, char* argv[] )
@@ -59,26 +69,22 @@ produced should be the same as if only a single core is asking for the data) */
 	shared_data = (char*)malloc( sizeof( char ) * shared_data_size );
 
 	CounterBenchmark<PAPILLCounter> cbench;
-	using Sched = Schedule<std::vector<std::string>>;
+	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 	Sched core_1 = Sched{
-	    1 /* core id */
-	    ,
+	    1 /* core id */,
 	    std::function<decltype( writer )>{ writer },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	    true /* collect */
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
 	};
 	Sched core_2 = Sched{
 	    2 /* core id */,
-	    std::function<decltype( writer )>{ reader },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	    true /* collect */
+	    std::function<decltype( reader )>{ reader },
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
 	};
 	Sched core_3 = Sched{
 	    3 /* core id */,
-	    std::function<decltype( writer )>{ reader },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	    true /* collect */
+	    std::function<decltype( reader )>{ reader },
+	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
 	};
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };

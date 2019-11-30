@@ -35,18 +35,30 @@ struct RandomInt
 static RandomInt rand_gen;
 static const int rand_g = rand_gen.gen();
 
-void do_flops()
+void do_flops( pcnt::PAPILLCounter& pc )
 {
+	uint64_t start, end;
+	pc.start();
+	start   = pcnt::rdtsc();
 	float x = 0.0;
 	for( int i = 0; i < rand_g; ++i )
 		x *= 0.2;
+	end = pcnt::rdtsc();
+	pc.read();
+	pc.cycles_measured = end - start;
 }
 
-void do_ints()
+void do_ints( pcnt::PAPILLCounter& pc )
 {
+	uint64_t start, end;
+	pc.start();
+	start = pcnt::rdtsc();
 	int x = 0;
 	for( int i = 0; i < rand_g; ++i )
 		x *= 0;
+	end = pcnt::rdtsc();
+	pc.read();
+	pc.cycles_measured = end - start;
 }
 
 int main( int argc, char* argv[] )
@@ -82,17 +94,23 @@ int main( int argc, char* argv[] )
 
 	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 
-	using Sched = pcnt::Schedule<std::vector<std::string>>;
+	using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
-	Sched core_1 = Sched{ 1,
-	                      std::function<decltype( do_flops )>{ do_flops },
-	                      { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } };
-	Sched core_2 = Sched{ 2,
-	                      std::function<decltype( do_ints )>{ do_ints },
-	                      { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } };
-	Sched core_3 = Sched{ 3,
-	                      std::function<decltype( do_ints )>{ do_ints },
-	                      { "PAPI_L3_TCW", "PAPI_L2_DCH", "PAPI_TOT_CYC" } };
+	Sched core_1 = Sched{
+	    1,
+	    std::function<decltype( do_flops )>{ do_flops },
+	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	};
+	Sched core_2 = Sched{
+	    2,
+	    std::function<decltype( do_ints )>{ do_ints },
+	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	};
+	Sched core_3 = Sched{
+	    3,
+	    std::function<decltype( do_ints )>{ do_ints },
+	    { "PAPI_L3_TCW", "PAPI_L2_DCH", "PAPI_TOT_CYC" },
+	};
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
 
@@ -100,4 +118,6 @@ int main( int argc, char* argv[] )
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
+
+	return 0;
 }

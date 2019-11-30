@@ -23,7 +23,6 @@ Counter<CntResult, Events>::Counter()
     , measured()
     , core_id()
     , cycles_measured()
-    , collect( true )
 {
 }
 
@@ -33,7 +32,6 @@ Counter<CntResult, Events>::Counter( Events const& cset )
     , measured()
     , core_id()
     , cycles_measured()
-    , collect( true )
 {
 }
 
@@ -107,56 +105,10 @@ void PMCCounter::add( CounterSet const& cset )
 {
 	this->cset.insert( this->cset.end(), cset.begin(), cset.end() );
 }
-#elif defined( WITH_PAPI_HL ) // !WITH_PMC
-
-PAPIHLCounter::PAPIHLCounter( std::vector<int> const& cset )
-    : Counter<std::vector<long_long>, std::vector<int>>( cset )
-{
-}
-
-PAPIHLCounter::PAPIHLCounter()
-    : Counter<std::vector<long_long>, std::vector<int>>()
-{
-}
-
-void PAPIHLCounter::add( std::string counter_name ) {}
-void PAPIHLCounter::add( std::vector<int> const& cset ) {}
-void PAPIHLCounter::read()
-{
-	this->measured.resize( this->cset.size() );
-	if( PAPI_stop_counters( this->measured.data(), this->cset.size() )
-	    != PAPI_OK )
-	{
-		PAPI_perror( "failed to read counters" );
-		exit( 1 );
-	}
-}
-
-void PAPIHLCounter::stats()
-{
-	assert( this->cset.size() == this->measured.size() );
-	for( int i = 0; i < this->cset.size(); ++i )
-	{
-		std::cout << this->cset[i] << ": " << this->measured[i] << '\n';
-	}
-	std::cout << std::endl;
-}
-
-void PAPIHLCounter::start()
-{
-	// check for return of init
-	PAPI_library_init( PAPI_VER_CURRENT );
-	// check perf counter number supported by HW
-	if( PAPI_start_counters( this->cset.data(), this->cset.size() ) != PAPI_OK )
-	{
-		PAPI_perror( "failed to start counters" );
-		exit( 1 );
-	}
-}
-#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+#elif defined( WITH_PAPI_LL ) // !WITH_PMC
 inline void exit_with_err( std::string msg, int exit_code = 1 )
 {
-	PAPI_perror( "msg" );
+	PAPI_perror( const_cast<char*>( msg.c_str() ) );
 	exit( exit_code );
 }
 
@@ -196,7 +148,8 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 	for( int i = 0; i < events.size(); ++i )
 	{
 		int code = 0;
-		retval   = PAPI_event_name_to_code( events[i].c_str(), &code );
+		retval   = PAPI_event_name_to_code(
+            const_cast<char*>( events[i].c_str() ), &code );
 		if( retval != PAPI_OK )
 			exit_with_err( "couldn't convert event name to code" );
 
@@ -222,7 +175,18 @@ void PAPILLCounter::read()
 	this->measured.resize( this->cset.size() );
 	if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
 		exit_with_err( "failed to read counters" );
+}
 
+void PAPILLCounter::reset()
+{
+	if( PAPI_reset( this->event_set ) != PAPI_OK )
+		exit_with_err( "failed to reset counters" );
+	this->measured.clear();
+	this->measured.resize( this->cset.size() );
+}
+
+void PAPILLCounter::end()
+{
 	int retval = 0;
 	if( ( retval = PAPI_cleanup_eventset( this->event_set ) ) != PAPI_OK )
 		exit_with_err( "failed to clean up eventset" );

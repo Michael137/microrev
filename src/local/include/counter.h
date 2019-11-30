@@ -57,20 +57,7 @@ class PMCCounter : public Counter<std::vector<pmc_value_t>, CounterSet>
 	void stats();
 	void start();
 };
-#elif defined( WITH_PAPI_HL ) // !WITH_PMC
-class PAPIHLCounter : public Counter<std::vector<long_long>, std::vector<int>>
-{
-   private:
-   public:
-	PAPIHLCounter();
-	explicit PAPIHLCounter( std::vector<int> const& cset );
-	void add( std::string counter_name );
-	void add( std::vector<int> const& cset );
-	void read();
-	void stats();
-	void start();
-};
-#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+#elif defined( WITH_PAPI_LL ) // !WITH_PMC
 // NOTE: run `papi_avail -a` to get details of PAPI counters that are supported
 // on HW
 // NOTE: run `papi_native_avail` to get a more complete list of events supported
@@ -94,6 +81,8 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 	void stats();
 	void start();
 	void init();
+	void end();
+	void reset();
 };
 #endif                        // WITH_PAPI_LL
 

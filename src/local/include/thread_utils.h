@@ -35,34 +35,30 @@ namespace pcnt
 void pin_self_to_core( int core_id );
 uint64_t rdtsc();
 
-template<typename EventTyp> struct Schedule
+template<typename EventTyp, typename CntType> struct Schedule
 {
+   private:
+	using BenchTyp = std::function<void( CntType& )>;
+
+   public:
 	int core_id;
-	std::function<void( void )> benchmark;
+	BenchTyp benchmark;
 	EventTyp events;
-	bool collect;
 
-	Schedule( int core_id, std::function<void( void )> benchmark,
-	          EventTyp events )
+	Schedule( int core_id, BenchTyp benchmark, EventTyp events )
 	    : core_id( core_id )
 	    , benchmark( benchmark )
 	    , events( events )
-	    , collect( true )
-	{
-	}
-
-	Schedule( int core_id, std::function<void( void )> benchmark,
-	          EventTyp events, bool collect )
-	    : core_id( core_id )
-	    , benchmark( benchmark )
-	    , events( events )
-	    , collect( collect )
 	{
 	}
 };
 
 template<typename CntTyp> struct CounterBenchmark
 {
+   private:
+	using BenchTyp = std::function<void( CntTyp& )>;
+
+   public:
 	std::mutex mtx;
 	std::condition_variable cv;
 	unsigned int benchmark_cores;
@@ -96,15 +92,17 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
-	                        int core_id, std::function<void( void )> benchmark,
-	                        int warmup = 5, bool sync = true )
+	                        int core_id, BenchTyp benchmark, int warmup = 5,
+	                        bool sync = true )
 	{
-		bool collect    = counter.collect;
+		uint64_t start, end;
 		counter.core_id = core_id;
 		pin_to_core( th_id, core_id );
 
-		for(int i = 0; i < warmup; ++i)
-			benchmark();
+		counter.add( events );
+		for( int i = 0; i < warmup; ++i )
+			benchmark( counter );
+		counter.reset();
 
 		if( sync )
 		{
@@ -112,32 +110,17 @@ template<typename CntTyp> struct CounterBenchmark
 			this->cv.wait( lck );
 		}
 
-		if( collect )
-		{
-			counter.add( events );
-			counter.start();
-		}
+		benchmark( counter );
 
-		uint64_t start = rdtsc();
-
-		benchmark();
-
-		uint64_t end = rdtsc();
-
-		if( collect )
-		{
-			counter.read();
-			counter.cycles_measured = end - start;
-		}
+		counter.end();
 	}
 
 	template<typename EventTyp>
-	void counters_with_schedule( std::vector<Schedule<EventTyp>>& svec )
+	void counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec )
 	{
 		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
 		for( int i = 0; i < svec.size(); ++i )
 		{
-			counters[i].collect = svec[i].collect;
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
@@ -153,31 +136,28 @@ template<typename CntTyp> struct CounterBenchmark
 
 		for( auto& cnt: counters )
 		{
-			if( cnt.collect )
-			{
-				cnt.stats();
-			}
+			cnt.stats();
 		}
 	}
 
 	template<typename EventTyp>
-	void
-	counters_with_priority_schedule( std::vector<Schedule<EventTyp>>& svec )
+	std::vector<CntTyp> counters_with_priority_schedule(
+	    std::vector<Schedule<EventTyp, CntTyp>>& svec )
 	{
 		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
 		for( int i = 0; i < svec.size(); ++i )
 		{
-			counters[i].collect = svec[i].collect;
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(
 				    counters[i], svec[i].events, 0 /* thread id */,
-				    svec[i].core_id, svec[i].benchmark, 0 /* warmup */, false /* sync */ );
+				    svec[i].core_id, svec[i].benchmark, 0 /* warmup */,
+				    false /* sync */ );
 			} );
 			auto fut = task.get_future();
 
 			this->threads.push_back( std::thread( std::move( task ) ) );
 
-			auto status = fut.wait_for( std::chrono::seconds( 5 ) );
+			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
 
 			if( status == std::future_status::ready )
 			{
@@ -185,14 +165,16 @@ template<typename CntTyp> struct CounterBenchmark
 				this->threads.erase( this->threads.begin() );
 				continue;
 			}
+			else
+			{
+				std::cout << "Serial benchmark timelimit reached." << std::endl;
+				exit( EXIT_FAILURE );
+			}
 		}
 
 		for( auto& cnt: counters )
 		{
-			if( cnt.collect )
-			{
-				cnt.stats();
-			}
+			cnt.stats();
 		}
 	}
 };

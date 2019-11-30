@@ -19,29 +19,36 @@
 using namespace pcnt;
 
 void __attribute__( ( optimize( "0" ) ) )
-doloops( uint64_t wset_sz, uint64_t stride = 32, uint64_t repeat = 100 )
+doloops( PAPILLCounter& pc, uint64_t wset_sz, uint64_t stride = 32,
+         uint64_t repeat = 100 )
 {
+	uint64_t start, end;
 	char c;
 	char arr[wset_sz];
 	for( uint64_t i = 0; i < wset_sz; i += stride )
 		arr[i] = ( i % 9 ) + 'A' - 1;
 
+	pc.start();
+	start = rdtsc();
 	for( uint64_t i = 0; i < repeat; ++i )
 		for( uint64_t j = 0; j < wset_sz; j += stride )
 			c = arr[j];
+	end = rdtsc();
+	pc.read();
+	pc.cycles_measured = end - start;
 }
 
-void test_wset2() { doloops( _2KB ); }
-void test_wset4() { doloops( _4KB ); }
-void test_wset8() { doloops( _8KB ); }
-void test_wset16() { doloops( _16KB ); }
-void test_wset32() { doloops( _32KB ); }
-void test_wset64() { doloops( _64KB ); }
-void test_wset128() { doloops( _128KB ); }
-void test_wset256() { doloops( _256KB ); }
-void test_wset512() { doloops( _512KB ); }
-void test_wset1024() { doloops( _1MB ); }
-void test_wset2048() { doloops( _2MB ); }
+void test_wset2( PAPILLCounter& pc ) { doloops( pc, _2KB ); }
+void test_wset4( PAPILLCounter& pc ) { doloops( pc, _4KB ); }
+void test_wset8( PAPILLCounter& pc ) { doloops( pc, _8KB ); }
+void test_wset16( PAPILLCounter& pc ) { doloops( pc, _16KB ); }
+void test_wset32( PAPILLCounter& pc ) { doloops( pc, _32KB ); }
+void test_wset64( PAPILLCounter& pc ) { doloops( pc, _64KB ); }
+void test_wset128( PAPILLCounter& pc ) { doloops( pc, _128KB ); }
+void test_wset256( PAPILLCounter& pc ) { doloops( pc, _256KB ); }
+void test_wset512( PAPILLCounter& pc ) { doloops( pc, _512KB ); }
+void test_wset1024( PAPILLCounter& pc ) { doloops( pc, _1MB ); }
+void test_wset2048( PAPILLCounter& pc ) { doloops( pc, _2MB ); }
 
 int main( int argc, char* argv[] )
 {
@@ -60,7 +67,7 @@ int main( int argc, char* argv[] )
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
 	CounterBenchmark<PAPILLCounter> cbench;
-	using Sched = Schedule<std::vector<std::string>>;
+	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 	Sched core_1
 	    = Sched{ 1,

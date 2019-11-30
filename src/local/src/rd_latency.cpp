@@ -5,6 +5,7 @@
 #include <random>
 
 #include "constants.h"
+#include "counter.h"
 #include "thread_utils.h"
 
 using namespace pcnt;
@@ -13,8 +14,6 @@ using namespace pcnt;
 #define TEN( a ) FIVE( a ) FIVE( a )
 #define FIFTY( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a )
 #define HUNDRED( a ) FIFTY( a ) FIFTY( a )
-
-#define B2MB( b ) ( (double)b ) / 1024 / 1024
 
 static std::random_device rd;
 static std::mt19937 gen( rd() );
@@ -30,11 +29,9 @@ int gen_num() { return dist( gen ); }
  * From:
  * https://github.com/foss-for-synopsys-dwc-arc-processors/lmbench/blob/master/src/lib_mem.c#L177
  */
-char** init_stride( uint64_t size )
+char** init_stride( uint64_t size, uint64_t stride )
 {
 	char* arr = (char*)malloc( size * sizeof( char ) );
-
-	uint64_t stride = 64;
 
 	char** head = (char**)arr;
 	char** iter = head;
@@ -54,16 +51,14 @@ char** init_stride( uint64_t size )
 	return iter;
 }
 
-uint64_t time_rd_latency( uint64_t size )
+void time_rd_latency( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
 	const int accesses = 1000000;
 
-	char** iter = init_stride( size );
+	char** iter = init_stride( size, stride );
 
-//	auto start = std::chrono::high_resolution_clock::now();
-
+	pc.start();
 	uint64_t start = rdtsc();
-
 	// Pointer-chase through linked list
 	for( int i = 0; i < accesses; ++i )
 	{
@@ -72,28 +67,48 @@ uint64_t time_rd_latency( uint64_t size )
 	}
 
 	uint64_t end = rdtsc();
-	//auto end = std::chrono::high_resolution_clock::now();
-
-//	return std::chrono::duration_cast<std::chrono::nanoseconds>( end
-//	                                                             - start )
-//	    .count();
-
-	return end - start;
+	pc.read();
+	pc.cycles_measured = end - start;
 }
+
+// Stride: 64 bytes
+void test32_64( PAPILLCounter& pc ) { time_rd_latency( pc, _32KB, 64 ); }
+void test64_64( PAPILLCounter& pc ) { time_rd_latency( pc, _64KB, 64 ); }
+void test128_64( PAPILLCounter& pc ) { time_rd_latency( pc, _128KB, 64 ); }
+void test256_64( PAPILLCounter& pc ) { time_rd_latency( pc, _256KB, 64 ); }
+void test512_64( PAPILLCounter& pc ) { time_rd_latency( pc, _512KB, 64 ); }
+void test1024_64( PAPILLCounter& pc ) { time_rd_latency( pc, _1MB, 64 ); }
+void test2048_64( PAPILLCounter& pc ) { time_rd_latency( pc, _2MB, 64 ); }
+
+// Stride: 128 bytes
+void test32_128( PAPILLCounter& pc ) { time_rd_latency( pc, _32KB, 128 ); }
+void test64_128( PAPILLCounter& pc ) { time_rd_latency( pc, _64KB, 128 ); }
+void test128_128( PAPILLCounter& pc ) { time_rd_latency( pc, _128KB, 128 ); }
+void test256_128( PAPILLCounter& pc ) { time_rd_latency( pc, _256KB, 128 ); }
+void test512_128( PAPILLCounter& pc ) { time_rd_latency( pc, _512KB, 128 ); }
+void test1024_128( PAPILLCounter& pc ) { time_rd_latency( pc, _1MB, 128 ); }
+void test2048_128( PAPILLCounter& pc ) { time_rd_latency( pc, _2MB, 128 ); }
 
 int main( int argc, char** argv )
 {
-	printf( "%f: %lu\n", B2MB( _4KB ), time_rd_latency( _4KB ) );
-	printf( "%f: %lu\n", B2MB( _8KB ), time_rd_latency( _8KB ) );
-	printf( "%f: %lu\n", B2MB( _16KB ), time_rd_latency( _16KB ) );
-	printf( "%f: %lu\n", B2MB( _32KB ), time_rd_latency( _32KB ) );
-	printf( "%f: %lu\n", B2MB( _64KB ), time_rd_latency( _64KB ) );
-	printf( "%f: %lu\n", B2MB( _128KB ), time_rd_latency( _128KB ) );
-	printf( "%f: %lu\n", B2MB( _256KB ), time_rd_latency( _256KB ) );
-	printf( "%f: %lu\n", B2MB( _512KB ), time_rd_latency( _512KB ) );
-	printf( "%f: %lu\n", B2MB( _1MB ), time_rd_latency( _1MB ) );
-	printf( "%f: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
-	printf( "%f: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
-	printf( "%f: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
+	CounterBenchmark<PAPILLCounter> cbench;
+	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
+
+	Sched core_1
+	    = Sched{ 1,
+	             std::function<decltype( test32_64 )>{ test32_64 },
+	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
+	Sched core_2
+	    = Sched{ 2,
+	             std::function<decltype( test32_64 )>{ test64_64 },
+	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
+	Sched core_3
+	    = Sched{ 3,
+	             std::function<decltype( test32_64 )>{ test2048_64 },
+	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
+
+	std::vector<Sched> vec{ core_1, core_2, core_3 };
+	cbench.counters_with_schedule<std::vector<std::string>>( vec );
+
 	return 0;
 }
