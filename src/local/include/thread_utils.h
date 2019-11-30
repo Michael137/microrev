@@ -99,16 +99,16 @@ template<typename CntTyp> struct CounterBenchmark
 		counter.core_id = core_id;
 		pin_to_core( th_id, core_id );
 
-		counter.add( events );
-		for( int i = 0; i < warmup; ++i )
-			benchmark( counter );
-		counter.reset();
-
 		if( sync )
 		{
 			std::unique_lock<std::mutex> lck( this->mtx );
 			this->cv.wait( lck );
 		}
+
+		counter.add( events );
+		for( int i = 0; i < warmup; ++i )
+			benchmark( counter );
+		counter.reset();
 
 		benchmark( counter );
 

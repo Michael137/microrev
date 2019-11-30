@@ -107,7 +107,7 @@ int main( int argc, char** argv )
 	             std::function<decltype( test32_64 )>{ test2048_64 },
 	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
 
-	std::vector<Sched> vec{ core_1, core_2, core_3 };
+	std::vector<Sched> vec{ core_1, core_2 };
 	cbench.counters_with_schedule<std::vector<std::string>>( vec );
 
 	return 0;
