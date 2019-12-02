@@ -17,33 +17,62 @@
 #	include <papi.h>
 #endif
 
+#define FIVE( a ) a a a a a
+#define TEN( a ) FIVE( a ) FIVE( a )
+#define FIFTY( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a )
+#define HUNDRED( a ) FIFTY( a ) FIFTY( a )
+
 using namespace pcnt;
 
 volatile char* shared_data         = nullptr;
+volatile char** shared_iter        = nullptr;
 volatile uint64_t shared_data_size = _16KB;
 
-void writer( PAPILLCounter& pc )
+// Create linked list
+void __attribute__( ( optimize( "0" ) ) )
+writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
-	uint64_t start, end;
-	pc.start();
-	start = rdtsc();
-	for( uint64_t i = 0; i < shared_data_size; ++i )
-		shared_data[i] = ( i % 26 ) + '0';
-	end = rdtsc();
-	pc.read();
+	shared_data = (char*)malloc( size * sizeof( char ) );
+
+	volatile char** head = (volatile char**)shared_data;
+	shared_iter          = head;
+
+	for( uint64_t i = 0; i < size; i += stride )
+	{
+		// Arrange linked list such that:
+		// Pointer at arr[i] == Pointer at arr[i + stride]
+		*shared_iter = &shared_data[i + stride];
+
+		shared_iter += ( stride / sizeof( shared_iter ) );
+	}
+
+	// Loop back end of linked list to the head
+	*shared_iter = (char*)head;
+
+	// TODO: random shuffle the entries
 }
 
-void reader( PAPILLCounter& pc )
+void __attribute__( ( optimize( "0" ) ) )
+reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
-	uint64_t start, end;
+	const int accesses = 1000000;
+
 	pc.start();
-	start = rdtsc();
-	char tmp;
-	for( uint64_t i = 1; i < shared_data_size; ++i )
-		tmp = shared_data[i] - shared_data[i - 1];
-	end = rdtsc();
+	uint64_t start = rdtsc();
+	// Pointer-chase through linked list
+	for( int i = 0; i < accesses; ++i )
+	{
+		// Unroll loop partially to reduce loop overhead
+		HUNDRED( shared_iter = ( (volatile char**)*shared_iter ); )
+	}
+	uint64_t end = rdtsc();
 	pc.read();
+	pc.cycles_measured = end - start;
 }
+
+void reader( PAPILLCounter& pc ) { reader_( pc, _32KB, 64 ); }
+
+void writer( PAPILLCounter& pc ) { writer_( pc, _32KB, 64 ); }
 
 int main( int argc, char* argv[] )
 {
@@ -54,11 +83,7 @@ int main( int argc, char* argv[] )
 
 #	error "TODO: implement this test using PAPI's HL interface"
 
-#elif defined( WITH_PAPI_HL ) // !WITH_PMC
-
-#	error "TODO: implement this test using PAPI's HL interface"
-
-#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+#elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
 	/* thread 1: write to shared_data
 	 * thread 2: read from shared_data (now cache in core 1 and 2 should be in S
@@ -71,23 +96,14 @@ produced should be the same as if only a single core is asking for the data) */
 	CounterBenchmark<PAPILLCounter> cbench;
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-	Sched core_1 = Sched{
-	    1 /* core id */,
-	    std::function<decltype( writer )>{ writer },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
-	};
-	Sched core_2 = Sched{
-	    2 /* core id */,
-	    std::function<decltype( reader )>{ reader },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
-	};
-	Sched core_3 = Sched{
-	    3 /* core id */,
-	    std::function<decltype( reader )>{ reader },
-	    { "OFFCORE_RESPONSE_1:L3_HITMESF", "PAPI_TOT_INS", "PAPI_TOT_CYC" }
-	};
+	Sched core_1 = Sched{ 1 /* core id */,
+	                      std::function<decltype( writer )>{ writer },
+	                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } };
+	Sched core_2 = Sched{ 2 /* core id */,
+	                      std::function<decltype( reader )>{ reader },
+	                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } };
 
-	std::vector<Sched> vec{ core_1, core_2, core_3 };
+	std::vector<Sched> vec{ core_1, core_2 };
 
 	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
 

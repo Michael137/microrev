@@ -118,7 +118,7 @@ template<typename CntTyp> struct CounterBenchmark
 	template<typename EventTyp>
 	void counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
+		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
@@ -144,7 +144,7 @@ template<typename CntTyp> struct CounterBenchmark
 	std::vector<CntTyp> counters_with_priority_schedule(
 	    std::vector<Schedule<EventTyp, CntTyp>>& svec )
 	{
-		std::vector<CntTyp> counters{ this->benchmark_cores - 1 };
+		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
