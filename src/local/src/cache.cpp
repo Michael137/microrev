@@ -11,6 +11,7 @@
 #include "counter.h"
 #include "counters.h"
 #include "thread_utils.h"
+#include "shuffle.h"
 
 #if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
@@ -27,7 +28,9 @@ doloops( PAPILLCounter& pc, uint64_t wset_sz, uint64_t stride = 32,
 	char arr[wset_sz];
 	for( uint64_t i = 0; i < wset_sz; i += stride )
 		arr[i] = ( i % 9 ) + 'A' - 1;
-
+    std::copy(arr, arr+wset_sz, std::ostream_iterator<int>(std::cout, " "));
+    std::cout << "\n";
+    shuffle(arr, wset_sz);
 	pc.start();
 	start = rdtsc();
 	for( uint64_t i = 0; i < repeat; ++i )
