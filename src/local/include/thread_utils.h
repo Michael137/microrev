@@ -103,6 +103,10 @@ template<typename CntTyp> struct CounterBenchmark
 			std::unique_lock<std::mutex> lck( this->mtx );
 			this->cv.wait( lck );
 		}
+        else
+        {
+		    std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+        }
 
 		counter.add( events );
 
@@ -158,6 +162,7 @@ template<typename CntTyp> struct CounterBenchmark
 			auto fut = task.get_future();
 
 			this->threads.push_back( std::thread( std::move( task ) ) );
+			pin_to_core( 0, svec[i].core_id );
 
 			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
 

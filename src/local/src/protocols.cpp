@@ -102,11 +102,11 @@ reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	pc.vec_cycles_measured.push_back(end - start);
 }
 
-void reader( PAPILLCounter& pc ) { reader_( pc, _32KB, 64 ); }
+void reader( PAPILLCounter& pc ) { reader_( pc, shared_data_size, CACHELINE_SIZE ); }
 
-void writer( PAPILLCounter& pc ) { writer_( pc, _32KB, 64 ); }
+void writer( PAPILLCounter& pc ) { writer_( pc, shared_data_size, CACHELINE_SIZE ); }
 
-void flusher( PAPILLCounter& pc ) { flusher_( pc, _32KB, 64 ); }
+void flusher( PAPILLCounter& pc ) { flusher_( pc, shared_data_size, CACHELINE_SIZE ); }
 
 void setup( uint64_t size, uint64_t stride = 64 )
 {
@@ -189,7 +189,7 @@ void run_test( mesi_type_t t )
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
-	int core_a = 1, core_b = 2, core_c = 1;
+	int core_a = 2, core_b = 4, core_c = 6;
     std::cout << mesi_type_des[t] << std::endl;
 	switch( t )
 	{
@@ -197,49 +197,49 @@ void run_test( mesi_type_t t )
 			init_state( vec, M_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
 			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
+			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS"} } );
 			break;
 		default: break;
 	}
