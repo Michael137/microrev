@@ -29,7 +29,7 @@
 using namespace pcnt;
 using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-uint64_t CACHE_SIZE = _32KB;
+uint64_t CACHE_SIZE = _64KB;
 uint64_t CACHELINE_SIZE = 64;
 
 typedef enum
@@ -170,9 +170,6 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 			                      {} } );
 			break;
 		case I_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
 			vec.push_back( Sched{ core_b /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
@@ -194,8 +191,7 @@ void run_test( mesi_type_t t )
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
 	int core_a = 1, core_b = 2, core_c = 1;
-	mesi_type_t test_case = LOAD_FROM_MODIFIED;
-	switch( test_case )
+	switch( t )
 	{
 		case STORE_ON_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
