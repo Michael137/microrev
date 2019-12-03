@@ -26,8 +26,11 @@
 #define O_STATE 4
 #define F_STATE 5
 
-#define CACHE_SIZE _64KB
-#define CACHELINE_SIZE 64
+using namespace pcnt;
+using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
+
+uint64_t CACHE_SIZE = _32KB;
+uint64_t CACHELINE_SIZE = 64;
 
 typedef enum
 {
@@ -46,8 +49,6 @@ const char* mesi_type_des[] = {
     "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
     "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID",
 };
-using namespace pcnt;
-using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 volatile char* shared_data         = nullptr;
 volatile char** shared_iter        = nullptr;
@@ -192,7 +193,7 @@ void run_test( mesi_type_t t )
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
-	int core_a = 1, core_b = 2, core_c = 3;
+	int core_a = 1, core_b = 2, core_c = 1;
 	mesi_type_t test_case = LOAD_FROM_MODIFIED;
 	switch( test_case )
 	{
