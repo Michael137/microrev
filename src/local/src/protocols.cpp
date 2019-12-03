@@ -266,6 +266,8 @@ produced should be the same as if only a single core is asking for the data) */
 	setup( shared_data_size );
 
 	run_test( LOAD_FROM_MODIFIED );
+	run_test( LOAD_FROM_SHARED );
+	run_test( LOAD_FROM_INVALID );
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
