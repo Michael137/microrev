@@ -53,52 +53,6 @@ volatile char* shared_data         = nullptr;
 volatile char** shared_iter        = nullptr;
 volatile uint64_t shared_data_size = _16KB;
 
-void init_state( vec, int cc_state, uint64_t core_a, uint64_t core_b )
-{
-	switch( cc_state )
-	{
-		case M_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
-			break;
-		case E_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( flusher )>{ flusher },
-			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
-			break;
-		case S_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
-			vec.push_back( Sched{ core_b /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
-			break;
-		case I_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( flusher )>{ flusher },
-			                      {} } );
-			break;
-		case F_STATE:
-			vec.push_back( Sched{ core_b /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
-			break;
-		default: break;
-	}
-	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
-}
-
 void __attribute__( ( optimize( "0" ) ) )
 flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
