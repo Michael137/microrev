@@ -144,45 +144,54 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 	if( PAPI_create_eventset( &( this->event_set ) ) != PAPI_OK )
 		exit_with_err( "failed to create eventset" );
 
-	std::vector<int> codes;
-	for( int i = 0; i < events.size(); ++i )
+	if( events.size() > 0 )
 	{
-		int code = 0;
-		retval   = PAPI_event_name_to_code(
-            const_cast<char*>( events[i].c_str() ), &code );
-		if( retval != PAPI_OK )
-			exit_with_err( "couldn't convert event name to code" );
+		std::vector<int> codes;
+		for( int i = 0; i < events.size(); ++i )
+		{
+			int code = 0;
+			retval   = PAPI_event_name_to_code(
+                const_cast<char*>( events[i].c_str() ), &code );
+			if( retval != PAPI_OK )
+				exit_with_err( "couldn't convert event name to code" );
 
-		codes.push_back( code );
-	}
-	assert( codes.size() == events.size() );
+			codes.push_back( code );
+		}
+		assert( codes.size() == events.size() );
 
-	this->cset.insert( this->cset.end(), codes.begin(), codes.end() );
-	if( PAPI_add_events( this->event_set, const_cast<int*>( codes.data() ),
-	                     codes.size() )
-	    != PAPI_OK )
-	{
-		std::stringstream ss;
-		ss << "failed to add events:\n";
-		for( auto& e: events )
-			ss << '\t' << e << std::endl;
+		this->cset.insert( this->cset.end(), codes.begin(), codes.end() );
+		if( PAPI_add_events( this->event_set, const_cast<int*>( codes.data() ),
+		                     codes.size() )
+		    != PAPI_OK )
+		{
+			std::stringstream ss;
+			ss << "failed to add events:\n";
+			for( auto& e: events )
+				ss << '\t' << e << std::endl;
 
-		exit_with_err( ss.str().c_str() );
+			exit_with_err( ss.str().c_str() );
+		}
 	}
 }
 void PAPILLCounter::read()
 {
-	this->measured.resize( this->cset.size() );
-	if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
-		exit_with_err( "failed to read counters" );
+	if( this->cset.size() > 0 )
+	{
+		this->measured.resize( this->cset.size() );
+		if( PAPI_stop( this->event_set, this->measured.data() ) != PAPI_OK )
+			exit_with_err( "failed to read counters" );
+	}
 }
 
 void PAPILLCounter::reset()
 {
-	if( PAPI_reset( this->event_set ) != PAPI_OK )
-		exit_with_err( "failed to reset counters" );
-	this->measured.clear();
-	this->measured.resize( this->cset.size() );
+	if( this->cset.size() > 0 )
+	{
+		if( PAPI_reset( this->event_set ) != PAPI_OK )
+			exit_with_err( "failed to reset counters" );
+		this->measured.clear();
+		this->measured.resize( this->cset.size() );
+	}
 }
 
 void PAPILLCounter::end()
@@ -215,8 +224,11 @@ void PAPILLCounter::stats()
 
 void PAPILLCounter::start()
 {
-	if( PAPI_start( this->event_set ) != PAPI_OK )
-		exit_with_err( "failed to start counters" );
+	if( this->cset.size() > 0 )
+	{
+		if( PAPI_start( this->event_set ) != PAPI_OK )
+			exit_with_err( "failed to start counters" );
+	}
 }
 
 unsigned long current_thread_id()
