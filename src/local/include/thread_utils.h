@@ -97,7 +97,6 @@ template<typename CntTyp> struct CounterBenchmark
 	{
 		uint64_t start, end;
 		counter.core_id = core_id;
-		pin_to_core( th_id, core_id );
 
 		if( sync )
 		{
@@ -128,6 +127,7 @@ template<typename CntTyp> struct CounterBenchmark
 				                                   i, svec[i].core_id,
 				                                   svec[i].benchmark );
 			} ) );
+			pin_to_core( i, svec[i].core_id );
 		}
 
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
