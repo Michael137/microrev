@@ -174,6 +174,8 @@ template<typename CntTyp> struct CounterBenchmark
 			}
 		}
 
+        return counters;
+
 		for( auto& cnt: counters )
 		{
 			cnt.stats();

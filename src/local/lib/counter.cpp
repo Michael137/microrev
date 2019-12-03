@@ -23,6 +23,7 @@ Counter<CntResult, Events>::Counter()
     , measured()
     , core_id()
     , cycles_measured()
+    , vec_cycles_measured()
 {
 }
 
@@ -32,6 +33,7 @@ Counter<CntResult, Events>::Counter( Events const& cset )
     , measured()
     , core_id()
     , cycles_measured()
+    , vec_cycles_measured()
 {
 }
 
@@ -212,11 +214,16 @@ void PAPILLCounter::stats()
 {
 	assert( this->cset.size() == this->measured.size() );
 	char name[PAPI_MAX_STR_LEN];
+    if(this->cset.size() == 0)
+        return;
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
 		PAPI_event_code_to_name( cset[i], name );
 		std::cout << name << ": " << this->measured[i] << '\n';
 	}
+    for( auto c : this->vec_cycles_measured) {
+        this->cycles_measured += ((double)c) / this->vec_cycles_measured.size(); 
+    }
 	std::cout << "Cycles: " << this->cycles_measured << '\n';
 
 	std::cout << std::endl;

@@ -83,7 +83,7 @@ writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	}
 	uint64_t end = rdtsc();
 	pc.read();
-	pc.cycles_measured = end - start;
+	pc.vec_cycles_measured.push_back(end - start);
 }
 
 void __attribute__( ( optimize( "0" ) ) )
@@ -99,7 +99,7 @@ reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	}
 	uint64_t end = rdtsc();
 	pc.read();
-	pc.cycles_measured = end - start;
+	pc.vec_cycles_measured.push_back(end - start);
 }
 
 void reader( PAPILLCounter& pc ) { reader_( pc, _32KB, 64 ); }
@@ -161,13 +161,19 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 			vec.push_back( Sched{ core_a /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
+			vec.push_back( Sched{ core_a /* core id */,
+			                      std::function<decltype( reader )>{ reader },
+			                      {} } );
 			vec.push_back( Sched{ core_b /* core id */,
 			                      std::function<decltype( reader )>{ reader },
 			                      {} } );
 			break;
 		case I_STATE:
 			vec.push_back( Sched{ core_a /* core id */,
-			                      std::function<decltype( flusher )>{ flusher },
+			                      std::function<decltype( writer )>{ writer },
+			                      {} } );
+			vec.push_back( Sched{ core_b /* core id */,
+			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
 			break;
 		case F_STATE:
@@ -187,8 +193,7 @@ void run_test( mesi_type_t t )
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
 	int core_a = 1, core_b = 2;
-	mesi_type_t test_case = LOAD_FROM_MODIFIED;
-	switch( test_case )
+	switch( t )
 	{
 		case STORE_ON_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
@@ -241,7 +246,18 @@ void run_test( mesi_type_t t )
 		default: break;
 	}
 
-	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+	//cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+    
+	auto counters = cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+    for( auto& cnt: counters )
+    {
+        if (cnt.cset.size() == 0)
+            continue;
+
+        cnt.stats();
+    }
+    
+    
 }
 
 int main( int argc, char* argv[] )
@@ -265,6 +281,12 @@ produced should be the same as if only a single core is asking for the data) */
 
 	setup( shared_data_size );
 
+    run_test( LOAD_FROM_MODIFIED );
+	run_test( LOAD_FROM_SHARED );
+	run_test( LOAD_FROM_INVALID );
+	run_test( LOAD_FROM_MODIFIED );
+	run_test( LOAD_FROM_SHARED );
+	run_test( LOAD_FROM_INVALID );
 	run_test( LOAD_FROM_MODIFIED );
 	run_test( LOAD_FROM_SHARED );
 	run_test( LOAD_FROM_INVALID );

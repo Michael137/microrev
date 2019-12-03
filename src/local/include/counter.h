@@ -20,11 +20,12 @@ namespace pcnt
 template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 {
    protected:
-	EventsVec cset;
 	ResultVec measured;
 
    public:
-	uint64_t cycles_measured;
+	EventsVec cset;
+	double cycles_measured;
+    std::vector<int64_t> vec_cycles_measured;
 	int core_id;
 	bool collect;
 
