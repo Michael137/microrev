@@ -29,7 +29,6 @@
 using namespace pcnt;
 using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-uint64_t CACHE_SIZE = _64KB;
 uint64_t CACHELINE_SIZE = 64;
 
 typedef enum
@@ -52,13 +51,13 @@ const char* mesi_type_des[] = {
 
 volatile char* shared_data         = nullptr;
 volatile char** shared_iter        = nullptr;
-volatile uint64_t shared_data_size = _16KB;
+volatile uint64_t shared_data_size = _32KB;
 
 void __attribute__( ( optimize( "0" ) ) )
 flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
 	char** iter = (char**)shared_iter;
-	for( uint64_t i = 0; i < size; i += stride )
+	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
 		// Arrange linked list such that:
 		// Pointer at arr[i] == Pointer at arr[i + stride]
@@ -75,7 +74,7 @@ writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	pc.start();
 	uint64_t start = rdtsc();
 	char** iter    = (char**)shared_iter;
-	for( uint64_t i = 0; i < size; i += stride )
+	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
 		// Arrange linked list such that:
 		// Pointer at arr[i] == Pointer at arr[i + stride]
@@ -93,7 +92,7 @@ reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	pc.start();
 	uint64_t start = rdtsc();
 	// Pointer-chase through linked list
-	for( uint64_t i = 0; i < CACHE_SIZE / CACHELINE_SIZE; i++ )
+	for( uint64_t i = 0; i < shared_data_size / CACHELINE_SIZE; i++ )
 	{
 		// Unroll loop partially to reduce loop overhead
 		shared_iter = ( (volatile char**)*shared_iter );
@@ -191,6 +190,7 @@ void run_test( mesi_type_t t )
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
 	int core_a = 1, core_b = 2, core_c = 1;
+    std::cout << mesi_type_des[t] << std::endl;
 	switch( t )
 	{
 		case STORE_ON_MODIFIED:
