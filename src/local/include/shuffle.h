@@ -1,9 +1,11 @@
 #include <random>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
-void shuffle(char* arr, uint64_t size) {
+template<typename T>
+void myshuffle(std::vector<T>&arr) {
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(arr, arr + size, g);
+    std::shuffle(arr.begin(), arr.end(), g);
 }

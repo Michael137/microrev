@@ -28,9 +28,6 @@ doloops( PAPILLCounter& pc, uint64_t wset_sz, uint64_t stride = 32,
 	char arr[wset_sz];
 	for( uint64_t i = 0; i < wset_sz; i += stride )
 		arr[i] = ( i % 9 ) + 'A' - 1;
-    std::copy(arr, arr+wset_sz, std::ostream_iterator<int>(std::cout, " "));
-    std::cout << "\n";
-    shuffle(arr, wset_sz);
 	pc.start();
 	start = rdtsc();
 	for( uint64_t i = 0; i < repeat; ++i )
@@ -71,6 +68,22 @@ int main( int argc, char* argv[] )
 
 	CounterBenchmark<PAPILLCounter> cbench;
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
+
+    std::vector<char *> a;
+    a.push_back((char*) 0);
+    a.push_back((char*) 1);
+    a.push_back((char*) 2);
+    a.push_back((char*) 3);
+    a.push_back((char*) 4);
+    for(auto e:a) {
+        std::cout << static_cast<void*>(e) << " ";
+    }
+    std::cout << '\n' << '\n';
+    myshuffle(a);
+    for(auto e:a) {
+        std::cout << static_cast<void*>(e)<< " ";
+    }
+    std::cout << '\n' << '\n';
 
 	Sched core_1
 	    = Sched{ 1,
