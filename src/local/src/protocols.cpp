@@ -279,8 +279,6 @@ state)
 	 * thread 3 to N: read from shared_data (in MESIF protocol the traffic
 produced should be the same as if only a single core is asking for the data) */
 
-	shared_data = (char*)malloc( sizeof( char ) * shared_data_size );
-
 	setup( shared_data_size );
 
     run_test( LOAD_FROM_MODIFIED );
@@ -292,6 +290,8 @@ produced should be the same as if only a single core is asking for the data) */
 	run_test( LOAD_FROM_MODIFIED );
 	run_test( LOAD_FROM_SHARED );
 	run_test( LOAD_FROM_INVALID );
+
+	free( (void*)shared_data );
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
