@@ -52,6 +52,7 @@ const char* mesi_type_des[] =
     "LOAD_FROM_INVALID",
   };
 using namespace pcnt;
+using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 volatile char* shared_data         = nullptr;
 volatile char** shared_iter        = nullptr;
@@ -75,6 +76,8 @@ flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 void __attribute__( ( optimize( "0" ) ) )
 writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
+	pc.start();
+	uint64_t start = rdtsc();
     char** iter = (char**)shared_iter;
 	for( uint64_t i = 0; i < size; i += stride )
 	{
@@ -83,6 +86,9 @@ writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
         iter = ( (char**)*iter );
         *(iter + 1) = (char*) 1;
 	}
+	uint64_t end = rdtsc();
+	pc.read();
+	pc.cycles_measured = end - start;
 }
 
 void __attribute__( ( optimize( "0" ) ) )
@@ -137,7 +143,7 @@ void setup(uint64_t size, uint64_t stride = 64 )
 	*shared_iter = (char*)head;
 }
 
-void init_state(vec, cc_state, uint64_t core_a, uint64_t core_b) {
+void init_state(std::vector<Sched> &vec, uint64_t cc_state, int core_a, int core_b) {
     switch(cc_state) {
         case M_STATE: 
 	        vec.push_back(Sched{ core_a /* core id */,
@@ -179,8 +185,68 @@ void init_state(vec, cc_state, uint64_t core_a, uint64_t core_b) {
         default:
             break;
     }
+}
+
+void run_test(mesi_type_t t) {
+	CounterBenchmark<PAPILLCounter> cbench;
+    std::vector<Sched> vec;
+    int core_a = 1, core_b = 2;
+    mesi_type_t test_case = LOAD_FROM_MODIFIED;
+    switch(test_case) {
+        case STORE_ON_MODIFIED:
+            init_state(vec, M_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( writer )>{ writer },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case STORE_ON_EXCLUSIVE:
+            init_state(vec, E_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( writer )>{ writer },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case STORE_ON_SHARED:
+            init_state(vec, S_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( writer )>{ writer },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case STORE_ON_INVALID:
+            init_state(vec, I_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( writer )>{ writer },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case LOAD_FROM_MODIFIED:
+            init_state(vec, M_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( reader )>{ reader },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case LOAD_FROM_EXCLUSIVE:
+            init_state(vec, E_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( reader )>{ reader },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case LOAD_FROM_SHARED:
+            init_state(vec, S_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( reader )>{ reader },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        case LOAD_FROM_INVALID:
+            init_state(vec, I_STATE, core_a, core_b);
+	        vec.push_back(Sched{ core_a /* core id */,
+	                      std::function<decltype( reader )>{ reader },
+	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
+                break;
+        default:
+                break;
+    }
 	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
 }
+
 
 int main( int argc, char* argv[] )
 {
@@ -203,42 +269,8 @@ produced should be the same as if only a single core is asking for the data) */
 
     setup(shared_data_size);
 
-	CounterBenchmark<PAPILLCounter> cbench;
-	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
-    int cc_state = E_STATE;
-    std::vector<Sched> vec;
-    init_state(vec, cc_state, 1, 2);
 
-    int test_case = LOAD_FROM_MODIFIED;
-    switch(test_case) {
-        case STORE_ON_MODIFIED:
-                break;
-        case STORE_ON_EXCLUSIVE:
-                break;
-        case STORE_ON_SHARED:
-                break;
-        case STORE_ON_INVALID:
-                break;
-        case LOAD_FROM_MODIFIED:
-            init_state(vec, M_STATE, 1, 2);
-	        vec.push_back(Sched{ 1 /* core id */,
-	                      std::function<decltype( reader )>{ reader },
-	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
-                break;
-        case LOAD_FROM_EXCLUSIVE:
-            init_state(vec, E_STATE, 1, 2);
-	        vec.push_back(Sched{ 1 /* core id */,
-	                      std::function<decltype( reader )>{ reader },
-	                      {"PAPI_TOT_INS", "PAPI_TOT_CYC"} });
-                break;
-        case LOAD_FROM_SHARED:
-                break;
-        case LOAD_FROM_INVALID:
-                break;
-        default:
-                break;
-    }
-	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+    run_test(LOAD_FROM_MODIFIED);
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
