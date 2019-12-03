@@ -60,15 +60,21 @@ template<typename CntTyp> struct CounterBenchmark
 
    public:
 	std::mutex mtx;
+	std::mutex sync_mtx;
 	std::condition_variable cv;
+	std::condition_variable sync_cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
+	bool sync_ready;
 
 	CounterBenchmark()
 	    : mtx()
 	    , cv()
 	    , benchmark_cores( default_phys_core_count )
 	    , threads()
+	    , sync_mtx()
+	    , sync_cv()
+	    , sync_ready( false )
 	{
 		pin_self_to_core( 0 );
 	}
@@ -103,10 +109,11 @@ template<typename CntTyp> struct CounterBenchmark
 			std::unique_lock<std::mutex> lck( this->mtx );
 			this->cv.wait( lck );
 		}
-        else
-        {
-		    std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
-        }
+		else
+		{
+			std::unique_lock<std::mutex> lck( this->sync_mtx );
+			this->sync_cv.wait( lck, [this]() { return this->sync_ready; } );
+		}
 
 		counter.add( events );
 
@@ -153,6 +160,9 @@ template<typename CntTyp> struct CounterBenchmark
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
+			this->sync_ready = false;
+
+			// Could use condition variable instead of futures here as well
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(
 				    counters[i], svec[i].events, 0 /* thread id */,
@@ -162,7 +172,10 @@ template<typename CntTyp> struct CounterBenchmark
 			auto fut = task.get_future();
 
 			this->threads.push_back( std::thread( std::move( task ) ) );
+			// std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 			pin_to_core( 0, svec[i].core_id );
+			this->sync_ready = true;
+			this->sync_cv.notify_one();
 
 			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
 
@@ -179,7 +192,7 @@ template<typename CntTyp> struct CounterBenchmark
 			}
 		}
 
-        return counters;
+		return counters;
 
 		for( auto& cnt: counters )
 		{
