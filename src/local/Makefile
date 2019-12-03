@@ -23,7 +23,7 @@ ifeq "$(PC_TYPE)" "WITH_PAPI_LL"
 else
   LDFLAGS :=
 endif
-CXXFLAGS += -g -std=$(CXX_VERSION) -I$(INCL_DIR) -D$(PC_TYPE) -pthread
+CXXFLAGS += -g -O0 -std=$(CXX_VERSION) -I$(INCL_DIR) -D$(PC_TYPE) -pthread
 
 all: setup $(OBJS) $(EXES) $(TEST_EXES)
 
@@ -37,6 +37,7 @@ ifeq "$(UNAME)" "FreeBSD"
   endif
 else
   ifdef WITH_PFM
+	export LD_LIBRARY_PATH=$(PFM_LIB_DIR)
     LDFLAGS += -lpfm
   else
     LDFLAGS += -L$(PAPI_DIR)/lib -lpapi

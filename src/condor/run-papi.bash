@@ -14,7 +14,7 @@ declare EXE=$1
 sudo sysctl -w kernel.perf_event_paranoid=1
 #sudo dmidecode -t cache
 
-ulimit -s 16384
+sudo ulimit -s 16384
 
 #getconf -a
 
