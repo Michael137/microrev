@@ -8,7 +8,7 @@
 executable = run-papi.bash
 
 # command-line arguments to the script
-arguments =
+arguments = protocols
 
 # no standard input needed this time
 # input = measure.in

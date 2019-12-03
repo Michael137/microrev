@@ -192,54 +192,55 @@ void run_test( mesi_type_t t )
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
-	int core_a = 1, core_b = 2;
-	switch( t )
+	int core_a = 1, core_b = 2, core_c = 3;
+	mesi_type_t test_case = LOAD_FROM_MODIFIED;
+	switch( test_case )
 	{
 		case STORE_ON_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case STORE_ON_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case STORE_ON_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case STORE_ON_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( writer )>{ writer },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case LOAD_FROM_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case LOAD_FROM_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case LOAD_FROM_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
 		case LOAD_FROM_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_c /* core id */,
 			                      std::function<decltype( reader )>{ reader },
 			                      { "PAPI_TOT_INS", "PAPI_TOT_CYC" } } );
 			break;
