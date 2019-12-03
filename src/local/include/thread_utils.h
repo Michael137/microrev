@@ -105,7 +105,9 @@ template<typename CntTyp> struct CounterBenchmark
 			this->cv.wait( lck );
 		}
 
-		counter.add( events );
+		if( events.size() > 0 )
+			counter.add( events );
+
 		for( int i = 0; i < warmup; ++i )
 			benchmark( counter );
 		counter.reset();
