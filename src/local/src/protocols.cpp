@@ -29,8 +29,6 @@
 using namespace pcnt;
 using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-uint64_t CACHELINE_SIZE = 64;
-
 typedef enum
 {
 	STORE_ON_MODIFIED,
@@ -43,6 +41,14 @@ typedef enum
 	LOAD_FROM_INVALID,
 } mesi_type_t;
 
+typedef enum
+{
+	LOCAL,		// Same core
+	NODE,		// Same Node
+	SOCKET		// Same Socket
+	GLOBAL		// Across Sockets
+} core_placement_t;
+
 const char* mesi_type_des[] = {
     "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED",
     "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
@@ -51,7 +57,9 @@ const char* mesi_type_des[] = {
 
 volatile char* shared_data         = nullptr;
 volatile char** shared_iter        = nullptr;
-volatile uint64_t shared_data_size = _32KB;
+volatile uint64_t shared_data_size;
+volatile uint64_t cache_line_size;
+volatile uint64_t cache_size;
 
 void __attribute__( ( optimize( "0" ) ) )
 flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
@@ -83,7 +91,7 @@ writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	}
 	uint64_t end = rdtsc();
 	pc.read();
-	pc.vec_cycles_measured.push_back(end - start);
+	pc.vec_cycles_measured.push_back( end - start );
 }
 
 void __attribute__( ( optimize( "0" ) ) )
@@ -92,21 +100,30 @@ reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	pc.start();
 	uint64_t start = rdtsc();
 	// Pointer-chase through linked list
-	for( uint64_t i = 0; i < shared_data_size / CACHELINE_SIZE; i++ )
+	for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )
 	{
 		// Unroll loop partially to reduce loop overhead
 		shared_iter = ( (volatile char**)*shared_iter );
 	}
 	uint64_t end = rdtsc();
 	pc.read();
-	pc.vec_cycles_measured.push_back(end - start);
+	pc.vec_cycles_measured.push_back( end - start );
 }
 
-void reader( PAPILLCounter& pc ) { reader_( pc, shared_data_size, CACHELINE_SIZE ); }
+void reader( PAPILLCounter& pc )
+{
+	reader_( pc, shared_data_size, cache_line_size );
+}
 
-void writer( PAPILLCounter& pc ) { writer_( pc, shared_data_size, CACHELINE_SIZE ); }
+void writer( PAPILLCounter& pc )
+{
+	writer_( pc, shared_data_size, cache_line_size );
+}
 
-void flusher( PAPILLCounter& pc ) { flusher_( pc, shared_data_size, CACHELINE_SIZE ); }
+void flusher( PAPILLCounter& pc )
+{
+	flusher_( pc, shared_data_size, cache_line_size );
+}
 
 void setup( uint64_t size, uint64_t stride = 64 )
 {
@@ -185,77 +202,93 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 	}
 }
 
-void run_test( mesi_type_t t )
+void run_test( mesi_type_t t, core_placement_t c = NODE)
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
 	int core_a = 2, core_b = 4, core_c = 6;
-    std::cout << mesi_type_des[t] << std::endl;
+	std::cout << mesi_type_des[t] << std::endl;
 	switch( t )
 	{
 		case STORE_ON_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( writer )>{ writer },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( writer )>{ writer },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( writer )>{ writer },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case STORE_ON_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( writer )>{ writer },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( writer )>{ writer },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( reader )>{ reader },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( reader )>{ reader },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( reader )>{ reader },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		case LOAD_FROM_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
-			vec.push_back( Sched{ core_c /* core id */,
-			                      std::function<decltype( reader )>{ reader },
-			                      { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS"} } );
+			vec.push_back(
+			    Sched{ core_c /* core id */,
+			           std::function<decltype( reader )>{ reader },
+			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
+			             "perf::L1-DCACHE-LOADS" } } );
 			break;
 		default: break;
 	}
 
-	//cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
-    
-	auto counters = cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
-    for( auto& cnt: counters )
-    {
-        if (cnt.cset.size() == 0)
-            continue;
+	// cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
 
-        cnt.stats();
-    }
-    
-    
+	auto counters
+	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
+	        vec );
+	for( auto& cnt: counters )
+	{
+		if( cnt.cset.size() == 0 )
+			continue;
+
+		cnt.stats();
+	}
 }
 
 int main( int argc, char* argv[] )
@@ -269,15 +302,24 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
-	/* thread 1: write to shared_data
-	 * thread 2: read from shared_data (now cache in core 1 and 2 should be in S
-state)
-	 * thread 3 to N: read from shared_data (in MESIF protocol the traffic
-produced should be the same as if only a single core is asking for the data) */
+//	if( argc < 4 )
+//	{
+//		std::cout << "Too few arguments provided (" << argc << ")" << '\n'
+//		          << "Usage: ./protocols <# of cores> <cache size> <cache line size> <working set size> <benchmark type>" << '\n';
+//		exit(EXIT_FAILURE);
+//	}
+//
+//	shared_data_size = std::stoull(argv[2]);
+//	cache_size = std::stoull(argv[3]);
+//	cache_line_size = std::stoull(argv[4]);
+
+	shared_data_size = _32KB;
+	cache_size = _32KB;
+	cache_line_size = _64B;
 
 	setup( shared_data_size );
 
-    run_test( LOAD_FROM_MODIFIED );
+	run_test( LOAD_FROM_MODIFIED );
 	run_test( LOAD_FROM_SHARED );
 	run_test( LOAD_FROM_INVALID );
 	run_test( LOAD_FROM_MODIFIED );
