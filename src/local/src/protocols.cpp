@@ -326,16 +326,14 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 
 	// cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
 
-	auto counters
-	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
-	        vec );
-	//	for( auto& cnt: counters )
-	//	{
-	//		if( cnt.cset.size() == 0 )
-	//			continue;
-	//
-	//		cnt.stats();
-	//	}
+	auto counters = cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+		for( auto& cnt: counters )
+		{
+			if( cnt.cset.size() == 0 )
+				continue;
+
+			cnt.stats();
+		}
 }
 void parse_cfg()
 {
@@ -387,7 +385,7 @@ int main( int argc, char* argv[] )
 
 	setup( shared_data_size );
 
-	for( int i = 0; i < 10000; i++ )
+	for( int i = 0; i < 1000; i++ )
 	{
 		run_test( LOAD_FROM_MODIFIED );
 		run_test( LOAD_FROM_SHARED );
