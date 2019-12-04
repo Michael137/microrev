@@ -5,3 +5,4 @@ tmp/
 *.core
 *.swp
 *.tmp
+*.dat

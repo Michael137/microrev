@@ -191,6 +191,12 @@ template<typename CntTyp> struct CounterBenchmark
 
 		counter.end();
 
+		if( sync )
+		{
+			std::lock_guard<std::mutex> lk( this->mtx );
+			this->ready = false;
+		}
+		else
 		{
 			std::lock_guard<std::mutex> lk( this->sync_mtx );
 			this->sync_ready = false;
@@ -244,29 +250,27 @@ template<typename CntTyp> struct CounterBenchmark
 			this->threads.push_back( std::thread( std::move( task ) ) );
 			pin_to_core( 0, svec[i].core_id );
 
-			//			auto msched_size = svec[i].measurement_scheds.size();
-			//			measurement_counters.resize( measurement_counters.size()
-			//			                             + msched_size );
-			//			for( int j = 0; j < msched_size; ++j )
-			//			{
-			//				measurement_tasks.emplace_back();
-			//				this->threads.push_back(
-			//				    std::thread( [this, &measurement_counters,
-			//&svec, j, i, 				                  &measurement_tasks] {
-			// this->counter_thread_fn<EventTyp>(
-			// measurement_counters[j],
-			//					        svec[i].measurement_scheds[j].events,
-			//					        j + 1 /* thread id */,
-			//					        svec[i].measurement_scheds[j].core_id,
-			//					        [&]( CntTyp& pc ) {
-			//						        measurement_tasks[j].run( pc );
-			//					        },
-			//					        0 /* warmup */, false /* sync */ );
-			//				    } ) );
-			//				pin_to_core( j + 1,
-			// svec[i].measurement_scheds[j].core_id
-			//);
-			//			}
+			auto msched_size = svec[i].measurement_scheds.size();
+			measurement_counters.resize( measurement_counters.size()
+			                             + msched_size );
+			for( int j = 0; j < msched_size; ++j )
+			{
+				measurement_tasks.emplace_back();
+				this->threads.push_back(
+				    std::thread( [this, &measurement_counters, &svec, j, i,
+				                  &measurement_tasks] {
+					    this->counter_thread_fn<EventTyp>(
+					        measurement_counters[j],
+					        svec[i].measurement_scheds[j].events,
+					        j + 1 /* thread id */,
+					        svec[i].measurement_scheds[j].core_id,
+					        [&]( CntTyp& pc ) {
+						        measurement_tasks[j].run( pc );
+					        },
+					        0 /* warmup */, false /* sync */ );
+				    } ) );
+				pin_to_core( j + 1, svec[i].measurement_scheds[j].core_id );
+			}
 
 			{
 				std::lock_guard<std::mutex> lk( this->sync_mtx );
