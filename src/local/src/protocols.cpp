@@ -385,12 +385,14 @@ int main( int argc, char* argv[] )
 
 	setup( shared_data_size );
 
-	for( int i = 0; i < 1000; i++ )
-	{
-		run_test( LOAD_FROM_MODIFIED );
-		run_test( LOAD_FROM_SHARED );
-		run_test( LOAD_FROM_INVALID );
-	}
+    for( int j = 0; j < 4; j++) {
+        for( int i = 0; i < 1000; i++ )
+        {
+            run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>(j));
+            run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>(j));
+            run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>(j));
+        }
+    }
 
 	free( (void*)shared_data );
 
