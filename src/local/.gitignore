@@ -5,6 +5,3 @@ tmp/
 *.core
 *.swp
 *.tmp
-
-config.mk
-arch.cfg
