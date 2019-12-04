@@ -40,3 +40,10 @@ Depending on the virtual-to-physical address mapping scheme, different arrayaddr
   - [StackOverflow Post](https://stackoverflow.com/questions/49179295/how-to-read-pmc-performance-monitoring-counter-of-intel-processor)
   - [Intel Forum](https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214)
   - [Pitfalls of Cache Performance Counter Measurement](http://sites.utexas.edu/jdm4372/2013/07/14/notes-on-the-mystery-of-hardware-cache-performance-counters/)
+
+# TODO
+* Parameterize benchmarks
+* Measure from multiple cores
+* Measure LLC - L2 on core
+* Detecting protocol
+* Graphs for CAB
