@@ -84,18 +84,18 @@ int main( int argc, char** argv )
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 	std::vector<Sched> vec{
-	    { 0, std::function<decltype( test8 )>{ test8 }, {}, "8B" },
-	    { 0, std::function<decltype( test8 )>{ test16 }, {}, "16B" },
-	    { 0, std::function<decltype( test8 )>{ test32 }, {}, "32B" },
-	    { 0, std::function<decltype( test8 )>{ test64 }, {}, "64B" },
-	    { 0, std::function<decltype( test8 )>{ test128 }, {}, "128B" },
-	    { 0, std::function<decltype( test8 )>{ test256 }, {}, "256B" },
-	    { 0, std::function<decltype( test8 )>{ test512 }, {}, "512B" },
-	    { 0, std::function<decltype( test8 )>{ test1024 }, {}, "1KB" },
+	    { 1, std::function<decltype( test8 )>{ test8 }, {}, "8B" },
+	    { 1, std::function<decltype( test8 )>{ test16 }, {}, "16B" },
+	    { 1, std::function<decltype( test8 )>{ test32 }, {}, "32B" },
+	    { 1, std::function<decltype( test8 )>{ test64 }, {}, "64B" },
+	    { 1, std::function<decltype( test8 )>{ test128 }, {}, "128B" },
+	    { 1, std::function<decltype( test8 )>{ test256 }, {}, "256B" },
+	    { 1, std::function<decltype( test8 )>{ test512 }, {}, "512B" },
+	    { 1, std::function<decltype( test8 )>{ test1024 }, {}, "1KB" },
 	};
 	auto counters
 	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
-	        vec );
+	        vec, 3 /* warmup */ );
 
 	for( auto& c: counters )
 		c.print_stats();

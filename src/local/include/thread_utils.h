@@ -244,7 +244,7 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	std::vector<CntTyp> counters_with_priority_schedule(
-	    std::vector<Schedule<EventTyp, CntTyp>>& svec )
+	    std::vector<Schedule<EventTyp, CntTyp>>& svec, int warmup = 0 )
 	{
 		std::vector<CntTyp> counters{ svec.size() };
 		std::vector<CntTyp> measurement_counters;
@@ -253,12 +253,13 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			counters[i].label = svec[i].label;
 			// Could use condition variable instead of futures here as well
-			std::packaged_task<void()> task( [this, &counters, &svec, i] {
-				this->counter_thread_fn<EventTyp>(
-				    counters[i], svec[i].events, 0 /* thread id */,
-				    svec[i].core_id, svec[i].benchmark, 0 /* warmup */,
-				    false /* sync */ );
-			} );
+			std::packaged_task<void()> task(
+			    [this, &counters, &svec, i, warmup] {
+				    this->counter_thread_fn<EventTyp>(
+				        counters[i], svec[i].events, 0 /* thread id */,
+				        svec[i].core_id, svec[i].benchmark, warmup,
+				        false /* sync */ );
+			    } );
 			auto fut = task.get_future();
 
 			this->threads.push_back( std::thread( std::move( task ) ) );

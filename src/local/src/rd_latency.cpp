@@ -95,17 +95,17 @@ int main( int argc, char** argv )
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 	std::vector<Sched> vec{
-	    { 0, std::function<decltype( test32_64 )>{ test4_64 }, {}, "4KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test8_64 }, {}, "8KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test16_64 }, {}, "16KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test32_64 }, {}, "32KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test64_64 }, {}, "64KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test128_64 }, {}, "128KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test256_64 }, {}, "256KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test512_64 }, {}, "512KB" },
-	    { 0, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "1MB" },
-	    { 0, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "2MB" },
-	    { 0, std::function<decltype( test32_64 )>{ test2048_64 }, {}, "4MB" } };
+	    { 1, std::function<decltype( test32_64 )>{ test4_64 }, {}, "4KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test8_64 }, {}, "8KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test16_64 }, {}, "16KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test32_64 }, {}, "32KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test64_64 }, {}, "64KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test128_64 }, {}, "128KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test256_64 }, {}, "256KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test512_64 }, {}, "512KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "1MB" },
+	    { 1, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "2MB" },
+	    { 1, std::function<decltype( test32_64 )>{ test2048_64 }, {}, "4MB" } };
 	auto counters
 	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
 	        vec );
