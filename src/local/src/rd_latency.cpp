@@ -63,10 +63,13 @@ time_rd_latency( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 
 	uint64_t end = rdtsc();
 	pc.read();
-	pc.cycles_measured = end - start;
+	pc.vec_cycles_measured.push_back( end - start );
 }
 
 // Stride: 64 bytes
+void test4_64( PAPILLCounter& pc ) { time_rd_latency( pc, _4KB, 64 ); }
+void test8_64( PAPILLCounter& pc ) { time_rd_latency( pc, _8KB, 64 ); }
+void test16_64( PAPILLCounter& pc ) { time_rd_latency( pc, _16KB, 64 ); }
 void test32_64( PAPILLCounter& pc ) { time_rd_latency( pc, _32KB, 64 ); }
 void test64_64( PAPILLCounter& pc ) { time_rd_latency( pc, _64KB, 64 ); }
 void test128_64( PAPILLCounter& pc ) { time_rd_latency( pc, _128KB, 64 ); }
@@ -86,24 +89,29 @@ void test2048_128( PAPILLCounter& pc ) { time_rd_latency( pc, _2MB, 128 ); }
 
 int main( int argc, char** argv )
 {
+	/* Should allow us to see cache sizes */
+
 	CounterBenchmark<PAPILLCounter> cbench;
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-	Sched core_1
-	    = Sched{ 1,
-	             std::function<decltype( test32_64 )>{ test32_64 },
-	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
-	Sched core_2
-	    = Sched{ 2,
-	             std::function<decltype( test32_64 )>{ test64_64 },
-	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
-	Sched core_3
-	    = Sched{ 3,
-	             std::function<decltype( test32_64 )>{ test2048_64 },
-	             { "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" } };
+	std::vector<Sched> vec{
+	    { 0, std::function<decltype( test32_64 )>{ test4_64 }, {}, "4KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test8_64 }, {}, "8KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test16_64 }, {}, "16KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test32_64 }, {}, "32KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test64_64 }, {}, "64KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test128_64 }, {}, "128KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test256_64 }, {}, "256KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test512_64 }, {}, "512KB" },
+	    { 0, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "1MB" },
+	    { 0, std::function<decltype( test32_64 )>{ test1024_64 }, {}, "2MB" },
+	    { 0, std::function<decltype( test32_64 )>{ test2048_64 }, {}, "4MB" } };
+	auto counters
+	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
+	        vec );
 
-	std::vector<Sched> vec{ core_1, core_2, core_3 };
-	cbench.counters_with_schedule<std::vector<std::string>>( vec );
+	for( auto& c: counters )
+		c.print_stats();
 
 	return 0;
 }

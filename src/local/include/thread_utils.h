@@ -97,12 +97,24 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	BenchTyp benchmark;
 	EventTyp events;
 	std::vector<Schedule<EventTyp, CntTyp>> measurement_scheds;
+	std::string label;
 
 	Schedule( int core_id, BenchTyp benchmark, EventTyp events )
 	    : core_id( core_id )
 	    , benchmark( benchmark )
 	    , events( events )
 	    , measurement_scheds()
+	    , label()
+	{
+	}
+
+	Schedule( int core_id, BenchTyp benchmark, EventTyp events,
+	          std::string const& label )
+	    : core_id( core_id )
+	    , benchmark( benchmark )
+	    , events( events )
+	    , measurement_scheds()
+	    , label( label )
 	{
 	}
 };
@@ -209,6 +221,7 @@ template<typename CntTyp> struct CounterBenchmark
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
+			counters[i].label = svec[i].label;
 			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
@@ -238,6 +251,7 @@ template<typename CntTyp> struct CounterBenchmark
 		std::vector<MeasurementBench<CntTyp>> measurement_tasks;
 		for( int i = 0; i < svec.size(); ++i )
 		{
+			counters[i].label = svec[i].label;
 			// Could use condition variable instead of futures here as well
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(

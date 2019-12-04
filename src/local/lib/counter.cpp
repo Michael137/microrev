@@ -1,7 +1,7 @@
 #include <sysexits.h>
 #include <cassert>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -25,6 +25,7 @@ Counter<CntResult, Events>::Counter()
     , core_id()
     , cycles_measured()
     , vec_cycles_measured()
+    , label()
 {
 }
 
@@ -35,6 +36,18 @@ Counter<CntResult, Events>::Counter( Events const& cset )
     , core_id()
     , cycles_measured()
     , vec_cycles_measured()
+    , label()
+{
+}
+
+template<typename CntResult, typename Events>
+Counter<CntResult, Events>::Counter( std::string const& label )
+    : cset()
+    , measured()
+    , core_id()
+    , cycles_measured()
+    , vec_cycles_measured()
+    , label( label )
 {
 }
 
@@ -211,31 +224,37 @@ void PAPILLCounter::end()
 		exit_with_err( "failed to unregister thread" );
 }
 
-void PAPILLCounter::stats()
+void PAPILLCounter::stats_to_stream( std::ostream& os )
 {
 	assert( this->cset.size() == this->measured.size() );
 	char name[PAPI_MAX_STR_LEN];
-    if(this->cset.size() == 0)
-        return;
+	if( this->cset.size() == 0 && this->vec_cycles_measured.size() == 0 )
+		return;
 
-    std::ofstream ofs("dump.dat", std::ofstream::out | std::ofstream::app);
-    
+	os << "~~" << this->label << "~~" << '\n';
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
 		PAPI_event_code_to_name( cset[i], name );
-		//std::cout << name << ": " << this->measured[i] << '\n';
-		ofs << name << ": " << this->measured[i] << '\n';
+		os << name << ": " << this->measured[i] << '\n';
 	}
-    for( auto c : this->vec_cycles_measured) {
-        this->cycles_measured += ((double)c) / this->vec_cycles_measured.size(); 
-    }
-	//std::cout << "Cycles: " << this->cycles_measured << '\n';
-    ofs << "Cycles: " << this->cycles_measured << '\n';
+	for( auto c: this->vec_cycles_measured )
+	{
+		this->cycles_measured
+		    += ( (double)c ) / this->vec_cycles_measured.size();
+	}
+	os << "Cycles: " << this->cycles_measured << '\n';
 
-	//std::cout << std::endl;
-	ofs << std::endl;
-    ofs.close();
+	os << std::endl;
 }
+
+void PAPILLCounter::stats()
+{
+	std::ofstream ofs( "dump.dat", std::ofstream::out | std::ofstream::app );
+	this->stats_to_stream( ofs );
+	ofs.close();
+}
+
+void PAPILLCounter::print_stats() { this->stats_to_stream( std::cout ); }
 
 void PAPILLCounter::start()
 {

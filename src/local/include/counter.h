@@ -3,6 +3,7 @@
 
 #include <err.h>
 #include <future>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -29,11 +30,13 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	std::vector<int64_t> vec_cycles_measured;
 	int core_id;
 	bool collect;
+	std::string label;
 
    public:
 	Counter();
 	virtual ~Counter() {}
 	explicit Counter( EventsVec const& cset );
+	explicit Counter( std::string const& cset );
 	virtual void add( std::string counter_name ) = 0;
 	virtual void add( EventsVec const& cset )    = 0;
 	virtual void read()                          = 0;
@@ -67,6 +70,8 @@ class PMCCounter : public Counter<std::vector<pmc_value_t>, CounterSet>
 class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 {
    private:
+	void stats_to_stream( std::ostream& os );
+
 	int event_set;
 	int max_hw_cntrs;
 
@@ -82,12 +87,14 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 	void add( std::vector<std::string> const& cset );
 	void read();
 	void stats();
+	void print_stats();
 	void start();
 	void init();
 	void end();
 	void reset();
 };
-#endif                        // WITH_PAPI_LL
+
+#endif // WITH_PAPI_LL
 
 } // namespace pcnt
 
