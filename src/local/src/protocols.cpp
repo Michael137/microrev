@@ -43,10 +43,10 @@ typedef enum
 
 typedef enum
 {
-	LOCAL,		// Same core
-	NODE,		// Same Node
-	SOCKET		// Same Socket
-	GLOBAL		// Across Sockets
+	LOCAL,  // Same core
+	NODE,   // Same Node
+	SOCKET, // Same Socket
+	GLOBAL  // Across Sockets
 } core_placement_t;
 
 const char* mesi_type_des[] = {
@@ -55,8 +55,8 @@ const char* mesi_type_des[] = {
     "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID",
 };
 
-volatile char* shared_data         = nullptr;
-volatile char** shared_iter        = nullptr;
+volatile char* shared_data  = nullptr;
+volatile char** shared_iter = nullptr;
 volatile uint64_t shared_data_size;
 volatile uint64_t cache_line_size;
 volatile uint64_t cache_size;
@@ -202,7 +202,7 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 	}
 }
 
-void run_test( mesi_type_t t, core_placement_t c = NODE)
+void run_test( mesi_type_t t, core_placement_t c = NODE )
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
@@ -302,20 +302,20 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
-//	if( argc < 4 )
-//	{
-//		std::cout << "Too few arguments provided (" << argc << ")" << '\n'
-//		          << "Usage: ./protocols <# of cores> <cache size> <cache line size> <working set size> <benchmark type>" << '\n';
-//		exit(EXIT_FAILURE);
-//	}
-//
-//	shared_data_size = std::stoull(argv[2]);
-//	cache_size = std::stoull(argv[3]);
-//	cache_line_size = std::stoull(argv[4]);
+	//	if( argc < 4 )
+	//	{
+	//		std::cout << "Too few arguments provided (" << argc << ")" << '\n'
+	//		          << "Usage: ./protocols <# of cores> <cache size> <cache line
+	//size> <working set size> <benchmark type>" << '\n'; 		exit(EXIT_FAILURE);
+	//	}
+	//
+	//	shared_data_size = std::stoull(argv[2]);
+	//	cache_size = std::stoull(argv[3]);
+	//	cache_line_size = std::stoull(argv[4]);
 
 	shared_data_size = _32KB;
-	cache_size = _32KB;
-	cache_line_size = _64B;
+	cache_size       = _32KB;
+	cache_line_size  = _64B;
 
 	setup( shared_data_size );
 

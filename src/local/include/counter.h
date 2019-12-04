@@ -2,6 +2,7 @@
 #define COUNTER_H_IN
 
 #include <err.h>
+#include <future>
 #include <string>
 #include <vector>
 
@@ -25,7 +26,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
    public:
 	EventsVec cset;
 	double cycles_measured;
-    std::vector<int64_t> vec_cycles_measured;
+	std::vector<int64_t> vec_cycles_measured;
 	int core_id;
 	bool collect;
 
@@ -73,6 +74,7 @@ class PAPILLCounter : public Counter<std::vector<long_long>, std::vector<int>>
 	PAPILLCounter();
 	~PAPILLCounter();
 	explicit PAPILLCounter( std::vector<int> cset );
+
 	void add( std::string counter_name ) {}
 	void add( std::vector<int> const& cset ) {
 	} // TODO: event_set could be std::string; then don't need this empty

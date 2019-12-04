@@ -214,16 +214,18 @@ void PAPILLCounter::stats()
 {
 	assert( this->cset.size() == this->measured.size() );
 	char name[PAPI_MAX_STR_LEN];
-    if(this->cset.size() == 0)
-        return;
+	if( this->cset.size() == 0 )
+		return;
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
 		PAPI_event_code_to_name( cset[i], name );
 		std::cout << name << ": " << this->measured[i] << '\n';
 	}
-    for( auto c : this->vec_cycles_measured) {
-        this->cycles_measured += ((double)c) / this->vec_cycles_measured.size(); 
-    }
+	for( auto c: this->vec_cycles_measured )
+	{
+		this->cycles_measured
+		    += ( (double)c ) / this->vec_cycles_measured.size();
+	}
 	std::cout << "Cycles: " << this->cycles_measured << '\n';
 
 	std::cout << std::endl;
