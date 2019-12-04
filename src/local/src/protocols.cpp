@@ -72,15 +72,13 @@ volatile uint64_t cache_size;
 void __attribute__( ( optimize( "0" ) ) )
 flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
-	char** iter = (char**)shared_iter;
 	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
 		// Arrange linked list such that:
 		// Pointer at arr[i] == Pointer at arr[i + stride]
-		_mm_sfence();
-		_mm_clflush( (void*)iter );
-		_mm_sfence();
-		iter = ( (char**)*iter );
+		_mm_mfence();
+		_mm_clflush( (void*)&shared_data[i] );
+		_mm_mfence();
 	}
 }
 
@@ -199,8 +197,8 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 			                      {} } );
 			break;
 		case I_STATE:
-			vec.push_back( Sched{ core_b /* core id */,
-			                      std::function<decltype( writer )>{ writer },
+			vec.push_back( Sched{ core_a /* core id */,
+			                      std::function<decltype( flusher )>{ flusher },
 			                      {} } );
 			break;
 		case F_STATE:
@@ -246,11 +244,21 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
     ofs << mesi_type_des[t] << std::endl;
     ofs << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
 
+    ofs.close();
     /*
     std::cout << "TEST RUN" << std::endl;
     std::cout << mesi_type_des[t] << std::endl;
     std::cout << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
     */
+    vec.push_back( Sched{ core_a /* core id */,
+                          std::function<decltype( flusher )>{ flusher },
+                          {} } );
+    vec.push_back( Sched{ core_b /* core id */,
+                          std::function<decltype( flusher )>{ flusher },
+                          {} } );
+    vec.push_back( Sched{ core_c /* core id */,
+                          std::function<decltype( flusher )>{ flusher },
+                          {} } );
 	switch( t )
 	{
 		case STORE_ON_MODIFIED:
@@ -363,6 +371,7 @@ void parse_cfg()
     core_global0 = std::stoi(rline);
     getline(infile, rline, '\n');
     core_global1 = std::stoi(rline);
+    infile.close();
 }
 
 int main( int argc, char* argv[] )
@@ -382,7 +391,7 @@ int main( int argc, char* argv[] )
 
 	setup( shared_data_size );
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1000; i++) {
         run_test( LOAD_FROM_MODIFIED );
         run_test( LOAD_FROM_SHARED );
         run_test( LOAD_FROM_INVALID );
