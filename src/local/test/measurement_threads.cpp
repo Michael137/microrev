@@ -38,7 +38,7 @@ void no_multi_measurement()
 	Sched core_1 = Sched{
 	    1,
 	    std::function<decltype( doflops )>{ doflops },
-	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	};
 
 	std::vector<Sched> vec = { core_1 };
@@ -68,7 +68,7 @@ void multi_measurement()
 	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	};
 	Sched measure_2 = Sched{
-	    2,
+	    3,
 	    std::function<decltype( doflops )>{ doflops },
 	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	};
