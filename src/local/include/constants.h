@@ -13,6 +13,9 @@ constexpr int max_pmc_num = 8;
 
 constexpr unsigned int default_phys_core_count = 4;
 
+constexpr uint64_t _8B   = 8;
+constexpr uint64_t _16B   = 16;
+constexpr uint64_t _32B   = 32;
 constexpr uint64_t _64B   = 64;
 constexpr uint64_t _128B  = 128;
 constexpr uint64_t _256B  = 256;
