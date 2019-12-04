@@ -42,8 +42,9 @@ Depending on the virtual-to-physical address mapping scheme, different arrayaddr
   - [Pitfalls of Cache Performance Counter Measurement](http://sites.utexas.edu/jdm4372/2013/07/14/notes-on-the-mystery-of-hardware-cache-performance-counters/)
 
 # TODO
-* Parameterize benchmarks
-* Measure from multiple cores
+* ~~Parameterize benchmarks~~
+* ~~Benchmark result aggregation~~
+* ~~Measure from multiple cores~~
 * Measure LLC - L2 on core
 * Detecting protocol
-* Graphs for CAB
+* Graphs

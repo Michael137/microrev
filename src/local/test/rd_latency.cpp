@@ -90,7 +90,6 @@ int main( int argc, char** argv )
 	printf( "%f MB: %lu\n", B2MB( _512KB ), time_rd_latency( _512KB ) );
 	printf( "%f MB: %lu\n", B2MB( _1MB ), time_rd_latency( _1MB ) );
 	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
-	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
 	printf( "%f MB: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
 
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;

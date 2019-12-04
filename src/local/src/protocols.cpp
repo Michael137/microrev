@@ -215,7 +215,7 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 	}
 }
 
-void run_test( mesi_type_t t, core_placement_t c = NODE)
+void run_test( mesi_type_t t, core_placement_t c = NODE )
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
