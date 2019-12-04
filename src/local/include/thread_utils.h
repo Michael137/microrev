@@ -119,7 +119,7 @@ template<typename CntTyp> struct CounterBenchmark
 	std::condition_variable sync_cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
-	bool sync_ready;
+	std::atomic<bool> sync_ready;
 
 	CounterBenchmark()
 	    : mtx()
@@ -166,7 +166,8 @@ template<typename CntTyp> struct CounterBenchmark
 		else
 		{
 			std::unique_lock<std::mutex> lck( this->sync_mtx );
-			this->sync_cv.wait( lck, [this]() { return this->sync_ready; } );
+			this->sync_cv.wait(
+			    lck, [this]() { return this->sync_ready == false; } );
 		}
 
 		counter.add( events );
