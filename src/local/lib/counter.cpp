@@ -1,6 +1,7 @@
 #include <sysexits.h>
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -216,17 +217,24 @@ void PAPILLCounter::stats()
 	char name[PAPI_MAX_STR_LEN];
     if(this->cset.size() == 0)
         return;
+
+    std::ofstream ofs("dump.dat", std::ofstream::out | std::ofstream::app);
+    
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
 		PAPI_event_code_to_name( cset[i], name );
-		std::cout << name << ": " << this->measured[i] << '\n';
+		//std::cout << name << ": " << this->measured[i] << '\n';
+		ofs << name << ": " << this->measured[i] << '\n';
 	}
     for( auto c : this->vec_cycles_measured) {
         this->cycles_measured += ((double)c) / this->vec_cycles_measured.size(); 
     }
-	std::cout << "Cycles: " << this->cycles_measured << '\n';
+	//std::cout << "Cycles: " << this->cycles_measured << '\n';
+    ofs << "Cycles: " << this->cycles_measured << '\n';
 
-	std::cout << std::endl;
+	//std::cout << std::endl;
+	ofs << std::endl;
+    ofs.close();
 }
 
 void PAPILLCounter::start()

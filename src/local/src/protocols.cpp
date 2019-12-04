@@ -4,8 +4,10 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <functional>
 #include <iostream>
+#include <fstream>
 #include <mutex>
 #include <random>
 #include <vector>
@@ -29,6 +31,8 @@
 using namespace pcnt;
 using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
+int core_src, core_node0, core_node1, core_socket0, core_socket1, core_global0, core_global1;
+
 typedef enum
 {
 	STORE_ON_MODIFIED,
@@ -45,7 +49,7 @@ typedef enum
 {
 	LOCAL,		// Same core
 	NODE,		// Same Node
-	SOCKET		// Same Socket
+	SOCKET,		// Same Socket
 	GLOBAL		// Across Sockets
 } core_placement_t;
 
@@ -53,6 +57,10 @@ const char* mesi_type_des[] = {
     "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED",
     "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
     "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID",
+};
+
+const char* core_placement_des[] = {
+    "LOCAL", "NODE", "SOCKET", "GLOBAL"
 };
 
 volatile char* shared_data         = nullptr;
@@ -123,6 +131,11 @@ void writer( PAPILLCounter& pc )
 void flusher( PAPILLCounter& pc )
 {
 	flusher_( pc, shared_data_size, cache_line_size );
+}
+
+void init_params()
+{
+
 }
 
 void setup( uint64_t size, uint64_t stride = 64 )
@@ -206,8 +219,38 @@ void run_test( mesi_type_t t, core_placement_t c = NODE)
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
-	int core_a = 2, core_b = 4, core_c = 6;
-	std::cout << mesi_type_des[t] << std::endl;
+	int core_a = core_src, core_b, core_c;
+    switch( c )
+    {
+        case LOCAL:
+            core_b = core_node0;
+            core_c = core_src;
+            break;
+        case NODE:
+            core_b = core_node0;
+            core_c = core_node1;
+            break;
+        case SOCKET:
+            core_b = core_socket0;
+            core_c = core_socket1;
+            break;
+        case GLOBAL:
+            core_b = core_global0;
+            core_c = core_global1;
+            break;
+        default:
+            break;
+    }
+    std::ofstream ofs("dump.dat", std::ofstream::out | std::ofstream::app);
+    ofs << "TEST RUN" << std::endl;
+    ofs << mesi_type_des[t] << std::endl;
+    ofs << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
+
+    /*
+    std::cout << "TEST RUN" << std::endl;
+    std::cout << mesi_type_des[t] << std::endl;
+    std::cout << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
+    */
 	switch( t )
 	{
 		case STORE_ON_MODIFIED:
@@ -290,49 +333,64 @@ void run_test( mesi_type_t t, core_placement_t c = NODE)
 		cnt.stats();
 	}
 }
+void parse_cfg()
+{
+    std::ifstream infile("arch.cfg");
+    if(!infile) {
+        std::cout << "Could not find file" << std::endl;
+        exit(1);
+    }
+    std::cout << "Reading from the file" << std::endl;
+
+    std::string rline;
+    getline(infile, rline, '\n');
+    shared_data_size = std::stoll(rline);
+    getline(infile, rline, '\n');
+    cache_size = std::stoll(rline);
+    getline(infile, rline, '\n');
+    cache_line_size = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_src = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_node0 = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_node1 = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_socket0 = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_socket1 = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_global0 = std::stoi(rline);
+    getline(infile, rline, '\n');
+    core_global1 = std::stoi(rline);
+}
 
 int main( int argc, char* argv[] )
 {
+    /*
 	std::cout
 	    << ">>>> TEST: force caches into M/E/S/I/F and measure performance"
 	    << std::endl;
+        */
 #ifdef WITH_PMC
 
 #	error "TODO: implement this test using PAPI's HL interface"
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
-//	if( argc < 4 )
-//	{
-//		std::cout << "Too few arguments provided (" << argc << ")" << '\n'
-//		          << "Usage: ./protocols <# of cores> <cache size> <cache line size> <working set size> <benchmark type>" << '\n';
-//		exit(EXIT_FAILURE);
-//	}
-//
-//	shared_data_size = std::stoull(argv[2]);
-//	cache_size = std::stoull(argv[3]);
-//	cache_line_size = std::stoull(argv[4]);
-
-	shared_data_size = _32KB;
-	cache_size = _32KB;
-	cache_line_size = _64B;
+    parse_cfg();
 
 	setup( shared_data_size );
 
-	run_test( LOAD_FROM_MODIFIED );
-	run_test( LOAD_FROM_SHARED );
-	run_test( LOAD_FROM_INVALID );
-	run_test( LOAD_FROM_MODIFIED );
-	run_test( LOAD_FROM_SHARED );
-	run_test( LOAD_FROM_INVALID );
-	run_test( LOAD_FROM_MODIFIED );
-	run_test( LOAD_FROM_SHARED );
-	run_test( LOAD_FROM_INVALID );
-
+    for (int i = 0; i < 10000; i++) {
+        run_test( LOAD_FROM_MODIFIED );
+        run_test( LOAD_FROM_SHARED );
+        run_test( LOAD_FROM_INVALID );
+    }
 	free( (void*)shared_data );
 
 #endif // !WITH_PAPI_LL
-	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
+	//std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
 
 	return 0;
 }
