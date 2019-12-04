@@ -120,6 +120,7 @@ template<typename CntTyp> struct CounterBenchmark
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
 	std::atomic<bool> sync_ready;
+	std::atomic<bool> ready;
 
 	CounterBenchmark()
 	    : mtx()
@@ -129,6 +130,7 @@ template<typename CntTyp> struct CounterBenchmark
 	    , sync_mtx()
 	    , sync_cv()
 	    , sync_ready( false )
+	    , ready( false )
 	{
 		pin_self_to_core( 0 );
 	}
@@ -144,8 +146,16 @@ template<typename CntTyp> struct CounterBenchmark
 		CPU_ZERO( &cpuset );
 		CPU_SET( core_id, &cpuset );
 
-		pthread_setaffinity_np( this->threads[th_idx].native_handle(),
-		                        sizeof( CPUSET_T ), &cpuset );
+		int retval
+		    = pthread_setaffinity_np( this->threads[th_idx].native_handle(),
+		                              sizeof( CPUSET_T ), &cpuset );
+
+		if( retval != 0 )
+		{
+			std::cout << "Failed to pin thread " << th_idx << " to core "
+			          << core_id << std::endl;
+			exit( EXIT_FAILURE );
+		}
 
 		return cpuset;
 	}
@@ -161,13 +171,13 @@ template<typename CntTyp> struct CounterBenchmark
 		if( sync )
 		{
 			std::unique_lock<std::mutex> lck( this->mtx );
-			this->cv.wait( lck );
+			this->cv.wait( lck, [this]() { return this->ready != false; } );
 		}
 		else
 		{
 			std::unique_lock<std::mutex> lck( this->sync_mtx );
-			this->sync_cv.wait(
-			    lck, [this]() { return this->sync_ready == false; } );
+			this->sync_cv.wait( lck,
+			                    [this] { return this->sync_ready != false; } );
 		}
 
 		counter.add( events );
@@ -180,6 +190,11 @@ template<typename CntTyp> struct CounterBenchmark
 		benchmark( counter );
 
 		counter.end();
+
+		{
+			std::lock_guard<std::mutex> lk( this->sync_mtx );
+			this->sync_ready = false;
+		}
 	}
 
 	template<typename EventTyp>
@@ -196,7 +211,7 @@ template<typename CntTyp> struct CounterBenchmark
 			pin_to_core( i, svec[i].core_id );
 		}
 
-		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+		this->ready = true;
 		this->cv.notify_all();
 
 		for( auto& th: this->threads )
@@ -217,8 +232,6 @@ template<typename CntTyp> struct CounterBenchmark
 		std::vector<MeasurementBench<CntTyp>> measurement_tasks;
 		for( int i = 0; i < svec.size(); ++i )
 		{
-			this->sync_ready = false;
-
 			// Could use condition variable instead of futures here as well
 			std::packaged_task<void()> task( [this, &counters, &svec, i] {
 				this->counter_thread_fn<EventTyp>(
@@ -231,29 +244,34 @@ template<typename CntTyp> struct CounterBenchmark
 			this->threads.push_back( std::thread( std::move( task ) ) );
 			pin_to_core( 0, svec[i].core_id );
 
-			auto msched_size = svec[i].measurement_scheds.size();
-			measurement_counters.resize( measurement_counters.size()
-			                             + msched_size );
-			for( int j = 0; j < msched_size; ++j )
-			{
-				measurement_tasks.emplace_back();
-				this->threads.push_back(
-				    std::thread( [this, &measurement_counters, &svec, j, i,
-				                  &measurement_tasks] {
-					    this->counter_thread_fn<EventTyp>(
-					        measurement_counters[j],
-					        svec[i].measurement_scheds[j].events,
-					        j + 1 /* thread id */,
-					        svec[i].measurement_scheds[j].core_id,
-					        [&]( CntTyp& pc ) {
-						        measurement_tasks[j].run( pc );
-					        },
-					        0 /* warmup */, false /* sync */ );
-				    } ) );
-				pin_to_core( j + 1, svec[i].measurement_scheds[j].core_id );
-			}
+			//			auto msched_size = svec[i].measurement_scheds.size();
+			//			measurement_counters.resize( measurement_counters.size()
+			//			                             + msched_size );
+			//			for( int j = 0; j < msched_size; ++j )
+			//			{
+			//				measurement_tasks.emplace_back();
+			//				this->threads.push_back(
+			//				    std::thread( [this, &measurement_counters,
+			//&svec, j, i, 				                  &measurement_tasks] {
+			// this->counter_thread_fn<EventTyp>(
+			// measurement_counters[j],
+			//					        svec[i].measurement_scheds[j].events,
+			//					        j + 1 /* thread id */,
+			//					        svec[i].measurement_scheds[j].core_id,
+			//					        [&]( CntTyp& pc ) {
+			//						        measurement_tasks[j].run( pc );
+			//					        },
+			//					        0 /* warmup */, false /* sync */ );
+			//				    } ) );
+			//				pin_to_core( j + 1,
+			// svec[i].measurement_scheds[j].core_id
+			//);
+			//			}
 
-			this->sync_ready = true;
+			{
+				std::lock_guard<std::mutex> lk( this->sync_mtx );
+				this->sync_ready = true;
+			}
 			this->sync_cv.notify_all();
 
 			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
@@ -271,6 +289,7 @@ template<typename CntTyp> struct CounterBenchmark
 				                 measurement_counters.end() );
 				measurement_counters.clear();
 				measurement_tasks.clear();
+
 				continue;
 			}
 			else

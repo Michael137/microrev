@@ -7,3 +7,4 @@ tmp/
 *.tmp
 
 config.mk
+arch.cfg
