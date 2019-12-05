@@ -17,7 +17,7 @@ with open("dump.dat", "r") as f:
             rline = f.readline()
             while rline and rline.strip() != "":
                 counter_name = rline.strip().split(" ")[0][:-1]
-                counter_value = int(rline.strip().split(" ")[1])
+                counter_value = int(float(rline.strip().split(" ")[1]))
                 if counter_name in res_dict.keys():
                     res_dict[counter_name].append(counter_value)
                 else:
