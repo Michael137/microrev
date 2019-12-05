@@ -60,20 +60,9 @@ void multi_measurement()
 	    1,
 	    std::function<decltype( doflops )>{ doflops },
 	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { Sched{ 2, { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } },
+	      Sched{ 2, { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } } },
 	};
-
-	Sched measure_1 = Sched{
-	    2,
-	    std::function<decltype( doflops )>{ doflops },
-	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	};
-	Sched measure_2 = Sched{
-	    3,
-	    std::function<decltype( doflops )>{ doflops },
-	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
-	};
-
-	core_1.measurement_scheds = { measure_1, measure_2 };
 
 	std::vector<Sched> vec = { core_1 };
 	auto counters
@@ -100,7 +89,7 @@ int main( int argc, char* argv[] )
 #elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
 
 	multi_measurement();
-	no_multi_measurement();
+	// no_multi_measurement();
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;

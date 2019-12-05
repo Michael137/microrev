@@ -108,6 +108,25 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	{
 	}
 
+	Schedule( int core_id, EventTyp events )
+	    : core_id( core_id )
+	    , benchmark()
+	    , events( events )
+	    , measurement_scheds()
+	    , label()
+	{
+	}
+
+	Schedule( int core_id, BenchTyp benchmark, EventTyp events,
+	          std::vector<Schedule<EventTyp, CntTyp>> const& scheds )
+	    : core_id( core_id )
+	    , benchmark( benchmark )
+	    , events( events )
+	    , measurement_scheds( scheds )
+	    , label()
+	{
+	}
+
 	Schedule( int core_id, BenchTyp benchmark, EventTyp events,
 	          std::string const& label )
 	    : core_id( core_id )
