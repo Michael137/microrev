@@ -31,7 +31,7 @@
 using namespace pcnt;
 using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-int core_src, core_node0, core_node1, core_socket0, core_socket1, core_global0,
+int core_src, core_socket0, core_socket1, core_global0,
     core_global1;
 
 typedef enum
@@ -44,12 +44,12 @@ typedef enum
 	LOAD_FROM_EXCLUSIVE,
 	LOAD_FROM_SHARED,
 	LOAD_FROM_INVALID,
+    FLUSH,
 } mesi_type_t;
 
 typedef enum
 {
 	LOCAL,  // Same core
-	NODE,   // Same Node
 	SOCKET, // Same Socket
 	GLOBAL  // Across Sockets
 } core_placement_t;
@@ -57,10 +57,10 @@ typedef enum
 const char* mesi_type_des[] = {
     "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED",
     "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
-    "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID",
+    "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID", "FLUSH",
 };
 
-const char* core_placement_des[] = { "LOCAL", "NODE", "SOCKET", "GLOBAL" };
+const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 
 volatile char* shared_data  = nullptr;
 volatile char** shared_iter = nullptr;
@@ -161,55 +161,63 @@ void setup( uint64_t size, uint64_t stride = 64 )
 }
 
 void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
-                 int core_b )
+                 int core_b, std::vector<std::string> cnt_vec = std::vector<std::string>{})
 {
 	switch( cc_state )
 	{
 		case M_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( writer )>{ writer },
-			                      {} } );
+			                      cnt_vec } );
 			break;
 		case E_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( flusher )>{ flusher },
 			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
+			                      cnt_vec } );
 			break;
 		case S_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( reader )>{ reader },
 			                      {} } );
-			vec.push_back( Sched{ core_b /* core id */,
+			vec.push_back( Sched{ core_b, // core id,
 			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
+                                  {} } );
+			vec.push_back( Sched{ core_b, // core id,
+			                      std::function<decltype( flusher )>{ flusher },
+                                  {} } );
 			break;
 		case I_STATE:
-			vec.push_back( Sched{ core_a /* core id */,
+            
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( flusher )>{ flusher },
-			                      {} } );
+			                      cnt_vec } );
 			break;
 		case F_STATE:
-			vec.push_back( Sched{ core_b /* core id */,
+			vec.push_back( Sched{ core_b, // core id,
 			                      std::function<decltype( writer )>{ writer },
 			                      {} } );
-			vec.push_back( Sched{ core_a /* core id */,
+			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( reader )>{ reader },
-			                      {} } );
+			                      cnt_vec } );
+			vec.push_back( Sched{ core_b, // core id,
+			                      std::function<decltype( flusher )>{ flusher },
+                                  {} } );
 			break;
-		default: break;
+        default:
+            break;
 	}
 }
 
-void run_test( mesi_type_t t, core_placement_t c = NODE )
+void run_test( mesi_type_t t, core_placement_t c, std::vector<std::string> cnt_vec)
 {
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
@@ -217,12 +225,8 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 	switch( c )
 	{
 		case LOCAL:
-			core_b = core_node0;
+			core_b = core_socket0;
 			core_c = core_src;
-			break;
-		case NODE:
-			core_b = core_node0;
-			core_c = core_node1;
 			break;
 		case SOCKET:
 			core_b = core_socket0;
@@ -242,13 +246,13 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 
 	ofs.close();
 
-	vec.push_back( Sched{ core_a /* core id */,
+	vec.push_back( Sched{ core_a, // core id,
 	                      std::function<decltype( flusher )>{ flusher },
 	                      {} } );
-	vec.push_back( Sched{ core_b /* core id */,
+	vec.push_back( Sched{ core_b, // core id,
 	                      std::function<decltype( flusher )>{ flusher },
 	                      {} } );
-	vec.push_back( Sched{ core_c /* core id */,
+	vec.push_back( Sched{ core_c, // core id,
 	                      std::function<decltype( flusher )>{ flusher },
 	                      {} } );
 	switch( t )
@@ -256,68 +260,70 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 		case STORE_ON_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( writer )>{ writer },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case STORE_ON_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( writer )>{ writer },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case STORE_ON_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( writer )>{ writer },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case STORE_ON_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( writer )>{ writer },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case LOAD_FROM_MODIFIED:
 			init_state( vec, M_STATE, core_a, core_b );
+            
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( reader )>{ reader },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case LOAD_FROM_EXCLUSIVE:
 			init_state( vec, E_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( reader )>{ reader },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case LOAD_FROM_SHARED:
 			init_state( vec, S_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( reader )>{ reader },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
 		case LOAD_FROM_INVALID:
 			init_state( vec, I_STATE, core_a, core_b );
 			vec.push_back(
-			    Sched{ core_c /* core id */,
+			    Sched{ core_c, // core id,
 			           std::function<decltype( reader )>{ reader },
-			           { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-			             "perf::L1-DCACHE-LOADS" } } );
+                       cnt_vec});
 			break;
-		default: break;
+        case FLUSH:
+			vec.push_back( Sched{ core_a, // core id,
+			                      std::function<decltype( writer )>{ writer },
+                                  {}} );
+			vec.push_back( Sched{ core_c, // core id,
+			                      std::function<decltype( writer )>{ writer },
+			                      cnt_vec } );
+            break;
+		default: 
+            break;
 	}
 
 	auto counters
@@ -351,10 +357,6 @@ void parse_cfg()
 	getline( infile, rline, '\n' );
 	core_src = std::stoi( rline );
 	getline( infile, rline, '\n' );
-	core_node0 = std::stoi( rline );
-	getline( infile, rline, '\n' );
-	core_node1 = std::stoi( rline );
-	getline( infile, rline, '\n' );
 	core_socket0 = std::stoi( rline );
 	getline( infile, rline, '\n' );
 	core_socket1 = std::stoi( rline );
@@ -381,16 +383,32 @@ int main( int argc, char* argv[] )
 	parse_cfg();
 
 	setup( shared_data_size );
-
-	for( int j = 0; j < 4; j++ )
-	{
-		for( int i = 0; i < 1000; i++ )
-		{
-			run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ) );
-			run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ) );
-			run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ) );
-		}
-	}
+    std::vector<std::vector<std::string> > cnt_vec_list;
+    cnt_vec_list.push_back(std::vector<std::string> { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" });
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL", "L2_LINES_IN:E", "L2_LINES_IN:I"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=1", "L2_LINES_IN:E:cpu=1", "L2_LINES_IN:I:cpu=1"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=7", "L2_LINES_IN:E:cpu=7", "L2_LINES_IN:I:cpu=7"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=9", "L2_LINES_IN:E:cpu=9", "L2_LINES_IN:I:cpu=9"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:S"});
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITMESF:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITM:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITS:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "PAPI_L2_DCA", "PAPI_L2_DCM", "PAPI_L3_DCA"});
+    cnt_vec_list.push_back(std::vector<std::string> { ""});
+    //cnt_vec_list.push_back(std::vector<std::string> { "ix86arch:LLC_MISSES"}); 
+    //cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITE:SNP_ANY", "OFFCORE_RESPONSE_0:ANY_DATA:L3_MISS:SNP_ANY" });
+    for(auto c:cnt_vec_list) {
+        for( int j = 0; j < 3; j++ )
+        {
+            for( int i = 0; i < 100; i++ )
+            {
+                run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), c );
+                run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ), c );
+                run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ), c );
+                run_test( FLUSH, static_cast<core_placement_t>( j ), c );
+            }
+        }
+    }
 
 	free( (void*)shared_data );
 
