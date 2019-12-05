@@ -126,12 +126,9 @@ template<typename CntTyp> struct CounterBenchmark
 
    public:
 	std::mutex mtx;
-	std::mutex sync_mtx;
 	std::condition_variable cv;
-	std::condition_variable sync_cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
-	std::atomic<bool> sync_ready;
 	std::atomic<bool> ready;
 
 	CounterBenchmark()
@@ -139,9 +136,6 @@ template<typename CntTyp> struct CounterBenchmark
 	    , cv()
 	    , benchmark_cores( default_phys_core_count )
 	    , threads()
-	    , sync_mtx()
-	    , sync_cv()
-	    , sync_ready( false )
 	    , ready( false )
 	{
 		pin_self_to_core( 0 );
@@ -174,22 +168,14 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
-	                        int core_id, BenchTyp benchmark, int warmup = 5,
-	                        bool sync = true )
+	                        int core_id, BenchTyp benchmark, int warmup = 5 )
 	{
 		uint64_t start, end;
 		counter.core_id = core_id;
 
-		if( sync )
 		{
 			std::unique_lock<std::mutex> lck( this->mtx );
 			this->cv.wait( lck, [this]() { return this->ready != false; } );
-		}
-		else
-		{
-			std::unique_lock<std::mutex> lck( this->sync_mtx );
-			this->sync_cv.wait( lck,
-			                    [this] { return this->sync_ready != false; } );
 		}
 
 		counter.add( events );
@@ -203,15 +189,9 @@ template<typename CntTyp> struct CounterBenchmark
 
 		counter.end();
 
-		if( sync )
 		{
 			std::lock_guard<std::mutex> lk( this->mtx );
 			this->ready = false;
-		}
-		else
-		{
-			std::lock_guard<std::mutex> lk( this->sync_mtx );
-			this->sync_ready = false;
 		}
 	}
 
@@ -230,7 +210,10 @@ template<typename CntTyp> struct CounterBenchmark
 			pin_to_core( i, svec[i].core_id );
 		}
 
-		this->ready = true;
+		{
+			std::lock_guard<std::mutex> lk( this->mtx );
+			this->ready = true;
+		}
 		this->cv.notify_all();
 
 		for( auto& th: this->threads )
@@ -257,8 +240,7 @@ template<typename CntTyp> struct CounterBenchmark
 			    [this, &counters, &svec, i, warmup] {
 				    this->counter_thread_fn<EventTyp>(
 				        counters[i], svec[i].events, 0 /* thread id */,
-				        svec[i].core_id, svec[i].benchmark, warmup,
-				        false /* sync */ );
+				        svec[i].core_id, svec[i].benchmark, warmup );
 			    } );
 			auto fut = task.get_future();
 
@@ -282,16 +264,16 @@ template<typename CntTyp> struct CounterBenchmark
 					        [&]( CntTyp& pc ) {
 						        measurement_tasks[j].run( pc );
 					        },
-					        0 /* warmup */, false /* sync */ );
+					        0 /* warmup */ );
 				    } ) );
 				pin_to_core( j + 1, svec[i].measurement_scheds[j].core_id );
 			}
 
 			{
-				std::lock_guard<std::mutex> lk( this->sync_mtx );
-				this->sync_ready = true;
+				std::lock_guard<std::mutex> lk( this->mtx );
+				this->ready = true;
 			}
-			this->sync_cv.notify_all();
+			this->cv.notify_all();
 
 			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
 

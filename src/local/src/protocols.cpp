@@ -214,47 +214,43 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 	CounterBenchmark<PAPILLCounter> cbench;
 	std::vector<Sched> vec;
 	int core_a = core_src, core_b, core_c;
-    switch( c )
-    {
-        case LOCAL:
-            core_b = core_node0;
-            core_c = core_src;
-            break;
-        case NODE:
-            core_b = core_node0;
-            core_c = core_node1;
-            break;
-        case SOCKET:
-            core_b = core_socket0;
-            core_c = core_socket1;
-            break;
-        case GLOBAL:
-            core_b = core_global0;
-            core_c = core_global1;
-            break;
-        default:
-            break;
-    }
-    std::ofstream ofs("dump.dat", std::ofstream::out | std::ofstream::app);
-    ofs << "TEST RUN" << std::endl;
-    ofs << mesi_type_des[t] << std::endl;
-    ofs << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
+	switch( c )
+	{
+		case LOCAL:
+			core_b = core_node0;
+			core_c = core_src;
+			break;
+		case NODE:
+			core_b = core_node0;
+			core_c = core_node1;
+			break;
+		case SOCKET:
+			core_b = core_socket0;
+			core_c = core_socket1;
+			break;
+		case GLOBAL:
+			core_b = core_global0;
+			core_c = core_global1;
+			break;
+		default: break;
+	}
+	std::ofstream ofs( "dump.dat", std::ofstream::out | std::ofstream::app );
+	ofs << "TEST RUN" << std::endl;
+	ofs << mesi_type_des[t] << std::endl;
+	ofs << "Core setting: " << core_placement_des[c] << " " << core_a << " "
+	    << core_b << " " << core_c << std::endl;
 
-    ofs.close();
-    /*
-    std::cout << "TEST RUN" << std::endl;
-    std::cout << mesi_type_des[t] << std::endl;
-    std::cout << "Core setting: " << core_placement_des[c] << " " << core_a << " " << core_b << " " << core_c << std::endl;
-    */
-    vec.push_back( Sched{ core_a /* core id */,
-                          std::function<decltype( flusher )>{ flusher },
-                          {} } );
-    vec.push_back( Sched{ core_b /* core id */,
-                          std::function<decltype( flusher )>{ flusher },
-                          {} } );
-    vec.push_back( Sched{ core_c /* core id */,
-                          std::function<decltype( flusher )>{ flusher },
-                          {} } );
+	ofs.close();
+
+	vec.push_back( Sched{ core_a /* core id */,
+	                      std::function<decltype( flusher )>{ flusher },
+	                      {} } );
+	vec.push_back( Sched{ core_b /* core id */,
+	                      std::function<decltype( flusher )>{ flusher },
+	                      {} } );
+	vec.push_back( Sched{ core_c /* core id */,
+	                      std::function<decltype( flusher )>{ flusher },
+	                      {} } );
 	switch( t )
 	{
 		case STORE_ON_MODIFIED:
@@ -324,48 +320,49 @@ void run_test( mesi_type_t t, core_placement_t c = NODE )
 		default: break;
 	}
 
-	// cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+	auto counters
+	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
+	        vec );
+	for( auto& cnt: counters )
+	{
+		if( cnt.cset.size() == 0 )
+			continue;
 
-	auto counters = cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
-		for( auto& cnt: counters )
-		{
-			if( cnt.cset.size() == 0 )
-				continue;
-
-			cnt.stats();
-		}
+		cnt.stats();
+	}
 }
 void parse_cfg()
 {
-    std::ifstream infile("arch.cfg");
-    if(!infile) {
-        std::cout << "Could not find file" << std::endl;
-        exit(1);
-    }
-    std::cout << "Reading from the file" << std::endl;
+	std::ifstream infile( "arch.cfg" );
+	if( !infile )
+	{
+		std::cout << "Could not find file" << std::endl;
+		exit( 1 );
+	}
+	std::cout << "Reading from the file" << std::endl;
 
-    std::string rline;
-    getline(infile, rline, '\n');
-    shared_data_size = std::stoll(rline);
-    getline(infile, rline, '\n');
-    cache_size = std::stoll(rline);
-    getline(infile, rline, '\n');
-    cache_line_size = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_src = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_node0 = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_node1 = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_socket0 = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_socket1 = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_global0 = std::stoi(rline);
-    getline(infile, rline, '\n');
-    core_global1 = std::stoi(rline);
-    infile.close();
+	std::string rline;
+	getline( infile, rline, '\n' );
+	shared_data_size = std::stoll( rline );
+	getline( infile, rline, '\n' );
+	cache_size = std::stoll( rline );
+	getline( infile, rline, '\n' );
+	cache_line_size = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_src = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_node0 = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_node1 = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_socket0 = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_socket1 = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_global0 = std::stoi( rline );
+	getline( infile, rline, '\n' );
+	core_global1 = std::stoi( rline );
+	infile.close();
 }
 
 int main( int argc, char* argv[] )
@@ -385,14 +382,15 @@ int main( int argc, char* argv[] )
 
 	setup( shared_data_size );
 
-    for( int j = 0; j < 4; j++) {
-        for( int i = 0; i < 1000; i++ )
-        {
-            run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>(j));
-            run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>(j));
-            run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>(j));
-        }
-    }
+	for( int j = 0; j < 4; j++ )
+	{
+		for( int i = 0; i < 1000; i++ )
+		{
+			run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ) );
+			run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ) );
+			run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ) );
+		}
+	}
 
 	free( (void*)shared_data );
 
