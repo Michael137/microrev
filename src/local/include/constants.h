@@ -13,7 +13,7 @@ constexpr int max_pmc_num = 8;
 
 constexpr unsigned int default_phys_core_count = 4;
 
-constexpr uint64_t _8B   = 8;
+constexpr uint64_t _8B    = 8;
 constexpr uint64_t _16B   = 16;
 constexpr uint64_t _32B   = 32;
 constexpr uint64_t _64B   = 64;
@@ -35,6 +35,12 @@ constexpr uint64_t _2MB   = 2097152;
 constexpr uint64_t _4MB   = 4194304;
 constexpr uint64_t _8MB   = 8388608;
 constexpr uint64_t _16MB  = 16777216;
+
+#ifdef __llvm__
+#	define OPT0 __attribute__( ( optnone ) )
+#else
+#	define OPT0 __attribute__( ( optimize( "O0" ) ) )
+#endif
 
 } // namespace pcnt
 
