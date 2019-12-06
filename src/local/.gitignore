@@ -6,3 +6,7 @@ tmp/
 *.swp
 *.tmp
 *.dat
+
+config.mk
+run.sh
+*.old
