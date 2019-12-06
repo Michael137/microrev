@@ -236,6 +236,7 @@ void run_test( mesi_type_t t, core_placement_t c, std::vector<std::string> cnt_v
 	}
 	std::ofstream ofs( "dump.dat", std::ofstream::out | std::ofstream::app );
 	ofs << "TEST RUN" << std::endl;
+	ofs << "Working Set Size: " << shared_data_size << std::endl;
 	ofs << mesi_type_des[t] << std::endl;
 	ofs << "Core setting: " << core_placement_des[c] << " " << core_a << " "
 	    << core_b << " " << core_c << std::endl;
@@ -378,7 +379,6 @@ int main( int argc, char* argv[] )
 
 	parse_cfg();
 
-	setup( shared_data_size );
     std::vector<std::vector<std::string> > cnt_vec_list;
     cnt_vec_list.push_back(std::vector<std::string> { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" });
     cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL", "L2_LINES_IN:E", "L2_LINES_IN:I"});
@@ -394,20 +394,26 @@ int main( int argc, char* argv[] )
     cnt_vec_list.push_back(std::vector<std::string> { "perf::PERF_COUNT_HW_CACHE_LL:ACCESS", "perf::PERF_COUNT_HW_CACHE_LL:MISS"});
     //cnt_vec_list.push_back(std::vector<std::string> { "ix86arch:LLC_MISSES"}); 
     //cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITE:SNP_ANY", "OFFCORE_RESPONSE_0:ANY_DATA:L3_MISS:SNP_ANY" });
-    for(auto c:cnt_vec_list) {
-        for( int j = 0; j < 3; j++ )
-        {
-            for( int i = 0; i < 100; i++ )
+    std::vector<uint64_t> size_vec{_128B, _256B, _512B, _1KB, _2KB, _4KB, _8KB, _16KB, _32KB, _64KB, _128KB, _256KB, _512KB, _1MB, _2MB};
+        
+    for(auto s:size_vec) {
+        shared_data_size = s;
+	    setup( shared_data_size );
+        for(auto c:cnt_vec_list) {
+            for( int j = 0; j < 3; j++ )
             {
-                run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), c );
-                run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ), c );
-                run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ), c );
-                run_test( FLUSH, static_cast<core_placement_t>( j ), c );
+                for( int i = 0; i < 100; i++ )
+                {
+                    run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ), c );
+                    run_test( FLUSH, static_cast<core_placement_t>( j ), c );
+                }
             }
         }
+	    free( (void*)shared_data );
     }
 
-	free( (void*)shared_data );
 
 #endif // !WITH_PAPI_LL
 	// std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;

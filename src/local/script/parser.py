@@ -1,5 +1,6 @@
 import os
 import statistics
+import pandas as pd
 
 test_res = {}
 
@@ -7,9 +8,10 @@ with open("dump.dat", "r") as f:
     rline = f.readline();
     while(rline):
         if rline.strip().startswith("TEST RUN"):
+            datasize = f.readline().strip().split(" ")[2]
             testtype = f.readline()
             placetype = f.readline().strip().split(" ")[2]
-            ttype = testtype.strip() + " " + placetype.strip()
+            ttype = testtype.strip() + " " + placetype.strip() + " " + datasize.strip()
             if ttype in test_res.keys():
                 res_dict = test_res[ttype]
             else:
@@ -34,4 +36,18 @@ with open("result.dat", "w") as f:
         for cname, cvalues in tdict.items():
             f.write(cname + ": " + format(statistics.mean(cvalues), ".2f") + "\n")
         f.write("\n")
+
+dictlist = []
+for tname, tdict in test_res.items():
+    ttype = tname.split(" ")[0]
+    ptype = tname.split(" ")[1]
+    dsize = tname.split(" ")[2]
+    tmpdict = {'Test': ttype, 'Placement': ptype, 'Size': dsize}
+    for cname, cvalues in tdict.items():
+        tmpdict[cname] = float(format(statistics.mean(cvalues), ".2f"))
+    dictlist.append(tmpdict)
+
+df = pd.DataFrame(dictlist, index=False)
+
+df.to_csv("result.csv")
 
