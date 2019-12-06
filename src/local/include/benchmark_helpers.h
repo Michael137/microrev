@@ -98,7 +98,10 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 	{                                                                          \
 		pc.start();                                                            \
 		uint64_t start = pcnt::rdtsc();                                        \
-		shared_iter    = ( (volatile char**)*shared_iter );                    \
+		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ ) \
+		{ \
+			shared_iter = ( (volatile char**)*shared_iter ); \
+		}  \
                                                                                \
 		uint64_t end = pcnt::rdtsc();                                          \
 		pc.read();                                                             \
