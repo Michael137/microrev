@@ -29,7 +29,7 @@ int main( int argc, char* argv[] )
 {
 #ifdef WITH_PMC
 
-#	error "TODO: implement this test using PAPI's HL interface"
+#error "TODO: implement this test using PAPI's HL interface"
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 	benchmark_setup();
@@ -60,22 +60,28 @@ int main( int argc, char* argv[] )
 	    "PAPI_L2_DCA", "PAPI_L2_DCM", "PAPI_L3_DCA" } );
 	cnt_vec_list.push_back( std::vector<std::string>{ "" } );
 
-	for( auto c: cnt_vec_list )
-	{
-		for( int j = 0; j < 3; j++ )
-		{
-			for( int i = 0; i < 100; i++ )
-			{
-				run_test( LOAD_FROM_MODIFIED,
-				          static_cast<core_placement_t>( j ), c );
-				run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ),
-				          c );
-				run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ),
-				          c );
-				run_test( FLUSH, static_cast<core_placement_t>( j ), c );
-			}
-		}
-	}
+    std::vector<uint64_t> size_vec{_256KB};
+    //std::vector<uint64_t> size_vec{KB, _16KB, _32KB, _64kB, _128KB, _256KB};
+
+    for( auto s: size_vec) {
+        shared_data_size = s;
+        for( auto c: cnt_vec_list )
+        {
+            for( int j = 0; j < 3; j++ )
+            {
+                for( int i = 0; i < 100; i++ )
+                {
+                    run_test( LOAD_FROM_MODIFIED,
+                              static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ),
+                              c );
+                    run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ),
+                              c );
+                    run_test( FLUSH, static_cast<core_placement_t>( j ), c );
+                }
+            }
+        }
+    }
 
 	free( (void*)shared_data );
 

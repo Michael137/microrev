@@ -274,6 +274,7 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 		std::ofstream ofs( "dump.dat",                                         \
 		                   std::ofstream::out | std::ofstream::app );          \
 		ofs << "TEST RUN" << std::endl;                                        \
+	    ofs << "Working Set Size: " << shared_data_size<< std::endl;           \
 		ofs << mesi_type_des[t] << std::endl;                                  \
 		ofs << "Core setting: " << core_placement_des[c] << " " << core_a      \
 		    << " " << core_b << " " << core_c << std::endl;                    \
