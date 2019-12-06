@@ -145,7 +145,7 @@ void setup( uint64_t size, uint64_t stride = 64 )
 		rndarray.push_back( (char*)&shared_data[i] );
 	}
 
-	myshuffle<char*>( rndarray );
+    myshuffle<char*>( rndarray );
 
 	for( uint64_t i = 0; i < size; i += stride )
 	{
@@ -191,12 +191,11 @@ void init_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
 			vec.push_back( Sched{ core_b, // core id,
 			                      std::function<decltype( reader )>{ reader },
                                   {} } );
-			vec.push_back( Sched{ core_b, // core id,
-			                      std::function<decltype( flusher )>{ flusher },
-                                  {} } );
 			break;
 		case I_STATE:
-            
+			vec.push_back( Sched{ core_a, // core id,
+			                      std::function<decltype( writer )>{ writer },
+			                      cnt_vec } );
 			vec.push_back( Sched{ core_a, // core id,
 			                      std::function<decltype( flusher )>{ flusher },
 			                      cnt_vec } );
@@ -386,15 +385,16 @@ int main( int argc, char* argv[] )
     std::vector<std::vector<std::string> > cnt_vec_list;
     cnt_vec_list.push_back(std::vector<std::string> { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" });
     cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL", "L2_LINES_IN:E", "L2_LINES_IN:I"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:S"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_RQSTS:CODE_RD_HIT", "L2_RQSTS:CODE_RD_MISS", "L2_RQSTS:ALL_PF"});
     cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=1", "L2_LINES_IN:E:cpu=1", "L2_LINES_IN:I:cpu=1"});
     cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=7", "L2_LINES_IN:E:cpu=7", "L2_LINES_IN:I:cpu=7"});
     cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=9", "L2_LINES_IN:E:cpu=9", "L2_LINES_IN:I:cpu=9"});
-    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:S"});
     cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITMESF:SNP_ANY"}); 
     cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITM:SNP_ANY"}); 
     cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITS:SNP_ANY"}); 
     cnt_vec_list.push_back(std::vector<std::string> { "PAPI_L2_DCA", "PAPI_L2_DCM", "PAPI_L3_DCA"});
-    cnt_vec_list.push_back(std::vector<std::string> { ""});
+    cnt_vec_list.push_back(std::vector<std::string> { "perf::PERF_COUNT_HW_CACHE_LL:ACCESS", "perf::PERF_COUNT_HW_CACHE_LL:MISS"});
     //cnt_vec_list.push_back(std::vector<std::string> { "ix86arch:LLC_MISSES"}); 
     //cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITE:SNP_ANY", "OFFCORE_RESPONSE_0:ANY_DATA:L3_MISS:SNP_ANY" });
     for(auto c:cnt_vec_list) {
