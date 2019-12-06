@@ -1,39 +1,39 @@
 #ifndef BENCHMARK_HELPERS_H_IN
 #define BENCHMARK_HELPERS_H_IN
 
+#include <err.h>
+#include <immintrin.h>
 #include <inttypes.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <mutex>
+#include <random>
 #include <string>
 #include <vector>
 
-#include "constants.h"
 #include "counter.h"
+#include "counters.h"
+#include "shuffle.h"
 #include "thread_utils.h"
 
-#define BENCHMARK_INIT()                                                       \
-	volatile char* shared_data         = nullptr;                              \
-	volatile char** shared_iter        = nullptr;                              \
-	volatile uint64_t shared_data_size = 0;                                    \
-	volatile uint64_t cache_line_size  = 0;                                    \
-	volatile uint64_t cache_size       = 0;                                    \
-	volatile uint64_t stride           = 0;                                    \
-                                                                               \
-	int core_src     = 0;                                                      \
-	int core_socket0 = 0;                                                      \
-	int core_socket1 = 0;                                                      \
-	int core_global0 = 0;                                                      \
-	int core_global1 = 0;
+#if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
+#	include <papi.h>
+#endif
 
-enum cache_state_t : unsigned int
-{
-	M_STATE,
-	E_STATE,
-	S_STATE,
-	I_STATE,
-	O_STATE,
-	F_STATE
-};
+#define M_STATE 0
+#define E_STATE 1
+#define S_STATE 2
+#define I_STATE 3
+#define O_STATE 4
+#define F_STATE 5
 
-enum mesi_type_t : unsigned int
+using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
+
+typedef enum
 {
 	STORE_ON_MODIFIED,
 	STORE_ON_EXCLUSIVE,
@@ -44,14 +44,14 @@ enum mesi_type_t : unsigned int
 	LOAD_FROM_SHARED,
 	LOAD_FROM_INVALID,
 	FLUSH,
-};
+} mesi_type_t;
 
-enum core_placement_t : unsigned int
+typedef enum
 {
 	LOCAL,  // Same core
 	SOCKET, // Same Socket
 	GLOBAL  // Across Sockets
-};
+} core_placement_t;
 
 const char* mesi_type_des[] = {
     "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED",
@@ -61,15 +61,19 @@ const char* mesi_type_des[] = {
 
 const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 
-using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
-
-#define BENCHMARK_SETUP()                                                      \
-	BENCHMARK_INIT()                                                           \
+#define BENCHMARK_INIT()                                                       \
+	int core_src, core_socket0, core_socket1, core_global0, core_global1;      \
                                                                                \
-	void OPT0 flusher_( pcnt::PAPILLCounter& pc, uint64_t size,         \
-	                           uint64_t stride )                               \
+	volatile char* shared_data  = nullptr;                                     \
+	volatile char** shared_iter = nullptr;                                     \
+	volatile uint64_t shared_data_size;                                        \
+	volatile uint64_t cache_line_size;                                         \
+	volatile uint64_t cache_size;                                              \
+                                                                               \
+	void OPT0 flusher_( PAPILLCounter& pc, uint64_t size,                      \
+	                    uint64_t stride = 64 )                                 \
 	{                                                                          \
-		for( uint64_t i = 0; i < size; i += stride )                           \
+		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
 		{                                                                      \
 			_mm_mfence();                                                      \
 			_mm_clflush( (void*)&shared_data[i] );                             \
@@ -77,117 +81,77 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 		}                                                                      \
 	}                                                                          \
                                                                                \
-	static void OPT0 writer_( pcnt::PAPILLCounter& pc, uint64_t size,          \
-	                          uint64_t stride )                                \
+	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
+	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
 		pc.start();                                                            \
-		uint64_t start = pcnt::rdtsc();                                        \
+		uint64_t start = rdtsc();                                              \
 		char** iter    = (char**)shared_iter;                                  \
 		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
 		{                                                                      \
 			iter          = ( (char**)*iter );                                 \
 			*( iter + 1 ) = (char*)1;                                          \
 		}                                                                      \
-		uint64_t end = pcnt::rdtsc();                                          \
+		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
                                                                                \
-	void OPT0 reader_( pcnt::PAPILLCounter& pc, uint64_t size,          \
-	                          uint64_t stride )                                \
+	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
+	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
 		pc.start();                                                            \
-		uint64_t start = pcnt::rdtsc();                                        \
-		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ ) \
-		{ \
-			shared_iter = ( (volatile char**)*shared_iter ); \
-		}  \
-                                                                               \
-		uint64_t end = pcnt::rdtsc();                                          \
+		uint64_t start = rdtsc();                                              \
+		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
+		{                                                                      \
+			shared_iter = ( (volatile char**)*shared_iter );                   \
+		}                                                                      \
+		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
                                                                                \
-	void parse_arch_cfg()                                               \
+	void reader( PAPILLCounter& pc )                                           \
 	{                                                                          \
-		std::ifstream infile( "arch.cfg" );                                    \
-		if( !infile )                                                          \
-		{                                                                      \
-			std::cout << "Could not find file" << std::endl;                   \
-			exit( 1 );                                                         \
-		}                                                                      \
-		std::cout << "Reading from the file" << std::endl;                     \
-                                                                               \
-		std::string rline;                                                     \
-		getline( infile, rline, '\n' );                                        \
-		shared_data_size = std::stoll( rline );                                \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		cache_size = std::stoll( rline );                                      \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		cache_line_size = std::stoi( rline );                                  \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		stride = std::stoi( rline );                                           \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		core_src = std::stoi( rline );                                         \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		core_socket0 = std::stoi( rline );                                     \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		core_socket1 = std::stoi( rline );                                     \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		core_global0 = std::stoi( rline );                                     \
-                                                                               \
-		getline( infile, rline, '\n' );                                        \
-		core_global1 = std::stoi( rline );                                     \
-                                                                               \
-		infile.close();                                                        \
+		reader_( pc, shared_data_size, cache_line_size );                      \
 	}                                                                          \
                                                                                \
-	void reader( pcnt::PAPILLCounter& pc )                                     \
+	void writer( PAPILLCounter& pc )                                           \
 	{                                                                          \
-		reader_( pc, shared_data_size, stride );                               \
+		writer_( pc, shared_data_size, cache_line_size );                      \
 	}                                                                          \
                                                                                \
-	void writer( pcnt::PAPILLCounter& pc )                                     \
+	void flusher( PAPILLCounter& pc )                                          \
 	{                                                                          \
-		writer_( pc, shared_data_size, stride );                               \
+		flusher_( pc, shared_data_size, cache_line_size );                     \
 	}                                                                          \
                                                                                \
-	void flusher( pcnt::PAPILLCounter& pc )                                    \
+	void setup( uint64_t size, uint64_t stride = 64 )                          \
 	{                                                                          \
-		flusher_( pc, shared_data_size, stride );                              \
-	}                                                                          \
+		shared_data = (char*)malloc( size * sizeof( char ) );                  \
                                                                                \
-	void benchmark_setup()                                                     \
-	{                                                                          \
-		parse_arch_cfg();                                                      \
-                                                                               \
-		shared_data = (char*)malloc( shared_data_size * sizeof( char ) );      \
 		volatile char** head = (volatile char**)shared_data;                   \
 		shared_iter          = head;                                           \
                                                                                \
 		std::vector<char*> rndarray;                                           \
-		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
+		for( uint64_t i = 0; i < size; i += stride )                           \
+		{                                                                      \
 			rndarray.push_back( (char*)&shared_data[i] );                      \
+		}                                                                      \
                                                                                \
-		shuffle_array<char*>( rndarray );                                      \
+		shuffle_array<char*>( rndarray );                                          \
                                                                                \
-		uint64_t i;                                                            \
-		for( i = 0; i < shared_data_size; i += stride )                        \
+		for( uint64_t i = 0; i < size; i += stride )                           \
 		{                                                                      \
 			*shared_iter = *(volatile char**)&rndarray[i / stride];            \
+                                                                               \
 			shared_iter += ( stride / sizeof( shared_iter ) );                 \
 		}                                                                      \
+                                                                               \
 		*shared_iter = (char*)head;                                            \
 	}                                                                          \
                                                                                \
-	void set_state(                                                            \
+	void init_state(                                                           \
 	    std::vector<Sched>& vec, uint64_t cc_state, int core_a, int core_b,    \
 	    std::vector<std::string> cnt_vec = std::vector<std::string>{} )        \
 	{                                                                          \
@@ -200,13 +164,13 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 				break;                                                         \
 			case E_STATE:                                                      \
 				vec.push_back(                                                 \
-				    Sched{ core_a,                                             \
-				           std::function<decltype( writer )>{ writer },        \
-				           {} } );                                             \
-				vec.push_back(                                                 \
-				    Sched{ core_a,                                             \
-				           std::function<decltype( flusher )>{ flusher },      \
-				           {} } );                                             \
+				       Sched{ core_a,                                          \
+				              std::function<decltype( writer )>{ writer },     \
+				              {} } );\
+			vec.push_back( Sched{                     \
+				    core_a,                                                    \
+				    std::function<decltype( flusher )>{ flusher },             \
+				    {} } );                                                    \
 				vec.push_back( Sched{                                          \
 				    core_a, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
@@ -224,13 +188,11 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 				    Sched{ core_b,                                             \
 				           std::function<decltype( reader )>{ reader },        \
 				           {} } );                                             \
-				vec.push_back(                                                 \
-				    Sched{ core_b,                                             \
-				           std::function<decltype( flusher )>{ flusher },      \
-				           {} } );                                             \
 				break;                                                         \
 			case I_STATE:                                                      \
-                                                                               \
+				vec.push_back( Sched{                                          \
+				    core_a, std::function<decltype( writer )>{ writer },       \
+				    cnt_vec } );                                               \
 				vec.push_back( Sched{                                          \
 				    core_a, std::function<decltype( flusher )>{ flusher },     \
 				    cnt_vec } );                                               \
@@ -255,7 +217,7 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 	void run_test( mesi_type_t t, core_placement_t c,                          \
 	               std::vector<std::string> cnt_vec )                          \
 	{                                                                          \
-		pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;                    \
+		CounterBenchmark<PAPILLCounter> cbench;                                \
 		std::vector<Sched> vec;                                                \
 		int core_a = core_src, core_b, core_c;                                 \
 		switch( c )                                                            \
@@ -277,7 +239,6 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 		std::ofstream ofs( "dump.dat",                                         \
 		                   std::ofstream::out | std::ofstream::app );          \
 		ofs << "TEST RUN" << std::endl;                                        \
-	    ofs << "Working Set Size: " << shared_data_size<< std::endl;           \
 		ofs << mesi_type_des[t] << std::endl;                                  \
 		ofs << "Core setting: " << core_placement_des[c] << " " << core_a      \
 		    << " " << core_b << " " << core_c << std::endl;                    \
@@ -293,50 +254,50 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 		switch( t )                                                            \
 		{                                                                      \
 			case STORE_ON_MODIFIED:                                            \
-				set_state( vec, M_STATE, core_a, core_b );                     \
+				init_state( vec, M_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case STORE_ON_EXCLUSIVE:                                           \
-				set_state( vec, E_STATE, core_a, core_b );                     \
+				init_state( vec, E_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case STORE_ON_SHARED:                                              \
-				set_state( vec, S_STATE, core_a, core_b );                     \
+				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case STORE_ON_INVALID:                                             \
-				set_state( vec, I_STATE, core_a, core_b );                     \
+				init_state( vec, I_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case LOAD_FROM_MODIFIED:                                           \
-				set_state( vec, M_STATE, core_a, core_b );                     \
+				init_state( vec, M_STATE, core_a, core_b );                    \
                                                                                \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case LOAD_FROM_EXCLUSIVE:                                          \
-				set_state( vec, E_STATE, core_a, core_b );                     \
+				init_state( vec, E_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case LOAD_FROM_SHARED:                                             \
-				set_state( vec, S_STATE, core_a, core_b );                     \
+				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case LOAD_FROM_INVALID:                                            \
-				set_state( vec, I_STATE, core_a, core_b );                     \
+				init_state( vec, I_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
@@ -364,6 +325,35 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
                                                                                \
 			cnt.stats();                                                       \
 		}                                                                      \
+	}                                                                          \
+	void parse_cfg()                                                           \
+	{                                                                          \
+		std::ifstream infile( "arch.cfg" );                                    \
+		if( !infile )                                                          \
+		{                                                                      \
+			std::cout << "Could not find file" << std::endl;                   \
+			exit( 1 );                                                         \
+		}                                                                      \
+		std::cout << "Reading from the file" << std::endl;                     \
+                                                                               \
+		std::string rline;                                                     \
+		getline( infile, rline, '\n' );                                        \
+		shared_data_size = std::stoll( rline );                                \
+		getline( infile, rline, '\n' );                                        \
+		cache_size = std::stoll( rline );                                      \
+		getline( infile, rline, '\n' );                                        \
+		cache_line_size = std::stoi( rline );                                  \
+		getline( infile, rline, '\n' );                                        \
+		core_src = std::stoi( rline );                                         \
+		getline( infile, rline, '\n' );                                        \
+		core_socket0 = std::stoi( rline );                                     \
+		getline( infile, rline, '\n' );                                        \
+		core_socket1 = std::stoi( rline );                                     \
+		getline( infile, rline, '\n' );                                        \
+		core_global0 = std::stoi( rline );                                     \
+		getline( infile, rline, '\n' );                                        \
+		core_global1 = std::stoi( rline );                                     \
+		infile.close();                                                        \
 	}
 
 #endif // BENCHMARK_HELPERS_H_IN

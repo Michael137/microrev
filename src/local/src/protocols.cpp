@@ -23,7 +23,7 @@
 
 using namespace pcnt;
 
-BENCHMARK_SETUP();
+BENCHMARK_INIT();
 
 int main( int argc, char* argv[] )
 {
@@ -32,7 +32,8 @@ int main( int argc, char* argv[] )
 #error "TODO: implement this test using PAPI's HL interface"
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
-	benchmark_setup();
+
+	parse_cfg();
 
 	std::vector<std::vector<std::string>> cnt_vec_list;
 	cnt_vec_list.push_back(
@@ -65,6 +66,7 @@ int main( int argc, char* argv[] )
 
     for( auto s: size_vec) {
         shared_data_size = s;
+	setup(shared_data_size);
         for( auto c: cnt_vec_list )
         {
             for( int j = 0; j < 3; j++ )
@@ -81,9 +83,9 @@ int main( int argc, char* argv[] )
                 }
             }
         }
+	free( (void*)shared_data );
     }
 
-	free( (void*)shared_data );
 
 #endif // !WITH_PAPI_LL
 
