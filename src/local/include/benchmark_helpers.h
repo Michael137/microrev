@@ -84,9 +84,9 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
+		char** iter    = (char**)shared_iter;                                  \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		char** iter    = (char**)shared_iter;                                  \
 		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
 		{                                                                      \
 			iter          = ( (char**)*iter );                                 \
@@ -100,11 +100,12 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
+		char** iter    = (char**)shared_iter;                                  \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
-			shared_iter = ( (volatile char**)*shared_iter );                   \
+			iter          = ( (char**)*iter );                                 \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
@@ -239,6 +240,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		std::ofstream ofs( "dump.dat",                                         \
 		                   std::ofstream::out | std::ofstream::app );          \
 		ofs << "TEST RUN" << std::endl;                                        \
+		ofs << "Working Set Size: " << shared_data_size << std::endl;                                        \
 		ofs << mesi_type_des[t] << std::endl;                                  \
 		ofs << "Core setting: " << core_placement_des[c] << " " << core_a      \
 		    << " " << core_b << " " << core_c << std::endl;                    \
