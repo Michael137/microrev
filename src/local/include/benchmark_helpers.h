@@ -14,6 +14,7 @@ extern volatile char** shared_iter;
 extern volatile uint64_t shared_data_size;
 extern volatile uint64_t cache_line_size;
 extern volatile uint64_t cache_size;
+extern volatile uint64_t stride;
 
 extern int core_src;
 extern int core_socket0;
@@ -27,6 +28,7 @@ extern int core_global1;
 	volatile uint64_t shared_data_size = 0;                                    \
 	volatile uint64_t cache_line_size  = 0;                                    \
 	volatile uint64_t cache_size       = 0;                                    \
+	volatile uint64_t stride       = 0;                                    \
                                                                                \
 	int core_src     = 0;                                                      \
 	int core_socket0 = 0;                                                      \
@@ -71,7 +73,7 @@ enum core_placement_t : unsigned int
 
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
-void benchmark_setup( uint64_t size, uint64_t stride = 64 );
+void benchmark_setup();
 void set_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
                 int core_b, std::vector<std::string> cnt_vec );
 void run_test( mesi_type_t t, core_placement_t c,

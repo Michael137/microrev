@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
-	benchmark_setup( shared_data_size );
+	benchmark_setup();
 
 	std::vector<std::vector<std::string>> cnt_vec_list;
 	cnt_vec_list.push_back(

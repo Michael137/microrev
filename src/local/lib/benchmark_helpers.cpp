@@ -35,9 +35,9 @@ const char* mesi_type_des[] = {
 const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 
 static void OPT0 flusher_( pcnt::PAPILLCounter& pc, uint64_t size,
-                           uint64_t stride = 64 )
+                           uint64_t stride )
 {
-	for( uint64_t i = 0; i < shared_data_size; i += stride )
+	for( uint64_t i = 0; i < size; i += stride )
 	{
 		// Arrange linked list such that:
 		// Pointer at arr[i] == Pointer at arr[i + stride]
@@ -48,11 +48,11 @@ static void OPT0 flusher_( pcnt::PAPILLCounter& pc, uint64_t size,
 }
 
 static void OPT0 writer_( pcnt::PAPILLCounter& pc, uint64_t size,
-                          uint64_t stride = 64 )
+                          uint64_t stride )
 {
 	pc.start();
 	uint64_t start = pcnt::rdtsc();
-	char** iter    = (char**)shared_data;
+	char** iter    = (char**)shared_iter;
 	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
 		// Arrange linked list such that:
@@ -66,17 +66,14 @@ static void OPT0 writer_( pcnt::PAPILLCounter& pc, uint64_t size,
 }
 
 static void OPT0 reader_( pcnt::PAPILLCounter& pc, uint64_t size,
-                          uint64_t stride = 64 )
+                          uint64_t stride )
 {
-	char** iter = (char**)shared_data;
 	pc.start();
 	uint64_t start = pcnt::rdtsc();
 	// Pointer-chase through linked list
 	for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )
-	{
-		// Unroll loop partially to reduce loop overhead
-		iter = ( (char**)*iter );
-	}
+		shared_iter = ( (volatile char**)*shared_iter );
+
 	uint64_t end = pcnt::rdtsc();
 	pc.read();
 	pc.vec_cycles_measured.push_back( end - start );
@@ -95,56 +92,70 @@ static void parse_arch_cfg()
 	std::string rline;
 	getline( infile, rline, '\n' );
 	shared_data_size = std::stoll( rline );
+
 	getline( infile, rline, '\n' );
 	cache_size = std::stoll( rline );
+
 	getline( infile, rline, '\n' );
 	cache_line_size = std::stoi( rline );
+
+	getline( infile, rline, '\n' );
+	stride = std::stoi( rline );
+
 	getline( infile, rline, '\n' );
 	core_src = std::stoi( rline );
+
 	getline( infile, rline, '\n' );
 	core_socket0 = std::stoi( rline );
+
 	getline( infile, rline, '\n' );
 	core_socket1 = std::stoi( rline );
+
 	getline( infile, rline, '\n' );
 	core_global0 = std::stoi( rline );
+
 	getline( infile, rline, '\n' );
 	core_global1 = std::stoi( rline );
+
 	infile.close();
 }
 
 void reader( pcnt::PAPILLCounter& pc )
 {
-	reader_( pc, shared_data_size, cache_line_size );
+	reader_( pc, shared_data_size, stride );
 }
 
 void writer( pcnt::PAPILLCounter& pc )
 {
-	writer_( pc, shared_data_size, cache_line_size );
+	writer_( pc, shared_data_size, stride );
 }
 
 void flusher( pcnt::PAPILLCounter& pc )
 {
-	flusher_( pc, shared_data_size, cache_line_size );
+	flusher_( pc, shared_data_size, stride );
 }
 
-void benchmark_setup( uint64_t size, uint64_t stride )
+void benchmark_setup()
 {
-	shared_data = (char*)malloc( size * sizeof( char ) );
+	parse_arch_cfg();
+
+	shared_data          = (char*)malloc( shared_data_size * sizeof( char ) );
+	volatile char** head = (volatile char**)shared_data;
+	shared_iter          = head;
 
 	std::vector<char*> rndarray;
-	for( uint64_t i = 0; i < size; i += stride )
+	for( uint64_t i = 0; i < shared_data_size; i += stride )
 		rndarray.push_back( (char*)&shared_data[i] );
 
 	shuffle_array<char*>( rndarray );
 
 	uint64_t i;
-	for( i = stride; i < size; i += stride )
-		*(volatile char**)&shared_data[i - stride]
-		    = *(volatile char**)&rndarray[( i / stride ) - 1];
-
-	*(char**)&shared_data[i - stride] = (char*)&shared_data[0];
-
-	parse_arch_cfg();
+	for( i = 0; i < shared_data_size; i += stride )
+	{
+		*shared_iter = *(volatile char**)&rndarray[i / stride];
+		shared_iter += ( stride / sizeof( shared_iter ) );
+	}
+	*shared_iter = (char*)head;
 }
 
 void set_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
