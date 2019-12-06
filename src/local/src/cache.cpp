@@ -10,8 +10,8 @@
 #include "constants.h"
 #include "counter.h"
 #include "counters.h"
-#include "thread_utils.h"
 #include "shuffle.h"
+#include "thread_utils.h"
 
 #if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
@@ -19,9 +19,8 @@
 
 using namespace pcnt;
 
-void __attribute__( ( optimize( "0" ) ) )
-doloops( PAPILLCounter& pc, uint64_t wset_sz, uint64_t stride = 32,
-         uint64_t repeat = 100 )
+void OPT0 doloops( PAPILLCounter& pc, uint64_t wset_sz, uint64_t stride = 32,
+                   uint64_t repeat = 100 )
 {
 	uint64_t start, end;
 	char c;
@@ -69,21 +68,23 @@ int main( int argc, char* argv[] )
 	CounterBenchmark<PAPILLCounter> cbench;
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
-    std::vector<char *> a;
-    a.push_back((char*) 0);
-    a.push_back((char*) 1);
-    a.push_back((char*) 2);
-    a.push_back((char*) 3);
-    a.push_back((char*) 4);
-    for(auto e:a) {
-        std::cout << static_cast<void*>(e) << " ";
-    }
-    std::cout << '\n' << '\n';
-    myshuffle(a);
-    for(auto e:a) {
-        std::cout << static_cast<void*>(e)<< " ";
-    }
-    std::cout << '\n' << '\n';
+	std::vector<char*> a;
+	a.push_back( (char*)0 );
+	a.push_back( (char*)1 );
+	a.push_back( (char*)2 );
+	a.push_back( (char*)3 );
+	a.push_back( (char*)4 );
+	for( auto e: a )
+	{
+		std::cout << static_cast<void*>( e ) << " ";
+	}
+	std::cout << '\n' << '\n';
+	myshuffle( a );
+	for( auto e: a )
+	{
+		std::cout << static_cast<void*>( e ) << " ";
+	}
+	std::cout << '\n' << '\n';
 
 	Sched core_1
 	    = Sched{ 1,

@@ -68,8 +68,7 @@ volatile uint64_t shared_data_size;
 volatile uint64_t cache_line_size;
 volatile uint64_t cache_size;
 
-void __attribute__( ( optimize( "0" ) ) )
-flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
+void OPT0 flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
 	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
@@ -81,8 +80,7 @@ flusher_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	}
 }
 
-void __attribute__( ( optimize( "0" ) ) )
-writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
+void OPT0 writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
 	pc.start();
 	uint64_t start = rdtsc();
@@ -99,8 +97,7 @@ writer_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 	pc.vec_cycles_measured.push_back( end - start );
 }
 
-void __attribute__( ( optimize( "0" ) ) )
-reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
+void OPT0 reader_( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
 {
 	pc.start();
 	uint64_t start = rdtsc();

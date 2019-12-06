@@ -61,16 +61,22 @@ void multi_measurement()
 	    std::function<decltype( doflops )>{ doflops },
 	    { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
 	    { Sched{ 2, { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } },
-	      Sched{ 2, { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } } },
+	      Sched{ 3, { "perf::LLC-LOADS", "PAPI_TOT_INS", "PAPI_TOT_CYC" } } },
 	};
 
 	std::vector<Sched> vec = { core_1 };
-	auto counters
-	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
-	        vec );
+//	auto counters
+//	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
+//	        vec );
 
-	for( auto& cnt: counters )
-		cnt.stats();
+	for(int i = 0; i < 1000; ++i)
+		auto counters
+	    	= cbench.counters_with_priority_schedule<std::vector<std::string>>(
+	        	vec );
+
+
+//	for( auto& cnt: counters )
+//		cnt.print_stats();
 }
 
 int main( int argc, char* argv[] )

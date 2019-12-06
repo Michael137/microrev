@@ -22,8 +22,7 @@ using namespace pcnt;
  * From:
  * https://github.com/foss-for-synopsys-dwc-arc-processors/lmbench/blob/master/src/lib_mem.c#L177
  */
-char** __attribute__( ( optimize( "0" ) ) )
-init_stride( uint64_t size, uint64_t stride )
+char** OPT0 init_stride( uint64_t size, uint64_t stride )
 {
 	char* arr = (char*)malloc( size * sizeof( char ) );
 
@@ -45,8 +44,8 @@ init_stride( uint64_t size, uint64_t stride )
 	return iter;
 }
 
-void __attribute__( ( optimize( "0" ) ) )
-time_rd_latency( PAPILLCounter& pc, uint64_t size, uint64_t stride = 64 )
+void OPT0 time_rd_latency( PAPILLCounter& pc, uint64_t size,
+                           uint64_t stride = 64 )
 {
 	const int accesses = 1000000;
 
