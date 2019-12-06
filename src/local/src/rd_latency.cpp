@@ -15,33 +15,19 @@ using namespace pcnt;
 #define FIFTY( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a )
 #define HUNDRED( a ) FIFTY( a ) FIFTY( a )
 
-/*
- * With predicatble stride i.e. pre-fetcher
- * will trigger
- *
- * From:
- * https://github.com/foss-for-synopsys-dwc-arc-processors/lmbench/blob/master/src/lib_mem.c#L177
- */
-char** OPT0 init_stride( uint64_t size, uint64_t stride )
+// See test/rd_latency.cpp for explanation
+char* init_stride( uint64_t size, uint64_t stride = 64 )
 {
 	char* arr = (char*)malloc( size * sizeof( char ) );
 
-	char** head = (char**)arr;
-	char** iter = head;
-
-	for( uint64_t i = 0; i < size; i += stride )
+	int i;
+	for( i = stride; i < size; i += stride )
 	{
-		// Arrange linked list such that:
-		// Pointer at arr[i] == Pointer at arr[i + stride]
-		*iter = &arr[i + stride];
-
-		iter += ( stride / sizeof( iter ) );
+		*(char**)&arr[i - stride] = (char*)&arr[i];
 	}
+	*(char**)&arr[i - stride] = (char*)&arr[0];
 
-	// Loop back end of linked list to the head
-	*iter = (char*)head;
-
-	return iter;
+	return arr;
 }
 
 void OPT0 time_rd_latency( PAPILLCounter& pc, uint64_t size,
@@ -49,20 +35,19 @@ void OPT0 time_rd_latency( PAPILLCounter& pc, uint64_t size,
 {
 	const int accesses = 1000000;
 
-	char** iter = init_stride( size, stride );
+	char* arr   = init_stride( size, stride );
+	char** iter = (char**)arr;
 
 	pc.start();
 	uint64_t start = rdtsc();
-	// Pointer-chase through linked list
 	for( int i = 0; i < accesses; ++i )
-	{
-		// Unroll loop partially to reduce loop overhead
 		HUNDRED( iter = ( (char**)*iter ); )
-	}
 
 	uint64_t end = rdtsc();
 	pc.read();
 	pc.vec_cycles_measured.push_back( end - start );
+
+	free(arr);
 }
 
 // Stride: 64 bytes

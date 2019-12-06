@@ -79,7 +79,7 @@ int main( int argc, char* argv[] )
 		std::cout << static_cast<void*>( e ) << " ";
 	}
 	std::cout << '\n' << '\n';
-	myshuffle( a );
+	shuffle_array( a );
 	for( auto e: a )
 	{
 		std::cout << static_cast<void*>( e ) << " ";

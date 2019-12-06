@@ -30,35 +30,32 @@ int gen_num() { return dist( gen ); }
  * From:
  * https://github.com/foss-for-synopsys-dwc-arc-processors/lmbench/blob/master/src/lib_mem.c#L177
  */
-char** init_stride( uint64_t size )
+char* init_stride( uint64_t size )
 {
 	char* arr = (char*)malloc( size * sizeof( char ) );
 
 	uint64_t stride = 64;
 
-	char** head = (char**)arr;
-	char** iter = head;
-
-	for( uint64_t i = 0; i < size; i += stride )
+	int i;
+	for( i = stride; i < size; i += stride )
 	{
 		// Arrange linked list such that:
 		// Pointer at arr[i] == Pointer at arr[i + stride]
-		*iter = &arr[i + stride];
-
-		iter += ( stride / sizeof( iter ) );
+		*(char**)&arr[i - stride] = (char*)&arr[i];
 	}
 
 	// Loop back end of linked list to the head
-	*iter = (char*)head;
+	*(char**)&arr[i - stride] = (char*)&arr[0];
 
-	return iter;
+	return arr;
 }
 
 uint64_t time_rd_latency( uint64_t size )
 {
 	const int accesses = 1000000;
 
-	char** iter = init_stride( size );
+	char* arr   = init_stride( size );
+	char** iter = (char**)arr;
 
 	uint64_t start = rdtsc();
 
@@ -70,6 +67,8 @@ uint64_t time_rd_latency( uint64_t size )
 	}
 
 	uint64_t end = rdtsc();
+
+	free(arr);
 
 	return end - start;
 }
