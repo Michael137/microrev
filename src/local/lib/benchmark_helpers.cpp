@@ -52,7 +52,7 @@ static void OPT0 writer_( pcnt::PAPILLCounter& pc, uint64_t size,
 {
 	pc.start();
 	uint64_t start = pcnt::rdtsc();
-	char** iter    = (char**)shared_iter;
+	char** iter    = (char**)shared_data;
 	for( uint64_t i = 0; i < shared_data_size; i += stride )
 	{
 		// Arrange linked list such that:
@@ -68,13 +68,14 @@ static void OPT0 writer_( pcnt::PAPILLCounter& pc, uint64_t size,
 static void OPT0 reader_( pcnt::PAPILLCounter& pc, uint64_t size,
                           uint64_t stride = 64 )
 {
+	char** iter = (char**)shared_data;
 	pc.start();
 	uint64_t start = pcnt::rdtsc();
 	// Pointer-chase through linked list
 	for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )
 	{
 		// Unroll loop partially to reduce loop overhead
-		shared_iter = ( (volatile char**)*shared_iter );
+		iter = ( (char**)*iter );
 	}
 	uint64_t end = pcnt::rdtsc();
 	pc.read();
@@ -130,35 +131,25 @@ void benchmark_setup( uint64_t size, uint64_t stride )
 {
 	shared_data = (char*)malloc( size * sizeof( char ) );
 
-	volatile char** head = (volatile char**)shared_data;
-	shared_iter          = head;
-
 	std::vector<char*> rndarray;
 	for( uint64_t i = 0; i < size; i += stride )
-	{
 		rndarray.push_back( (char*)&shared_data[i] );
-	}
 
 	shuffle_array<char*>( rndarray );
 
-	for( uint64_t i = 0; i < size; i += stride )
-	{
-		// Arrange linked list such that:
-		// Pointer at arr[i] == Pointer at arr[i + stride]
-		*shared_iter = *(volatile char**)&rndarray[i / stride];
+	uint64_t i;
+	for( i = stride; i < size; i += stride )
+		*(volatile char**)&shared_data[i - stride]
+		    = *(volatile char**)&rndarray[( i / stride ) - 1];
 
-		shared_iter += ( stride / sizeof( shared_iter ) );
-	}
-
-	// Loop back end of linked list to the head
-	*shared_iter = (char*)head;
+	*(char**)&shared_data[i - stride] = (char*)&shared_data[0];
 
 	parse_arch_cfg();
 }
 
 void set_state( std::vector<Sched>& vec, uint64_t cc_state, int core_a,
-                 int core_b,
-                 std::vector<std::string> cnt_vec = std::vector<std::string>{} )
+                int core_b,
+                std::vector<std::string> cnt_vec = std::vector<std::string>{} )
 {
 	switch( cc_state )
 	{
