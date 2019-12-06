@@ -168,8 +168,13 @@ void PAPILLCounter::add( std::vector<std::string> const& events )
 			int code = 0;
 			retval   = PAPI_event_name_to_code(
                 const_cast<char*>( events[i].c_str() ), &code );
-			if( retval != PAPI_OK )
-				exit_with_err( "couldn't convert event name to code" );
+			if( retval != PAPI_OK ){
+				std::stringstream ss;
+				ss << "couldn't convert event name to code\n";
+				for( auto& e: events )
+					ss << '\t' << e << std::endl;
+				exit_with_err(ss.str().c_str() );
+			}
 
 			codes.push_back( code );
 		}
