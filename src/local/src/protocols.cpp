@@ -23,6 +23,8 @@
 
 using namespace pcnt;
 
+BENCHMARK_SETUP();
+
 int main( int argc, char* argv[] )
 {
 #ifdef WITH_PMC
@@ -30,7 +32,6 @@ int main( int argc, char* argv[] )
 #	error "TODO: implement this test using PAPI's HL interface"
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
-
 	benchmark_setup();
 
 	std::vector<std::vector<std::string>> cnt_vec_list;
