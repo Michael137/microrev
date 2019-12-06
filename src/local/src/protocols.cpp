@@ -35,55 +35,38 @@ int main( int argc, char* argv[] )
 
 	parse_cfg();
 
-	std::vector<std::vector<std::string>> cnt_vec_list;
-	cnt_vec_list.push_back(
-	    std::vector<std::string>{ "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
-	                              "perf::L1-DCACHE-LOADS" } );
-	cnt_vec_list.push_back( std::vector<std::string>{
-	    "L2_LINES_IN:ALL", "L2_LINES_IN:E", "L2_LINES_IN:I" } );
-	cnt_vec_list.push_back( std::vector<std::string>{ "L2_LINES_IN:ALL:cpu=1",
-	                                                  "L2_LINES_IN:E:cpu=1",
-	                                                  "L2_LINES_IN:I:cpu=1" } );
-	cnt_vec_list.push_back( std::vector<std::string>{ "L2_LINES_IN:ALL:cpu=7",
-	                                                  "L2_LINES_IN:E:cpu=7",
-	                                                  "L2_LINES_IN:I:cpu=7" } );
-	cnt_vec_list.push_back( std::vector<std::string>{ "L2_LINES_IN:ALL:cpu=9",
-	                                                  "L2_LINES_IN:E:cpu=9",
-	                                                  "L2_LINES_IN:I:cpu=9" } );
-	cnt_vec_list.push_back( std::vector<std::string>{ "L2_LINES_IN:S" } );
-	cnt_vec_list.push_back( std::vector<std::string>{
-	    "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITMESF:SNP_ANY" } );
-	cnt_vec_list.push_back( std::vector<std::string>{
-	    "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITM:SNP_ANY" } );
-	cnt_vec_list.push_back( std::vector<std::string>{
-	    "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITS:SNP_ANY" } );
-	cnt_vec_list.push_back( std::vector<std::string>{
-	    "PAPI_L2_DCA", "PAPI_L2_DCM", "PAPI_L3_DCA" } );
-	cnt_vec_list.push_back( std::vector<std::string>{ "" } );
-
-    std::vector<uint64_t> size_vec{_256KB};
-    //std::vector<uint64_t> size_vec{KB, _16KB, _32KB, _64kB, _128KB, _256KB};
-
-    for( auto s: size_vec) {
+    std::vector<std::vector<std::string> > cnt_vec_list;
+    cnt_vec_list.push_back(std::vector<std::string> { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES", "perf::L1-DCACHE-LOADS" });
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL", "L2_LINES_IN:E", "L2_LINES_IN:I"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:S"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_RQSTS:CODE_RD_HIT", "L2_RQSTS:CODE_RD_MISS", "L2_RQSTS:ALL_PF"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=1", "L2_LINES_IN:E:cpu=1", "L2_LINES_IN:I:cpu=1"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=7", "L2_LINES_IN:E:cpu=7", "L2_LINES_IN:I:cpu=7"});
+    cnt_vec_list.push_back(std::vector<std::string> { "L2_LINES_IN:ALL:cpu=9", "L2_LINES_IN:E:cpu=9", "L2_LINES_IN:I:cpu=9"});
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITMESF:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITM:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITS:SNP_ANY"}); 
+    cnt_vec_list.push_back(std::vector<std::string> { "PAPI_L2_DCA", "PAPI_L2_DCM", "PAPI_L3_DCA"});
+    cnt_vec_list.push_back(std::vector<std::string> { "perf::PERF_COUNT_HW_CACHE_LL:ACCESS", "perf::PERF_COUNT_HW_CACHE_LL:MISS"});
+    //cnt_vec_list.push_back(std::vector<std::string> { "ix86arch:LLC_MISSES"}); 
+    //cnt_vec_list.push_back(std::vector<std::string> { "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITE:SNP_ANY", "OFFCORE_RESPONSE_0:ANY_DATA:L3_MISS:SNP_ANY" });
+    std::vector<uint64_t> size_vec{_128B, _256B, _512B, _1KB, _2KB, _4KB, _8KB, _16KB, _32KB, _64KB, _128KB, _256KB, _512KB, _1MB, _2MB};
+        
+    for(auto s:size_vec) {
         shared_data_size = s;
-	setup(shared_data_size);
-        for( auto c: cnt_vec_list )
-        {
+	    setup( shared_data_size );
+        for(auto c:cnt_vec_list) {
             for( int j = 0; j < 3; j++ )
             {
                 for( int i = 0; i < 100; i++ )
                 {
-                    run_test( LOAD_FROM_MODIFIED,
-                              static_cast<core_placement_t>( j ), c );
-                    run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ),
-                              c );
-                    run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ),
-                              c );
-                    run_test( FLUSH, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_SHARED, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ), c );
                 }
             }
         }
-	free( (void*)shared_data );
+	    free( (void*)shared_data );
     }
 
 
