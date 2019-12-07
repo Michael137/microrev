@@ -148,14 +148,14 @@ template<typename CntTyp> struct CounterBenchmark
 	std::condition_variable cv;
 	unsigned int benchmark_cores;
 	std::vector<std::thread> threads;
-	std::atomic<bool> ready;
+	std::atomic<bool> pause;
 
 	CounterBenchmark()
 	    : mtx()
 	    , cv()
 	    , benchmark_cores( default_phys_core_count )
 	    , threads()
-	    , ready( false )
+	    , pause( false )
 	{
 		pin_self_to_core( 0 );
 	}
@@ -185,6 +185,34 @@ template<typename CntTyp> struct CounterBenchmark
 		return cpuset;
 	}
 
+	void pause_thread()
+	{
+		if(!this->pause)
+		{
+			std::lock_guard<std::mutex> lck(this->mtx);
+			this->pause = true;
+		}
+	}
+
+	void unpause_thread()
+	{
+		if(this->pause)
+		{
+			{
+				std::lock_guard<std::mutex> lck(this->mtx);
+				this->pause = false;
+			}	
+			this->cv.notify_all();
+		}
+	}
+
+	void wait_to_start()
+	{
+			std::unique_lock<std::mutex> lck(this->mtx);
+			auto not_paused = [this](){return this->pause == false;};
+			this->cv.wait(lck, not_paused);
+	}
+
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
 	                        int core_id, BenchTyp benchmark, int warmup = 5 )
@@ -192,10 +220,7 @@ template<typename CntTyp> struct CounterBenchmark
 		uint64_t start, end;
 		counter.core_id = core_id;
 
-		{
-			std::unique_lock<std::mutex> lck( this->mtx );
-			this->cv.wait( lck, [this]() { return this->ready != false; } );
-		}
+		this->wait_to_start();
 
 		counter.add( events );
 
@@ -207,11 +232,7 @@ template<typename CntTyp> struct CounterBenchmark
 		benchmark( counter );
 
 		counter.end();
-
-		{
-			std::lock_guard<std::mutex> lk( this->mtx );
-			this->ready = false;
-		}
+		pause_thread();
 	}
 
 	template<typename EventTyp>
@@ -229,11 +250,7 @@ template<typename CntTyp> struct CounterBenchmark
 			pin_to_core( i, svec[i].core_id );
 		}
 
-		{
-			std::lock_guard<std::mutex> lk( this->mtx );
-			this->ready = true;
-		}
-		this->cv.notify_all();
+		unpause_thread();
 
 		for( auto& th: this->threads )
 			th.join();
@@ -265,50 +282,45 @@ template<typename CntTyp> struct CounterBenchmark
 
 			this->threads.push_back( std::thread( std::move( task ) ) );
 			pin_to_core( 0, svec[i].core_id );
+			unpause_thread();
 
-			auto msched_size = svec[i].measurement_scheds.size();
-			measurement_counters.resize( measurement_counters.size()
-			                             + msched_size );
-			for( int j = 0; j < msched_size; ++j )
-			{
-				measurement_tasks.emplace_back();
-				this->threads.push_back(
-				    std::thread( [this, &measurement_counters, &svec, j, i,
-				                  &measurement_tasks] {
-					    this->counter_thread_fn<EventTyp>(
-					        measurement_counters[j],
-					        svec[i].measurement_scheds[j].events,
-					        j + 1 /* thread id */,
-					        svec[i].measurement_scheds[j].core_id,
-					        [&]( CntTyp& pc ) {
-						        measurement_tasks[j].run( pc );
-					        },
-					        0 /* warmup */ );
-				    } ) );
-				pin_to_core( j + 1, svec[i].measurement_scheds[j].core_id );
-			}
-
-			{
-				std::lock_guard<std::mutex> lk( this->mtx );
-				this->ready = true;
-			}
-			this->cv.notify_all();
+//			auto msched_size = svec[i].measurement_scheds.size();
+//			measurement_counters.resize( measurement_counters.size()
+//			                             + msched_size );
+//			for( int j = 0; j < msched_size; ++j )
+//			{
+//				measurement_tasks.emplace_back();
+//				this->threads.push_back(
+//				    std::thread( [this, &measurement_counters, &svec, j, i,
+//				                  &measurement_tasks] {
+//					    this->counter_thread_fn<EventTyp>(
+//					        measurement_counters[j],
+//					        svec[i].measurement_scheds[j].events,
+//					        j + 1 /* thread id */,
+//					        svec[i].measurement_scheds[j].core_id,
+//					        [&]( CntTyp& pc ) {
+//						        measurement_tasks[j].run( pc );
+//					        },
+//					        0 /* warmup */ );
+//				    } ) );
+//				pin_to_core( j + 1, svec[i].measurement_scheds[j].core_id );
+			//}
 
 			auto status = fut.wait_for( std::chrono::seconds( 30 ) );
 
 			if( status == std::future_status::ready )
 			{
-				for( auto& task: measurement_tasks )
-					task.stop();
+			//	for( auto& task: measurement_tasks )
+			//		task.stop();
 				for( auto& th: this->threads )
 					th.join();
 
 				this->threads.clear();
 
-				counters.insert( counters.end(), measurement_counters.begin(),
-				                 measurement_counters.end() );
-				measurement_counters.clear();
-				measurement_tasks.clear();
+			//	counters.insert( counters.end(), measurement_counters.begin(),
+				                 //measurement_counters.end() );
+			//	measurement_counters.clear();
+			//	measurement_tasks.clear();
 
 				continue;
 			}

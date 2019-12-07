@@ -8,7 +8,7 @@
 executable = run-papi.bash
 
 # command-line arguments to the script
-arguments = protocols
+arguments = 
 
 # no standard input needed this time
 # input = measure.in
@@ -25,8 +25,8 @@ request_cpus = 96
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = ../local/bin
-transfer_output_files = 
+transfer_input_files = ../local/bin,../local/arch.cfg,../local/run.sh,../local/scripts/parser.py
+transfer_output_files = dump.dat
 
 # submit a job with the parameters given above
 queue

@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -37,11 +38,11 @@ typedef enum
 {
 	STORE_ON_MODIFIED,
 	STORE_ON_EXCLUSIVE,
-	STORE_ON_SHARED,
+	STORE_ON_SHARED_OR_FORWARD,
 	STORE_ON_INVALID,
 	LOAD_FROM_MODIFIED,
 	LOAD_FROM_EXCLUSIVE,
-	LOAD_FROM_SHARED,
+	LOAD_FROM_SHARED_OR_FORWARD,
 	LOAD_FROM_INVALID,
 	FLUSH,
 } mesi_type_t;
@@ -54,12 +55,38 @@ typedef enum
 } core_placement_t;
 
 const char* mesi_type_des[] = {
-    "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED",
-    "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
-    "LOAD_FROM_SHARED",  "LOAD_FROM_INVALID",  "FLUSH",
+    "STORE_ON_MODIFIED",
+    "STORE_ON_EXCLUSIVE",
+    "STORE_ON_SHARED_OR_FORWARD",
+    "STORE_ON_INVALID",
+    "LOAD_FROM_MODIFIED",
+    "LOAD_FROM_EXCLUSIVE",
+    "LOAD_FROM_SHARED_OR_FORWARD",
+    "LOAD_FROM_INVALID",
+    "FLUSH",
 };
 
 const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
+
+#ifdef __llvm__
+#	define DEMOTER_DEF()                                                      \
+		void demoter_( PAPILLCounter& pc, uint64_t size,                       \
+		               uint64_t stride = 64 )                                  \
+		{                                                                      \
+			for( uint64_t i = 0; i < shared_data_size; i += stride )           \
+			{                                                                  \
+				_mm_mfence();                                                  \
+				_cldemote( (void*)&shared_data[i] );                           \
+				_mm_mfence();                                                  \
+			}                                                                  \
+		}
+#else
+#	define DEMOTER_DEF()                                                      \
+		void demoter_( PAPILLCounter& pc, uint64_t size,                       \
+		               uint64_t stride = 64 )                                  \
+		{                                                                      \
+		}
+#endif
 
 #define BENCHMARK_INIT()                                                       \
 	int core_src, core_socket0, core_socket1, core_global0, core_global1;      \
@@ -84,7 +111,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter    = (char**)shared_iter;                                  \
+		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
@@ -100,15 +127,30 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter    = (char**)shared_iter;                                  \
+		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
+		/*                                                                     \
+		std::cout << "shared_data_size: " <<shared_data_size << std::endl;     \
+		std::cout << "cache_line_size: " <<cache_line_size << std::endl; */    \
 		uint64_t start = rdtsc();                                              \
+		/*auto iter0          = iter;*/                                        \
+		iter = ( (char**)*iter );                                              \
+		iter = ( (char**)*iter );                                              \
+		iter = ( (char**)*iter );                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
-			iter          = ( (char**)*iter );                                 \
+			/*uint64_t tmp = rdtsc(); */                                       \
+			iter = ( (char**)*iter );                                          \
+			/*iter0         = ( (char**)*iter0 ); */                           \
+			/*std::cout << rdtsc() - tmp << " "; */                            \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
+		/*                                                                     \
+		std::cout << std::endl;                                                \
+		std::cout << end - start << " ";                                       \
+		std::cout << std::endl;                                                \
+		std::cout << std::endl; */                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
                                                                                \
@@ -127,6 +169,12 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		flusher_( pc, shared_data_size, cache_line_size );                     \
 	}                                                                          \
                                                                                \
+	DEMOTER_DEF()                                                              \
+	void demoter( PAPILLCounter& pc )                                          \
+	{                                                                          \
+		demoter_( pc, shared_data_size, cache_line_size );                     \
+	}                                                                          \
+                                                                               \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
 	{                                                                          \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
@@ -140,7 +188,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			rndarray.push_back( (char*)&shared_data[i] );                      \
 		}                                                                      \
                                                                                \
-		shuffle_array<char*>( rndarray );                                          \
+		shuffle_array<char*>( rndarray );                                      \
                                                                                \
 		for( uint64_t i = 0; i < size; i += stride )                           \
 		{                                                                      \
@@ -148,7 +196,6 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 			shared_iter += ( stride / sizeof( shared_iter ) );                 \
 		}                                                                      \
-                                                                               \
 		*shared_iter = (char*)head;                                            \
 	}                                                                          \
                                                                                \
@@ -165,13 +212,13 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 				break;                                                         \
 			case E_STATE:                                                      \
 				vec.push_back(                                                 \
-				       Sched{ core_a,                                          \
-				              std::function<decltype( writer )>{ writer },     \
-				              {} } );\
-			vec.push_back( Sched{                     \
-				    core_a,                                                    \
-				    std::function<decltype( flusher )>{ flusher },             \
-				    {} } );                                                    \
+				    Sched{ core_a,                                             \
+				           std::function<decltype( writer )>{ writer },        \
+				           {} } );                                             \
+				vec.push_back(                                                 \
+				    Sched{ core_a,                                             \
+				           std::function<decltype( flusher )>{ flusher },      \
+				           {} } );                                             \
 				vec.push_back( Sched{                                          \
 				    core_a, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
@@ -240,7 +287,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		std::ofstream ofs( "dump.dat",                                         \
 		                   std::ofstream::out | std::ofstream::app );          \
 		ofs << "TEST RUN" << std::endl;                                        \
-		ofs << "Working Set Size: " << shared_data_size << std::endl;                                        \
+		ofs << "Working Set Size: " << shared_data_size << std::endl;          \
 		ofs << mesi_type_des[t] << std::endl;                                  \
 		ofs << "Core setting: " << core_placement_des[c] << " " << core_a      \
 		    << " " << core_b << " " << core_c << std::endl;                    \
@@ -267,7 +314,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 				    core_c, std::function<decltype( writer )>{ writer },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
-			case STORE_ON_SHARED:                                              \
+			case STORE_ON_SHARED_OR_FORWARD:                                   \
 				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
@@ -292,7 +339,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 				    core_c, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
 				break;                                                         \
-			case LOAD_FROM_SHARED:                                             \
+			case LOAD_FROM_SHARED_OR_FORWARD:                                  \
 				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
@@ -357,5 +404,19 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		core_global1 = std::stoi( rline );                                     \
 		infile.close();                                                        \
 	}
+
+#define INIT_ARCH_CFG( csrc, csock0, csock1, cglobal0, cglobal1, csize,        \
+                       clsize, data_size )                                     \
+	do                                                                         \
+	{                                                                          \
+		core_src         = ( csrc );                                           \
+		core_socket0     = ( csock0 );                                         \
+		core_socket1     = ( csock1 );                                         \
+		core_global0     = ( cglobal0 );                                       \
+		core_global1     = ( cglobal1 );                                       \
+		cache_line_size  = ( clsize );                                         \
+		cache_size       = ( csize );                                          \
+		shared_data_size = ( data_size );                                      \
+	} while( 0 );
 
 #endif // BENCHMARK_HELPERS_H_IN
