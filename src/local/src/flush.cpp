@@ -26,6 +26,22 @@ void flusher_test( std::vector<std::string> counters,
 	int core_a = core_src, core_b, core_c;
 
 	// Read across sockets
+	//         S0                   S1
+	// |-------|-------|####|-------|-------|
+	// |-- 0 --|-- 2 --|####|-- 1 --|-- 3 --|
+	// |-------|-------|    |-------|-------|
+	// |-- 4 --|-- 6 --|    |-- 5 --|-- 7 --|
+	// |-------|-------|    |-------|-------|
+	// |-- 8 --|--10 --|    |-- 9 --|--11 --|
+	// |-------|-------|    |-------|-------|
+	// |--12 --|--14 --|    |--13 --|--15 --|
+	// |-------|-------|    |-------|-------|
+	//
+	// Write on core 1 (core_src)
+	// Read on core 1
+	// Read on core 8 (global0)
+	// Flush on core 1
+	// Read on core 10 (global1) <--- Measure read latency
 	core_b = core_global0;
 	core_c = core_global1;
 
@@ -63,7 +79,7 @@ int main( int argc, char* argv[] )
 
 #elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
-	INIT_ARCH_CFG( 1, 2, 3, 1, 2, _32KB, _64B, _256KB )
+	INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, _256KB )
 
 	std::vector<std::string> counters
 	    = { "PAPI_TOT_INS", "perf::L1-DCACHE-LOAD-MISSES",
