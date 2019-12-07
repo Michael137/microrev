@@ -250,11 +250,7 @@ template<typename CntTyp> struct CounterBenchmark
 			pin_to_core( i, svec[i].core_id );
 		}
 
-		{
-			std::lock_guard<std::mutex> lk( this->mtx );
-			this->pause = true;
-		}
-		this->cv.notify_all();
+		unpause_thread();
 
 		for( auto& th: this->threads )
 			th.join();

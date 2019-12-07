@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -67,6 +68,26 @@ const char* mesi_type_des[] = {
 
 const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 
+#ifdef __llvm__
+#	define DEMOTER_DEF()                                                      \
+		void demoter_( PAPILLCounter& pc, uint64_t size,                       \
+		               uint64_t stride = 64 )                                  \
+		{                                                                      \
+			for( uint64_t i = 0; i < shared_data_size; i += stride )           \
+			{                                                                  \
+				_mm_mfence();                                                  \
+				_cldemote( (void*)&shared_data[i] );                           \
+				_mm_mfence();                                                  \
+			}                                                                  \
+		}
+#else
+#	define DEMOTER_DEF()                                                      \
+		void demoter_( PAPILLCounter& pc, uint64_t size,                       \
+		               uint64_t stride = 64 )                                  \
+		{                                                                      \
+		}
+#endif
+
 #define BENCHMARK_INIT()                                                       \
 	int core_src, core_socket0, core_socket1, core_global0, core_global1;      \
                                                                                \
@@ -118,9 +139,9 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		iter = ( (char**)*iter );                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
-			/*uint64_t tmp = rdtsc(); */                                                                            \
+			/*uint64_t tmp = rdtsc(); */                                       \
 			iter = ( (char**)*iter );                                          \
-			/*iter0         = ( (char**)*iter0 ); */                                                                            \
+			/*iter0         = ( (char**)*iter0 ); */                           \
 			/*std::cout << rdtsc() - tmp << " "; */                            \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
@@ -146,6 +167,12 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void flusher( PAPILLCounter& pc )                                          \
 	{                                                                          \
 		flusher_( pc, shared_data_size, cache_line_size );                     \
+	}                                                                          \
+                                                                               \
+	DEMOTER_DEF()                                                              \
+	void demoter( PAPILLCounter& pc )                                          \
+	{                                                                          \
+		demoter_( pc, shared_data_size, cache_line_size );                     \
 	}                                                                          \
                                                                                \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
@@ -377,5 +404,19 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		core_global1 = std::stoi( rline );                                     \
 		infile.close();                                                        \
 	}
+
+#define INIT_ARCH_CFG( csrc, csock0, csock1, cglobal0, cglobal1, csize,        \
+                       clsize, data_size )                                     \
+	do                                                                         \
+	{                                                                          \
+		core_src         = ( csrc );                                           \
+		core_socket0     = ( csock0 );                                         \
+		core_socket1     = ( csock1 );                                         \
+		core_global0     = ( cglobal0 );                                       \
+		core_global1     = ( cglobal1 );                                       \
+		cache_line_size  = ( clsize );                                         \
+		cache_size       = ( csize );                                          \
+		shared_data_size = ( data_size );                                      \
+	} while( 0 );
 
 #endif // BENCHMARK_HELPERS_H_IN
