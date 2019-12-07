@@ -31,9 +31,7 @@ void do_flops( pcnt::PAPILLCounter& pc )
 
 int main( int argc, char* argv[] )
 {
-	std::cout << ">>>> TEST: different benchmarks on different cores "
-	             "(validates counters are read correctly on separate cores)"
-	          << std::endl;
+	std::cout << ">>>> TEST: schdule counter benchmarks in series" << std::endl;
 #ifdef WITH_PMC
 
 #	error "TODO: implement this test using PMC"
@@ -56,12 +54,22 @@ int main( int argc, char* argv[] )
 	Sched core_2 = Sched{
 	    2,
 	    std::function<decltype( do_flops )>{ do_flops },
-	    { "PAPI_FP_INS", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	    { "PAPI_L2_DCM", "PAPI_TOT_INS", "PAPI_TOT_CYC" },
+	};
+	Sched core_1a = Sched{
+	    1,
+	    std::function<decltype( do_flops )>{ do_flops },
+	    { "PAPI_TOT_INS", "PAPI_L2_DCH", "PAPI_TOT_CYC" },
 	};
 
-	std::vector<Sched> vec{ core_1, core_2 };
+	std::vector<Sched> vec{ core_1, core_2, core_1a };
 
-	cbench.counters_with_priority_schedule<std::vector<std::string>>( vec );
+	auto counters
+	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
+	        vec );
+
+	for( auto& c: counters )
+		c.print_stats();
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
