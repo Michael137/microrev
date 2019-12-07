@@ -1,5 +1,5 @@
 ROOT_DIR ?= .
-CXXFLAGS ?=  # -fsanitize=thread # -fsanitize=address
+CXXFLAGS ?=  -O0 #-fsanitize=thread # -fsanitize=address
 CXX = g++
 SHELL = /bin/bash
 UNAME := $(shell uname)
