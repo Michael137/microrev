@@ -37,8 +37,6 @@ int main( int argc, char** argv )
                 { 1, std::function<decltype( reader )>{ reader }, {"perf::PERF_COUNT_HW_CACHE_L1D:ACCESS", "perf::PERF_COUNT_HW_CACHE_L1D:PREFETCH"}, std::to_string(n)},
                 { 1, std::function<decltype( reader )>{ reader }, {"PAPI_L1_DCM", "L1D:REPLACEMENT", "PAPI_TOT_CYC"}, std::to_string(n)},
                 { 1, std::function<decltype( reader )>{ reader }, {"PAPI_L2_DCM", "PAPI_L2_DCH"}, std::to_string(n)}};
-                
-                
 
             auto counters
                 = cbench.counters_with_priority_schedule<std::vector<std::string>>(
