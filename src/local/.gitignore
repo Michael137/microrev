@@ -10,3 +10,6 @@ tmp/
 config.mk
 run.sh
 *.old
+
+*.csv
+*.txt

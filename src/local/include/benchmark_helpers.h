@@ -54,9 +54,15 @@ typedef enum
 } core_placement_t;
 
 const char* mesi_type_des[] = {
-    "STORE_ON_MODIFIED", "STORE_ON_EXCLUSIVE", "STORE_ON_SHARED_OR_FORWARD",
-    "STORE_ON_INVALID",  "LOAD_FROM_MODIFIED", "LOAD_FROM_EXCLUSIVE",
-    "LOAD_FROM_SHARED_OR_FORWARD",  "LOAD_FROM_INVALID",  "FLUSH",
+    "STORE_ON_MODIFIED",
+    "STORE_ON_EXCLUSIVE",
+    "STORE_ON_SHARED_OR_FORWARD",
+    "STORE_ON_INVALID",
+    "LOAD_FROM_MODIFIED",
+    "LOAD_FROM_EXCLUSIVE",
+    "LOAD_FROM_SHARED_OR_FORWARD",
+    "LOAD_FROM_INVALID",
+    "FLUSH",
 };
 
 const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
@@ -84,7 +90,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter    = (char**)shared_iter;                                  \
+		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
@@ -100,31 +106,31 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter    = (char**)shared_iter;                                  \
+		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
-        /*
-        std::cout << "shared_data_size: " <<shared_data_size << std::endl; \
-        std::cout << "cache_line_size: " <<cache_line_size << std::endl; */\
+		/*                                                                     \
+		std::cout << "shared_data_size: " <<shared_data_size << std::endl;     \
+		std::cout << "cache_line_size: " <<cache_line_size << std::endl; */    \
 		uint64_t start = rdtsc();                                              \
-		auto iter0          = iter; \
-		iter          = ( (char**)*iter );                                 \
-		iter          = ( (char**)*iter );                                 \
-		iter          = ( (char**)*iter );                                 \
+		/*auto iter0          = iter;*/                                        \
+		iter = ( (char**)*iter );                                              \
+		iter = ( (char**)*iter );                                              \
+		iter = ( (char**)*iter );                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
-		    /*uint64_t tmp = rdtsc();                                              */\
-			iter          = ( (char**)*iter );                                 \
-			/*iter0         = ( (char**)*iter0 );                                 */\
-            /*std::cout << rdtsc() - tmp << " "; */\
+			/*uint64_t tmp = rdtsc(); */                                                                            \
+			iter = ( (char**)*iter );                                          \
+			/*iter0         = ( (char**)*iter0 ); */                                                                            \
+			/*std::cout << rdtsc() - tmp << " "; */                            \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
-        /*
-        std::cout << std::endl; \
-        std::cout << end - start << " "; \
-        std::cout << std::endl; \
-        std::cout << std::endl; */\
-		pc.vec_cycles_measured.push_back( end-start); \
+		/*                                                                     \
+		std::cout << std::endl;                                                \
+		std::cout << end - start << " ";                                       \
+		std::cout << std::endl;                                                \
+		std::cout << std::endl; */                                             \
+		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
                                                                                \
 	void reader( PAPILLCounter& pc )                                           \
@@ -163,8 +169,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 			shared_iter += ( stride / sizeof( shared_iter ) );                 \
 		}                                                                      \
-        *shared_iter =(char *)head;                                            \
-                                                                               \
+		*shared_iter = (char*)head;                                            \
 	}                                                                          \
                                                                                \
 	void init_state(                                                           \
@@ -180,13 +185,13 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 				break;                                                         \
 			case E_STATE:                                                      \
 				vec.push_back(                                                 \
-				       Sched{ core_a,                                          \
-				              std::function<decltype( writer )>{ writer },     \
-				              {} } );\
-			vec.push_back( Sched{                     \
-				    core_a,                                                    \
-				    std::function<decltype( flusher )>{ flusher },             \
-				    {} } );                                                    \
+				    Sched{ core_a,                                             \
+				           std::function<decltype( writer )>{ writer },        \
+				           {} } );                                             \
+				vec.push_back(                                                 \
+				    Sched{ core_a,                                             \
+				           std::function<decltype( flusher )>{ flusher },      \
+				           {} } );                                             \
 				vec.push_back( Sched{                                          \
 				    core_a, std::function<decltype( reader )>{ reader },       \
 				    cnt_vec } );                                               \
