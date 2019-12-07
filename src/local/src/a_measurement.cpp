@@ -26,7 +26,8 @@ int main( int argc, char** argv )
     {
         for ( uint64_t n = _4MB / cache_size; n >= 1; n/=2) {
             std::cout<< n<< std::endl;
-            setup(cache_size * n, cache_size);
+            shared_data_size = cache_size * n;
+            setup(shared_data_size, cache_size);
 
             //std::vector<Sched> vec{
             //    { 1, std::function<decltype( reader )>{ reader }, {}, std::to_string(n)}};

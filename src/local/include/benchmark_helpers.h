@@ -114,7 +114,7 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		{                                                                      \
 		    /*uint64_t tmp = rdtsc();                                              */\
 			iter          = ( (char**)*iter );                                 \
-			iter0         = ( (char**)*iter0 );                                 \
+			/*iter0         = ( (char**)*iter0 );                                 */\
             /*std::cout << rdtsc() - tmp << " "; */\
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
@@ -144,8 +144,6 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
 	{                                                                          \
-        shared_data_size = size; \
-        cache_line_size = stride; \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
                                                                                \
 		volatile char** head = (volatile char**)shared_data;                   \
