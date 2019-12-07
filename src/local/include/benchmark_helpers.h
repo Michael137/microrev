@@ -405,4 +405,18 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		infile.close();                                                        \
 	}
 
+#define INIT_ARCH_CFG( csrc, csock0, csock1, cglobal0, cglobal1, csize,        \
+                       clsize, data_size )                                     \
+	do                                                                         \
+	{                                                                          \
+		core_src         = ( csrc );                                           \
+		core_socket0     = ( csock0 );                                         \
+		core_socket1     = ( csock1 );                                         \
+		core_global0     = ( cglobal0 );                                       \
+		core_global1     = ( cglobal1 );                                       \
+		cache_line_size  = ( clsize );                                         \
+		cache_size       = ( csize );                                          \
+		shared_data_size = ( data_size );                                      \
+	} while( 0 );
+
 #endif // BENCHMARK_HELPERS_H_IN
