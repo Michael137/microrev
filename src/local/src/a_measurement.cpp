@@ -22,13 +22,22 @@ int main( int argc, char** argv )
 	/* Should allow us to see cache sizes */
     parse_cfg();
 	CounterBenchmark<PAPILLCounter> cbench;
-    for( int i = 0; i < 10; i++ )
+    for( int i = 0; i < 1; i++ )
     {
-        for ( uint64_t n = 1; n * cache_size < _4MB; n*=2) {
+        for ( uint64_t n = _4MB / cache_size; n >= 1; n/=2) {
+            std::cout<< n<< std::endl;
             setup(cache_size * n, cache_size);
 
+            //std::vector<Sched> vec{
+            //    { 1, std::function<decltype( reader )>{ reader }, {}, std::to_string(n)}};
+            
+            
             std::vector<Sched> vec{
-                { n % 10, std::function<decltype( reader )>{ reader }, {"PAPI_L1_DCM", "L1D:REPLACEMENT", "PAPI_TOT_CYC"}, std::to_string(n)}};
+                { 1, std::function<decltype( reader )>{ reader }, {"perf::PERF_COUNT_HW_CACHE_L1D:ACCESS", "perf::PERF_COUNT_HW_CACHE_L1D:PREFETCH"}, std::to_string(n)},
+                { 1, std::function<decltype( reader )>{ reader }, {"PAPI_L1_DCM", "L1D:REPLACEMENT", "PAPI_TOT_CYC"}, std::to_string(n)},
+                { 1, std::function<decltype( reader )>{ reader }, {"PAPI_L2_DCM", "PAPI_L2_DCH"}, std::to_string(n)}};
+                
+                
 
             auto counters
                 = cbench.counters_with_priority_schedule<std::vector<std::string>>(

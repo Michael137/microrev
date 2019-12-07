@@ -30,22 +30,25 @@ with open("dump.dat", "r") as f:
         rline = f.readline()
 
 with open("result.dat", "w") as f:
-    cnt = 1
     for tname, tdict in test_res.items():
+        dsize = tname
         f.write(tname + "\n")
         for cname, cvalues in tdict.items():
-            f.write(cname + ": " + format(statistics.mean(cvalues)/cnt, ".2f") + "\n")
+            if "Cycle" in cname or "CYC" in cname:
+                f.write(cname + ": " + format(statistics.mean(cvalues)/int(dsize), ".2f") + "\n")
+            else:
+                f.write(cname + ": " + format(statistics.mean(cvalues), ".2f") + "\n")
         f.write("\n")
-        cnt *= 2
 
 dictlist = []
-cnt = 1
 for tname, tdict in test_res.items():
     dsize = tname
     tmpdict = {'Size': int(dsize)}
     for cname, cvalues in tdict.items():
-        tmpdict[cname] = float(format(statistics.mean(cvalues)/cnt, ".2f"))
-    cnt *= 2
+        if "Cycle" in cname or "CYC" in cname:
+            tmpdict[cname] = float(format(statistics.mean(cvalues)/int(dsize), ".2f"))
+        else:
+            tmpdict[cname] = float(format(statistics.mean(cvalues), ".2f"))
     dictlist.append(tmpdict)
 
 print("CSV save")

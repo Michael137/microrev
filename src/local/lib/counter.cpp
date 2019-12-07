@@ -211,6 +211,7 @@ void PAPILLCounter::reset()
 		if( PAPI_reset( this->event_set ) != PAPI_OK )
 			exit_with_err( "failed to reset counters" );
 		this->measured.clear();
+        this->vec_cycles_measured.clear();
 		this->measured.resize( this->cset.size() );
 	}
 }

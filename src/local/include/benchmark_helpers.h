@@ -102,14 +102,22 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	{                                                                          \
 		char** iter    = (char**)shared_iter;                                  \
 		pc.start();                                                            \
+        std::cout << "shared_data_size: " <<shared_data_size << std::endl; \
+        std::cout << "cache_line_size: " <<cache_line_size << std::endl; \
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
+		    uint64_t tmp = rdtsc();                                              \
 			iter          = ( (char**)*iter );                                 \
+            std::cout << rdtsc() - tmp << " "; \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
-		pc.vec_cycles_measured.push_back( end - start );                       \
+        std::cout << std::endl; \
+        std::cout << end - start << " "; \
+        std::cout << std::endl; \
+        std::cout << std::endl; \
+		pc.vec_cycles_measured.push_back( end-start); \
 	}                                                                          \
                                                                                \
 	void reader( PAPILLCounter& pc )                                           \
@@ -129,6 +137,8 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
 	{                                                                          \
+        shared_data_size = size; \
+        cache_line_size = stride; \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
                                                                                \
 		volatile char** head = (volatile char**)shared_data;                   \
