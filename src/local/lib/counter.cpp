@@ -237,8 +237,8 @@ void PAPILLCounter::stats_to_stream( std::ostream& os )
 		return;
 
 	// Note: when changing label layout also change scripts/parser.py
-	// TODO: be able to output label and still aggregate results
-	// os << "~~" << this->label << "~~" << '\n';
+    if(!(this->label.empty()))
+	    os << "~~" << this->label << "~~" << '\n';
 	for( int i = 0; i < this->cset.size(); ++i )
 	{
 		PAPI_event_code_to_name( cset[i], name );
