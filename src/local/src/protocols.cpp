@@ -53,11 +53,16 @@ int main( int argc, char* argv[] )
         for(auto c:cnt_vec_list) {
             for( int j = 0; j < 3; j++ )
             {
-                for( int i = 0; i < 1000; i++ )
+                for( int i = 0; i < 100; i++ )
                 {
                     run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), c );
+                    run_test( LOAD_FROM_EXCLUSIVE, static_cast<core_placement_t>( j ), c );
                     run_test( LOAD_FROM_SHARED_OR_FORWARD, static_cast<core_placement_t>( j ), c );
                     run_test( LOAD_FROM_INVALID, static_cast<core_placement_t>( j ), c );
+                    run_test( STORE_ON_MODIFIED, static_cast<core_placement_t>( j ), c );
+                    run_test( STORE_ON_EXCLUSIVE, static_cast<core_placement_t>( j ), c );
+                    run_test( STORE_ON_SHARED_OR_FORWARD, static_cast<core_placement_t>( j ), c );
+                    run_test( STORE_ON_INVALID, static_cast<core_placement_t>( j ), c );
                 }
             }
         }
