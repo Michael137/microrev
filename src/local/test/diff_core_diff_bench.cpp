@@ -114,7 +114,10 @@ int main( int argc, char* argv[] )
 
 	std::vector<Sched> vec{ core_1, core_2, core_3 };
 
-	cbench.counters_with_schedule<std::vector<std::string>>( vec );
+	auto counters = cbench.counters_with_schedule<std::vector<std::string>>( vec );
+
+	for(auto& c : counters)
+		c.print_stats();
 
 #endif // !WITH_PAPI_LL
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
