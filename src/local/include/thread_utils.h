@@ -206,8 +206,6 @@ template<typename CntTyp> struct CounterBenchmark
 	    std::vector<Schedule<EventTyp, CntTyp>>& svec, int warmup = 0 )
 	{
 		std::vector<CntTyp> counters{ svec.size() };
-		std::vector<CntTyp> measurement_counters;
-		std::vector<MeasurementBench<CntTyp>> measurement_tasks;
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			counters[i].label = svec[i].label;
@@ -232,46 +230,10 @@ template<typename CntTyp> struct CounterBenchmark
 				auto wakeup = [this]() { return this->ready == true; };
 				this->cv.wait( lck, wakeup );
 			}
-
-			//			auto msched_size =
-			// svec[i].measurement_scheds.size();
-			//			measurement_counters.resize(
-			// measurement_counters.size()
-			//			                             + msched_size );
-			//			for( int j = 0; j < msched_size; ++j )
-			//			{
-			//				measurement_tasks.emplace_back();
-			//				this->threads.push_back(
-			//				    std::thread( [this,
-			//&measurement_counters, &svec, j, i,
-			//&measurement_tasks] {
-			// this->counter_thread_fn<EventTyp>(
-			// measurement_counters[j],
-			//					        svec[i].measurement_scheds[j].events,
-			//					        j + 1 /* thread id */,
-			//					        svec[i].measurement_scheds[j].core_id,
-			//					        [&]( CntTyp& pc ) {
-			//						        measurement_tasks[j].run( pc
-			//);
-			//					        },
-			//					        0 /* warmup */ );
-			//				    } ) );
-			//				pin_to_core( j + 1,
-			// svec[i].measurement_scheds[j].core_id
-			//);
-			//}
-
-			//	for( auto& task: measurement_tasks )
-			//		task.stop();
 			for( auto& th: this->threads )
 				th.join();
 
 			this->threads.clear();
-
-			//	counters.insert( counters.end(),
-			// measurement_counters.begin(), measurement_counters.end() );
-			//	measurement_counters.clear();
-			//	measurement_tasks.clear();
 		}
 
 		this->ready = false;
