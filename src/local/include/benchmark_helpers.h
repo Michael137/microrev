@@ -107,7 +107,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 flusher_( PAPILLCounter& pc, uint64_t size,                      \
 	                    uint64_t stride = 64 )                                 \
 	{                                                                          \
-		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
+		for( uint64_t i = 0; i < shared_data_size; i ++ )               \
 		{                                                                      \
 			_mm_mfence();                                                      \
 			_mm_clflush( (void*)&shared_data[i] );                             \
@@ -162,8 +162,8 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < line_cnt; i++)               \
 		{                                                                      \
-			*( iter + 1 ) = (char*)1;                                          \
 			iter          = ( (char**)*iter );                                 \
+			*( iter + 1 ) = (char*)1;                                          \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
