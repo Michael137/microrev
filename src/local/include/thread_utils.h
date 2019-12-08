@@ -36,57 +36,6 @@ namespace pcnt
 void pin_self_to_core( int core_id );
 uint64_t rdtsc();
 
-template<typename CntTyp> class Stoppable
-{
-	std::promise<void> exitSignal;
-	std::future<void> futureObj;
-
-   public:
-	Stoppable()
-	    : futureObj( exitSignal.get_future() )
-	{
-	}
-	Stoppable( Stoppable&& obj )
-	    : exitSignal( std::move( obj.exitSignal ) )
-	    , futureObj( std::move( obj.futureObj ) )
-	{
-	}
-
-	Stoppable& operator=( Stoppable&& obj )
-	{
-		exitSignal = std::move( obj.exitSignal );
-		futureObj  = std::move( obj.futureObj );
-		return *this;
-	}
-
-	virtual void run( CntTyp& ) = 0;
-
-	void operator()() { run(); }
-
-	bool stopRequested()
-	{
-		if( futureObj.wait_for( std::chrono::milliseconds( 0 ) )
-		    == std::future_status::timeout )
-			return false;
-		return true;
-	}
-	void stop() { exitSignal.set_value(); }
-};
-
-template<typename CntTyp> class MeasurementBench : public Stoppable<CntTyp>
-{
-   public:
-	void run( CntTyp& pc )
-	{
-		pc.start();
-		while( this->stopRequested() == false )
-		{
-			_mm_pause();
-		}
-		pc.read();
-	}
-};
-
 template<typename EventTyp, typename CntTyp> struct Schedule
 {
    private:
@@ -202,12 +151,8 @@ template<typename CntTyp> struct CounterBenchmark
 		counter.add( events );
 
 
-		for( int i = 0; i < warmup; ++i ) {
-            std::cout << "WARMUP START" << std::endl;
+		for( int i = 0; i < warmup; ++i )
 			benchmark( counter );
-            std::cout << "WARMUP DONE" << std::endl;
-        }
-
 
 		counter.reset();
 
