@@ -16,9 +16,9 @@
 #include <string>
 #include <vector>
 
+#include "constants.h"
 #include "counter.h"
 #include "counters.h"
-#include "constants.h"
 #include "shuffle.h"
 #include "thread_utils.h"
 
@@ -33,13 +33,13 @@
 #define O_STATE 4
 #define F_STATE 5
 
-uint64_t avg_no_overflow(std::vector<uint64_t> const& nums);
+uint64_t avg_no_overflow( std::vector<uint64_t> const& nums );
 
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
 typedef enum
 {
-    PRODUCER_CONSUMER,
+	PRODUCER_CONSUMER,
 	STORE_ON_MODIFIED,
 	STORE_ON_EXCLUSIVE,
 	STORE_ON_SHARED_OR_FORWARD,
@@ -59,16 +59,11 @@ typedef enum
 } core_placement_t;
 
 static const char* mesi_type_des[] = {
-    "PRODUCER_CONSUMER",
-    "STORE_ON_MODIFIED",
-    "STORE_ON_EXCLUSIVE",
-    "STORE_ON_SHARED_OR_FORWARD",
-    "STORE_ON_INVALID",
-    "LOAD_FROM_MODIFIED",
-    "LOAD_FROM_EXCLUSIVE",
-    "LOAD_FROM_SHARED_OR_FORWARD",
-    "LOAD_FROM_INVALID",
-    "FLUSH",
+    "PRODUCER_CONSUMER",   "STORE_ON_MODIFIED",
+    "STORE_ON_EXCLUSIVE",  "STORE_ON_SHARED_OR_FORWARD",
+    "STORE_ON_INVALID",    "LOAD_FROM_MODIFIED",
+    "LOAD_FROM_EXCLUSIVE", "LOAD_FROM_SHARED_OR_FORWARD",
+    "LOAD_FROM_INVALID",   "FLUSH",
 };
 
 static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
@@ -97,65 +92,66 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	int core_src, core_socket0, core_socket1, core_global0, core_global1;      \
                                                                                \
 	volatile char* shared_data  = nullptr;                                     \
-	volatile int* wrflag  = nullptr;                                     \
+	volatile int* wrflag        = nullptr;                                     \
 	volatile char** shared_iter = nullptr;                                     \
 	volatile uint64_t shared_data_size;                                        \
 	volatile uint64_t cache_line_size;                                         \
 	volatile uint64_t cache_size;                                              \
-	volatile uint64_t producer_start_time;                                              \
+	volatile uint64_t producer_start_time;                                     \
                                                                                \
 	void OPT0 flusher_( PAPILLCounter& pc, uint64_t size,                      \
 	                    uint64_t stride = 64 )                                 \
 	{                                                                          \
-		for( uint64_t i = 0; i < shared_data_size; i ++ )               \
+		for( uint64_t i = 0; i < shared_data_size; i++ )                       \
 		{                                                                      \
 			_mm_mfence();                                                      \
 			_mm_clflush( (void*)&shared_data[i] );                             \
 			_mm_mfence();                                                      \
 		}                                                                      \
 	}                                                                          \
-	void OPT0 producer_( PAPILLCounter& pc, uint64_t size,                       \
-	                   uint64_t stride = 64 )                                  \
+	void OPT0 producer_( PAPILLCounter& pc, uint64_t size,                     \
+	                     uint64_t stride = 64 )                                \
 	{                                                                          \
-		char** iter = (char**)shared_iter;                                     \
+		char** iter       = (char**)shared_iter;                               \
+		uint64_t line_cnt = shared_data_size / stride;                         \
 		pc.start();                                                            \
-		producer_start_time = rdtsc();                                              \
 		uint64_t start = rdtsc();                                              \
-        uint64_t line_cnt = shared_data_size / stride;              \
-		for( uint64_t i = 0; i < line_cnt; i ++ )               \
+		for( uint64_t i = 0; i < line_cnt; i++ )                               \
 		{                                                                      \
 			*( iter + 1 ) = (char*)1;                                          \
 			iter          = ( (char**)*iter );                                 \
-            		__sync_fetch_and_add(&wrflag[i], -1);                        \
+			__sync_fetch_and_add( &wrflag[i], -1 );                            \
+		}                                                                      \
+		pc.read();                                                             \
+		pc.vec_cycles_measured.push_back( start );                             \
+	}                                                                          \
+	void OPT0 consumer_( PAPILLCounter& pc, uint64_t size,                     \
+	                     uint64_t stride = 64 )                                \
+	{                                                                          \
+		char** iter       = (char**)shared_iter;                               \
+		uint64_t line_cnt = shared_data_size / stride;                         \
+		pc.start();                                                            \
+		for( uint64_t i = 0; i < line_cnt; i++ )                               \
+		{                                                                      \
+			while( !__sync_lock_test_and_set( &wrflag[i], 1 ) )                \
+			{                                                                  \
+				_mm_pause();                                                   \
+			};                                                                 \
+			iter = ( (char**)*iter );                                          \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
-		pc.vec_cycles_measured.push_back( end - start );                       \
-	}                                                                          \
-	void OPT0 consumer_( PAPILLCounter& pc, uint64_t size,                       \
-	                   uint64_t stride = 64 )                                  \
-	{                                                                          \
-		char** iter = (char**)shared_iter;                                     \
-		pc.start();                                                            \
-        uint64_t line_cnt = shared_data_size / stride;              \
-		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i ++ )               \
-		{                                                                      \
-            		while(!__sync_lock_test_and_set(&wrflag[i],1)) { _mm_pause(); };      \
-			iter          = ( (char**)*iter );                                 \
-		}                                                                      \
-		pc.read();                                                             \
-		pc.vec_cycles_measured.push_back( start );                       \
+		pc.vec_cycles_measured.push_back( end );                               \
 	}                                                                          \
                                                                                \
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter = (char**)shared_iter;                                     \
-        uint64_t line_cnt = shared_data_size / stride;              \
+		char** iter       = (char**)shared_iter;                               \
+		uint64_t line_cnt = shared_data_size / stride;                         \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i++)               \
+		for( uint64_t i = 0; i < line_cnt; i++ )                               \
 		{                                                                      \
 			iter          = ( (char**)*iter );                                 \
 			*( iter + 1 ) = (char*)1;                                          \
@@ -168,11 +164,11 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter = (char**)shared_iter;                                     \
-        uint64_t line_cnt = shared_data_size / stride;              \
+		char** iter       = (char**)shared_iter;                               \
+		uint64_t line_cnt = shared_data_size / stride;                         \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i++ )     \
+		for( uint64_t i = 0; i < line_cnt; i++ )                               \
 		{                                                                      \
 			iter = ( (char**)*iter );                                          \
 		}                                                                      \
@@ -180,13 +176,13 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
-	void producer( PAPILLCounter& pc )                                           \
+	void producer( PAPILLCounter& pc )                                         \
 	{                                                                          \
-		producer_( pc, shared_data_size, cache_line_size );                      \
+		producer_( pc, shared_data_size, cache_line_size );                    \
 	}                                                                          \
-	void consumer( PAPILLCounter& pc )                                           \
+	void consumer( PAPILLCounter& pc )                                         \
 	{                                                                          \
-		consumer_( pc, shared_data_size, cache_line_size );                      \
+		consumer_( pc, shared_data_size, cache_line_size );                    \
 	}                                                                          \
                                                                                \
 	void reader( PAPILLCounter& pc )                                           \
@@ -212,13 +208,15 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void pr_co_setup( uint64_t size, uint64_t stride = 64 )                    \
 	{                                                                          \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
-		wrflag = (int*)malloc( size / stride * sizeof( int ) );              \
-											\
-		for (uint64_t i = 0; i < size/stride; i ++) {                          \
-		    wrflag[i] = 1;                                                     \
+		wrflag      = (int*)malloc( size / stride * sizeof( int ) );           \
+                                                                               \
+		for( uint64_t i = 0; i < size / stride; i++ )                          \
+		{                                                                      \
+			wrflag[i] = 1;                                                     \
 		}                                                                      \
-		for (uint64_t i = 0; i < size; i ++) {                          \
-		    shared_data[i] = 0;                                                     \
+		for( uint64_t i = 0; i < size; i++ )                                   \
+		{                                                                      \
+			shared_data[i] = 0;                                                \
 		}                                                                      \
                                                                                \
 		volatile char** head = (volatile char**)shared_data;                   \
@@ -369,12 +367,12 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		switch( t )                                                            \
 		{                                                                      \
 			case PRODUCER_CONSUMER:                                            \
-			    vec.clear();                                            \
+				vec.clear();                                                   \
 				vec.push_back( Sched{                                          \
-				    core_a, std::function<decltype( producer )>{ producer },       \
+				    core_a, std::function<decltype( producer )>{ producer },   \
 				    cnt_vec } );                                               \
 				vec.push_back( Sched{                                          \
-				    core_c, std::function<decltype( consumer )>{ consumer },       \
+				    core_c, std::function<decltype( consumer )>{ consumer },   \
 				    cnt_vec } );                                               \
 				break;                                                         \
 			case STORE_ON_MODIFIED:                                            \
@@ -429,22 +427,20 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			case FLUSH:                                                        \
 				vec.push_back(                                                 \
 				    Sched{ core_a,                                             \
-				           std::function<decltype( flusher )>{ flusher },        \
+				           std::function<decltype( flusher )>{ flusher },      \
 				           {} } );                                             \
 				break;                                                         \
 			default: break;                                                    \
 		}                                                                      \
                                                                                \
-        std::vector<PAPILLCounter> counters;                                                          \
-        if(t == PRODUCER_CONSUMER) \
-                counters = cbench                                                           \
-                      .counters_with_schedule<std::vector<std::string>>(  \
-                          vec , 0);                                                   \
-        else                        \
-            counters                                                          \
-                = cbench                                                           \
-                      .counters_with_priority_schedule<std::vector<std::string>>(  \
-                          vec );                                                   \
+		std::vector<PAPILLCounter> counters;                                   \
+		if( t == PRODUCER_CONSUMER )                                           \
+			counters                                                           \
+			    = cbench.counters_with_schedule<std::vector<std::string>>(     \
+			        vec, 0 );                                                  \
+		else                                                                   \
+			counters = cbench.counters_with_priority_schedule<                 \
+			    std::vector<std::string>>( vec );                              \
 		for( auto& cnt: counters )                                             \
 		{                                                                      \
 			if( cnt.cset.size() == 0 )                                         \
@@ -497,9 +493,10 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		shared_data_size = ( data_size );                                      \
 	} while( 0 );
 
-#define BENCHMARK_END() 			\
-	do { 					\
-		free( (void*)shared_data ); 	\
-	} while(0);
+#define BENCHMARK_END()                                                        \
+	do                                                                         \
+	{                                                                          \
+		free( (void*)shared_data );                                            \
+	} while( 0 );
 
 #endif // BENCHMARK_HELPERS_H_IN
