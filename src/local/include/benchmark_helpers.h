@@ -419,4 +419,9 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		shared_data_size = ( data_size );                                      \
 	} while( 0 );
 
+#define BENCHMARK_END() 			\
+	do { 					\
+		free( (void*)shared_data ); 	\
+	} while(0);
+
 #endif // BENCHMARK_HELPERS_H_IN
