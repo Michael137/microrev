@@ -55,8 +55,10 @@ int main( int argc, char* argv[] )
 	        shared_data_size = s;
 	    	pr_co_setup( shared_data_size );
 		for(int i = 0; i < 3; ++i) {
-		    run_test( FLUSH, (core_placement_t)i , { "perf::L1-DCACHE-LOAD-MISSES"});
-		    run_test( PRODUCER_CONSUMER, (core_placement_t)i , { "perf::L1-DCACHE-LOAD-MISSES"});
+			for(int j = 0; j < 100; ++j) {
+			    run_test( FLUSH, (core_placement_t)i , { "perf::L1-DCACHE-LOAD-MISSES"});
+			    run_test( PRODUCER_CONSUMER, (core_placement_t)i , { "perf::L1-DCACHE-LOAD-MISSES"});
+			}
 		}
 	}
 
