@@ -39,6 +39,7 @@ using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
 typedef enum
 {
+    PRODUCER_CONSUMER,
 	STORE_ON_MODIFIED,
 	STORE_ON_EXCLUSIVE,
 	STORE_ON_SHARED_OR_FORWARD,
@@ -58,6 +59,7 @@ typedef enum
 } core_placement_t;
 
 static const char* mesi_type_des[] = {
+    "PRODUCER_CONSUMER",
     "STORE_ON_MODIFIED",
     "STORE_ON_EXCLUSIVE",
     "STORE_ON_SHARED_OR_FORWARD",
@@ -95,10 +97,12 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	int core_src, core_socket0, core_socket1, core_global0, core_global1;      \
                                                                                \
 	volatile char* shared_data  = nullptr;                                     \
+	volatile int* wrflag  = nullptr;                                     \
 	volatile char** shared_iter = nullptr;                                     \
 	volatile uint64_t shared_data_size;                                        \
 	volatile uint64_t cache_line_size;                                         \
 	volatile uint64_t cache_size;                                              \
+	volatile uint64_t producer_start_time;                                              \
                                                                                \
 	void OPT0 flusher_( PAPILLCounter& pc, uint64_t size,                      \
 	                    uint64_t stride = 64 )                                 \
@@ -109,6 +113,42 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			_mm_clflush( (void*)&shared_data[i] );                             \
 			_mm_mfence();                                                      \
 		}                                                                      \
+	}                                                                          \
+	void OPT0 producer_( PAPILLCounter& pc, uint64_t size,                       \
+	                   uint64_t stride = 64 )                                  \
+	{                                                                          \
+		char** iter = (char**)shared_iter;                                     \
+		pc.start();                                                            \
+		uint64_t producer_start_time = rdtsc();                                              \
+		uint64_t start = rdtsc();                                              \
+        uint64_t line_cnt = shared_data_size / stride;              \
+		for( uint64_t i = 0; i < line_cnt; i ++ )               \
+		{                                                                      \
+			iter          = ( (char**)*iter );                                 \
+			*( iter + 1 ) = (char*)1;                                          \
+            wrflag[i] = 1;                                               \
+		}                                                                      \
+		uint64_t end = rdtsc();                                                \
+		pc.read();                                                             \
+		pc.vec_cycles_measured.push_back( end - start );                       \
+	}                                                                          \
+	void OPT0 consumer_( PAPILLCounter& pc, uint64_t size,                       \
+	                   uint64_t stride = 64 )                                  \
+	{                                                                          \
+		char** iter = (char**)shared_iter;                                     \
+		pc.start();                                                            \
+		uint64_t start = rdtsc();                                              \
+        uint64_t line_cnt = shared_data_size / stride;              \
+		for( uint64_t i = 0; i < line_cnt; i ++ )               \
+		{                                                                      \
+            while(!wrflag[i]);                                            \
+			iter          = ( (char**)*iter );                                 \
+		    uint64_t end = rdtsc();                                                \
+            std::cout<<end -producer_start_time << std::endl; \
+		}                                                                      \
+		/*uint64_t end = rdtsc();                                               */ \
+		pc.read();                                                             \
+		pc.vec_cycles_measured.push_back( start );                       \
 	}                                                                          \
                                                                                \
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
@@ -156,6 +196,14 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		std::cout << std::endl; */                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
+	void producer( PAPILLCounter& pc )                                           \
+	{                                                                          \
+		producer_( pc, shared_data_size, cache_line_size );                      \
+	}                                                                          \
+	void consumer( PAPILLCounter& pc )                                           \
+	{                                                                          \
+		consumer_( pc, shared_data_size, cache_line_size );                      \
+	}                                                                          \
                                                                                \
 	void reader( PAPILLCounter& pc )                                           \
 	{                                                                          \
@@ -176,6 +224,33 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void demoter( PAPILLCounter& pc )                                          \
 	{                                                                          \
 		demoter_( pc, shared_data_size, cache_line_size );                     \
+	}                                                                          \
+	void pr_co_setup( uint64_t size, uint64_t stride = 64 )                    \
+	{                                                                          \
+		shared_data = (char*)malloc( size * sizeof( char ) );                  \
+		wrflag = (int*)malloc( size / stride * sizeof( int ) );              \
+                                                                               \
+		volatile char** head = (volatile char**)shared_data;                   \
+		shared_iter          = head;                                           \
+        for (uint64_t i = 0; i < size/stride; i ++) {                          \
+            wrflag[i] = 0;                                                     \
+        }                                                                      \
+                                                                               \
+		std::vector<char*> rndarray;                                           \
+		for( uint64_t i = 0; i < size; i += stride )                           \
+		{                                                                      \
+			rndarray.push_back( (char*)&shared_data[i] );                      \
+		}                                                                      \
+                                                                               \
+		shuffle_array<char*>( rndarray );                                      \
+                                                                               \
+		for( uint64_t i = 0; i < size; i += stride )                           \
+		{                                                                      \
+			*shared_iter = *(volatile char**)&rndarray[i / stride];            \
+                                                                               \
+			shared_iter += ( stride / sizeof( shared_iter ) );                 \
+		}                                                                      \
+		*shared_iter = (char*)head;                                            \
 	}                                                                          \
                                                                                \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
@@ -305,6 +380,15 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		    core_c, std::function<decltype( flusher )>{ flusher }, {} } );     \
 		switch( t )                                                            \
 		{                                                                      \
+			case PRODUCER_CONSUMER:                                            \
+			    vec.clear();                                            \
+				vec.push_back( Sched{                                          \
+				    core_a, std::function<decltype( producer )>{ producer },       \
+				    cnt_vec } );                                               \
+				vec.push_back( Sched{                                          \
+				    core_c, std::function<decltype( consumer )>{ consumer },       \
+				    cnt_vec } );                                               \
+				break;                                                         \
 			case STORE_ON_MODIFIED:                                            \
 				init_state( vec, M_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
@@ -357,19 +441,22 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			case FLUSH:                                                        \
 				vec.push_back(                                                 \
 				    Sched{ core_a,                                             \
-				           std::function<decltype( writer )>{ writer },        \
+				           std::function<decltype( flusher )>{ flusher },        \
 				           {} } );                                             \
-				vec.push_back( Sched{                                          \
-				    core_c, std::function<decltype( writer )>{ writer },       \
-				    cnt_vec } );                                               \
 				break;                                                         \
 			default: break;                                                    \
 		}                                                                      \
                                                                                \
-		auto counters                                                          \
-		    = cbench                                                           \
-		          .counters_with_priority_schedule<std::vector<std::string>>(  \
-		              vec );                                                   \
+        std::vector<PAPILLCounter> counters;                                                          \
+        if(t == PRODUCER_CONSUMER) \
+                counters = cbench                                                           \
+                      .counters_with_schedule<std::vector<std::string>>(  \
+                          vec );                                                   \
+        else                        \
+            counters                                                          \
+                = cbench                                                           \
+                      .counters_with_priority_schedule<std::vector<std::string>>(  \
+                          vec );                                                   \
 		for( auto& cnt: counters )                                             \
 		{                                                                      \
 			if( cnt.cset.size() == 0 )                                         \

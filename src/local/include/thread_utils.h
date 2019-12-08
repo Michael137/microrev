@@ -236,7 +236,7 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	void counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec )
+	std::vector<CntTyp> counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec )
 	{
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
@@ -259,6 +259,7 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			cnt.stats();
 		}
+		return counters;
 	}
 
 	template<typename EventTyp>
