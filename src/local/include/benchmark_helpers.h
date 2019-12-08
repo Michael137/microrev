@@ -18,6 +18,7 @@
 
 #include "counter.h"
 #include "counters.h"
+#include "constants.h"
 #include "shuffle.h"
 #include "thread_utils.h"
 
@@ -31,6 +32,8 @@
 #define I_STATE 3
 #define O_STATE 4
 #define F_STATE 5
+
+uint64_t avg_no_overflow(std::vector<uint64_t> const& nums);
 
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
@@ -54,7 +57,7 @@ typedef enum
 	GLOBAL  // Across Sockets
 } core_placement_t;
 
-const char* mesi_type_des[] = {
+static const char* mesi_type_des[] = {
     "STORE_ON_MODIFIED",
     "STORE_ON_EXCLUSIVE",
     "STORE_ON_SHARED_OR_FORWARD",
@@ -66,7 +69,7 @@ const char* mesi_type_des[] = {
     "FLUSH",
 };
 
-const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
+static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 
 #ifdef __llvm__
 #	define DEMOTER_DEF()                                                      \
