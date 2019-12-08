@@ -123,33 +123,50 @@ int main( int argc, char* argv[] )
 	 * Sweep:
 	 *     We perform the test for increasing working set (i.e., shared data) size
          */
-	INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, _256KB )
+    	std::vector<uint64_t> shared_sizes{_1KB, _2KB, _4KB, _8KB,
+					   _16KB, _32KB, _64KB, _128KB,
+					   _256KB, _512KB, _1MB, _2MB};
 
 	std::vector<std::string> counters
 	    = { "perf::L1-DCACHE-LOAD-MISSES",
-	        "perf::L1-DCACHE-LOADS" };
+		"perf::L1-DCACHE-LOADS" };
 
-	std::vector<uint64_t> flush_cycles;
-	std::vector<uint64_t> invalid_cycles;
+	std::vector<uintmax_t> flush_cycles;
+	std::vector<uintmax_t> invalid_cycles;
 
-	setup( shared_data_size );
+	std::cout << ">>> Flushing on both sockets <<<\n";
+	for(auto size : shared_sizes)
+	{
+		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
 
-	for( int i = 0; i < 1000; ++i )
-		flusher_test( counters, flush_cycles );
+		setup( shared_data_size );
 
-	for( int i = 0; i < 1000; ++i )
-		read_from_invalid_test( counters, invalid_cycles );
+		for( int i = 0; i < 200; ++i )
+			read_from_invalid_test( counters, invalid_cycles );
+
+		std::cout << size << "," << avg_no_overflow(invalid_cycles) << '\n';
+
+		invalid_cycles.clear();
+	}
+
+	std::cout << ">>> Flushing on one socket <<<\n";
+	for(auto size : shared_sizes)
+	{
+		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
+
+		setup( shared_data_size );
+
+		for( int i = 0; i < 200; ++i )
+			flusher_test( counters, flush_cycles );
+
+		std::cout << size << "," << avg_no_overflow(flush_cycles) << '\n';
+
+		flush_cycles.clear();
+	}
+
+	std::cout << std::endl;
 
 	BENCHMARK_END();
-
-	std::cout << "Flushing on one socket: "
-	          << std::accumulate( flush_cycles.begin(), flush_cycles.end(), 0 ) / flush_cycles.size()
-	          << std::endl;
-
-	std::cout << "Flushing on both sockets: "
-	          << std::accumulate( invalid_cycles.begin(), invalid_cycles.end(), 0 ) / invalid_cycles.size()
-	          << std::endl;
-
 #endif // !WITH_PAPI_LL
 
 	return 0;
