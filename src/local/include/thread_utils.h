@@ -224,8 +224,13 @@ template<typename CntTyp> struct CounterBenchmark
 
 		counter.add( events );
 
-		for( int i = 0; i < warmup; ++i )
+
+		for( int i = 0; i < warmup; ++i ) {
+            std::cout << "WARMUP START" << std::endl;
 			benchmark( counter );
+            std::cout << "WARMUP DONE" << std::endl;
+        }
+
 
 		counter.reset();
 
@@ -236,16 +241,16 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	std::vector<CntTyp> counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec )
+	std::vector<CntTyp> counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec, int warmup = 0)
 	{
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			counters[i].label = svec[i].label;
-			this->threads.push_back( std::thread( [this, &counters, &svec, i] {
+			this->threads.push_back( std::thread( [this, &counters, &svec, i, warmup] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
-				                                   svec[i].benchmark );
+				                                   svec[i].benchmark, warmup);
 			} ) );
 			pin_to_core( i, svec[i].core_id );
 		}
@@ -332,6 +337,7 @@ template<typename CntTyp> struct CounterBenchmark
 			}
 		}
 
+        this->pause = true;
 		return counters;
 	}
 };

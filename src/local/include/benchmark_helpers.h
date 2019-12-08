@@ -116,13 +116,13 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	{                                                                          \
 		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
-		uint64_t producer_start_time = rdtsc();                                              \
+		producer_start_time = rdtsc();                                              \
 		uint64_t start = rdtsc();                                              \
         uint64_t line_cnt = shared_data_size / stride;              \
 		for( uint64_t i = 0; i < line_cnt; i ++ )               \
 		{                                                                      \
-			iter          = ( (char**)*iter );                                 \
 			*( iter + 1 ) = (char*)1;                                          \
+			iter          = ( (char**)*iter );                                 \
             wrflag[i] = 1;                                               \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
@@ -140,8 +140,10 @@ const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		{                                                                      \
             while(!wrflag[i]);                                            \
 			iter          = ( (char**)*iter );                                 \
-		    uint64_t end = rdtsc();                                                \
-            std::cout<<end -producer_start_time << std::endl; \
+            if(i == 0) { \
+                uint64_t end = rdtsc();                                                \
+                std::cout<<end -producer_start_time << std::endl; \
+            } \
 		}                                                                      \
 		/*uint64_t end = rdtsc();                                               */ \
 		pc.read();                                                             \
