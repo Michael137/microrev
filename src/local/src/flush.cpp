@@ -137,7 +137,7 @@ int main( int argc, char* argv[] )
 	std::cout << ">>> Flushing on both sockets <<<\n";
 	for(auto size : shared_sizes)
 	{
-		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
+		INIT_ARCH_CFG( 2, 4, 6, 7, 9, _32KB, _64B, size )
 
 		setup( shared_data_size );
 
@@ -152,7 +152,7 @@ int main( int argc, char* argv[] )
 	std::cout << ">>> Flushing on one socket <<<\n";
 	for(auto size : shared_sizes)
 	{
-		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
+		INIT_ARCH_CFG( 2, 4, 6, 7, 9, _32KB, _64B, size )
 
 		setup( shared_data_size );
 
