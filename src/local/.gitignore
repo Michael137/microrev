@@ -7,8 +7,6 @@ tmp/
 *.tmp
 *.dat
 
-config.mk
-run.sh
 *.old
 
 *.csv

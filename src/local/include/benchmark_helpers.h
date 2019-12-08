@@ -174,28 +174,13 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	{                                                                          \
 		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
-		/*                                                                     \
-		std::cout << "shared_data_size: " <<shared_data_size << std::endl;     \
-		std::cout << "cache_line_size: " <<cache_line_size << std::endl; */    \
 		uint64_t start = rdtsc();                                              \
-		/*auto iter0          = iter;*/                                        \
-		iter = ( (char**)*iter );                                              \
-		iter = ( (char**)*iter );                                              \
-		iter = ( (char**)*iter );                                              \
 		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
 		{                                                                      \
-			/*uint64_t tmp = rdtsc(); */                                       \
 			iter = ( (char**)*iter );                                          \
-			/*iter0         = ( (char**)*iter0 ); */                           \
-			/*std::cout << rdtsc() - tmp << " "; */                            \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
-		/*                                                                     \
-		std::cout << std::endl;                                                \
-		std::cout << end - start << " ";                                       \
-		std::cout << std::endl;                                                \
-		std::cout << std::endl; */                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
 	void producer( PAPILLCounter& pc )                                           \
