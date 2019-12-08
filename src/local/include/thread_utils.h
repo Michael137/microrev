@@ -141,9 +141,9 @@ template<typename CntTyp> struct CounterBenchmark
 	                        int core_id, BenchTyp benchmark, int warmup = 5 )
 	{
 		// Wait for scheduler
-		std::unique_lock<std::mutex> lck( this->mtx );
-		auto not_paused = [this]() { return this->pause == false; };
-		this->cv.wait( lck, not_paused );
+        std::unique_lock<std::mutex> lck( this->mtx );
+        auto not_paused = [this]() { return this->pause == false; };
+        this->cv.wait( lck, not_paused );
 
 		uint64_t start, end;
 		counter.core_id = core_id;

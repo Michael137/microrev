@@ -137,8 +137,8 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	{                                                                          \
 		char** iter = (char**)shared_iter;                                     \
 		pc.start();                                                            \
-		uint64_t start = rdtsc();                                              \
         uint64_t line_cnt = shared_data_size / stride;              \
+		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < line_cnt; i ++ )               \
 		{                                                                      \
             while(!wrflag[i]);                                            \
@@ -157,12 +157,13 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
 		char** iter = (char**)shared_iter;                                     \
+        uint64_t line_cnt = shared_data_size / stride;              \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < shared_data_size; i += stride )               \
+		for( uint64_t i = 0; i < line_cnt; i++)               \
 		{                                                                      \
-			iter          = ( (char**)*iter );                                 \
 			*( iter + 1 ) = (char*)1;                                          \
+			iter          = ( (char**)*iter );                                 \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
@@ -173,9 +174,10 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
 		char** iter = (char**)shared_iter;                                     \
+        uint64_t line_cnt = shared_data_size / stride;              \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < shared_data_size / cache_line_size; i++ )     \
+		for( uint64_t i = 0; i < line_cnt; i++ )     \
 		{                                                                      \
 			iter = ( (char**)*iter );                                          \
 		}                                                                      \

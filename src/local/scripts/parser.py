@@ -44,7 +44,7 @@ for tname, tdict in test_res.items():
     dsize = tname.split(" ")[2]
     tmpdict = {'Test': ttype, 'Placement': ptype, 'Size': int(dsize)}
     for cname, cvalues in tdict.items():
-        tmpdict[cname] = float(format(statistics.mean(cvalues)/float(dsize), ".2f"))
+        tmpdict[cname] = float(format(statistics.mean(cvalues)/float(dsize) * 64, ".2f"))
     dictlist.append(tmpdict)
 
 print("CSV save")
@@ -52,5 +52,41 @@ print("CSV save")
 df = pd.DataFrame(dictlist, columns = tmpdict.keys())
 
 df.to_csv("./result.csv", index=False)
+
+cyc_idx = list(df.columns).index("Cycles")
+test_list = [
+    "PRODUCER_CONSUMER",
+    "STORE_ON_MODIFIED",
+    "STORE_ON_EXCLUSIVE",
+    "STORE_ON_SHARED_OR_FORWARD",
+    "STORE_ON_INVALID",
+    "LOAD_FROM_MODIFIED",
+    "LOAD_FROM_EXCLUSIVE",
+    "LOAD_FROM_SHARED_OR_FORWARD",
+    "LOAD_FROM_INVALID",
+    "FLUSH",
+    ]
+place_list = ["GLOBAL", "SOCKET", "LOCAL"]
+
+for t in test_list:
+    joined_df = ""
+    for pl in place_list:
+        tmp = df[(df['Test'] == t) & (df['Placement'] == pl)]
+        if isinstance(tmp, pd.DataFrame):
+            res = tmp.iloc[:,[2, cyc_idx]]
+            res = res.rename(columns={"Cycles": pl + " Cycles"})
+            if isinstance(joined_df, pd.DataFrame):
+                joined_df = joined_df.merge(res, on='Size', how='left')
+
+            else:
+                joined_df = res
+
+
+    if isinstance(joined_df, pd.DataFrame):
+        #print(len(joined_df))
+        if len(joined_df) != 0:
+            os.system("mkdir -p csv")
+            joined_df.to_csv("./csv/result_" + t + ".csv", index=False)
+    #res.to_csv("./result_" + t + "_" + pl + ".csv", index=False)
 
 print("Done")
