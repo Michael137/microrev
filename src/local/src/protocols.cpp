@@ -69,6 +69,7 @@ int main( int argc, char* argv[] )
             }
         }
 	    free( (void*)shared_data );
+        shared_data = NULL;
     }
 
 
