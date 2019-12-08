@@ -126,7 +126,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		{                                                                      \
 			*( iter + 1 ) = (char*)1;                                          \
 			iter          = ( (char**)*iter );                                 \
-            wrflag[i] = 1;                                               \
+            		__sync_fetch_and_add(&wrflag[i], -1);                        \
 		}                                                                      \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
@@ -141,14 +141,9 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		uint64_t start = rdtsc();                                              \
 		for( uint64_t i = 0; i < line_cnt; i ++ )               \
 		{                                                                      \
-            while(!wrflag[i]);                                            \
+            		while(!__sync_lock_test_and_set(&wrflag[i],1)) { _mm_pause(); };      \
 			iter          = ( (char**)*iter );                                 \
-            if(i == 0) { \
-                uint64_t end = rdtsc();                                                \
-                std::cout<<end -producer_start_time << std::endl; \
-            } \
 		}                                                                      \
-		/*uint64_t end = rdtsc();                                               */ \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( start );                       \
 	}                                                                          \
@@ -218,12 +213,16 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	{                                                                          \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
 		wrflag = (int*)malloc( size / stride * sizeof( int ) );              \
+											\
+		for (uint64_t i = 0; i < size/stride; i ++) {                          \
+		    wrflag[i] = 1;                                                     \
+		}                                                                      \
+		for (uint64_t i = 0; i < size; i ++) {                          \
+		    shared_data[i] = 0;                                                     \
+		}                                                                      \
                                                                                \
 		volatile char** head = (volatile char**)shared_data;                   \
 		shared_iter          = head;                                           \
-        for (uint64_t i = 0; i < size/stride; i ++) {                          \
-            wrflag[i] = 0;                                                     \
-        }                                                                      \
                                                                                \
 		std::vector<char*> rndarray;                                           \
 		for( uint64_t i = 0; i < size; i += stride )                           \
