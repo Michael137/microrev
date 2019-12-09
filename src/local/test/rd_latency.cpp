@@ -79,6 +79,15 @@ int main( int argc, char** argv )
 	             "with a predictable stride"
 	          << std::endl;
 
+	time_rd_latency( _64B );
+	time_rd_latency( _64B );
+
+	printf( "%f MB: %lu\n", B2MB( _64B ), time_rd_latency( _64B ) );
+	printf( "%f MB: %lu\n", B2MB( _128B ), time_rd_latency( _128B ) );
+	printf( "%f MB: %lu\n", B2MB( _256B ), time_rd_latency( _256B ) );
+	printf( "%f MB: %lu\n", B2MB( _512B ), time_rd_latency( _512B ) );
+	printf( "%f MB: %lu\n", B2MB( _1KB), time_rd_latency( _1KB ) );
+	printf( "%f MB: %lu\n", B2MB( _2KB), time_rd_latency( _2KB ) );
 	printf( "%f MB: %lu\n", B2MB( _4KB ), time_rd_latency( _4KB ) );
 	printf( "%f MB: %lu\n", B2MB( _8KB ), time_rd_latency( _8KB ) );
 	printf( "%f MB: %lu\n", B2MB( _16KB ), time_rd_latency( _16KB ) );
@@ -90,6 +99,8 @@ int main( int argc, char** argv )
 	printf( "%f MB: %lu\n", B2MB( _1MB ), time_rd_latency( _1MB ) );
 	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
 	printf( "%f MB: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
+	printf( "%f MB: %lu\n", B2MB( _8MB ), time_rd_latency( _8MB ) );
+	printf( "%f MB: %lu\n", B2MB( _16MB ), time_rd_latency( _16MB ) );
 
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
 
