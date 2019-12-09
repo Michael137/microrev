@@ -39,7 +39,7 @@ template<typename T> void shuffle_array( std::vector<T>& arr )
 
 }
 
-void set_shuffled_linked_list(char* &arr, uint64_t size, uint64_t stride) 
+inline void set_shuffled_linked_list(char* &arr, uint64_t size, uint64_t stride) 
 {
 	std::vector<char*> rndarray;
 	for( uint64_t i = 0; i < size; i += stride )
