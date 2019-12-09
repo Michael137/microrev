@@ -47,7 +47,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	EventTyp events;
 	std::vector<Schedule<EventTyp, CntTyp>> measurement_scheds;
 	std::string label;
-    bool printchk;
+	bool printchk;
 
 	Schedule( int core_id, BenchTyp benchmark, EventTyp events )
 	    : core_id( core_id )
@@ -55,7 +55,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label()
-	    , printchk(false)
+	    , printchk( false )
 	{
 	}
 
@@ -65,7 +65,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label()
-	    , printchk(false)
+	    , printchk( false )
 	{
 	}
 
@@ -73,9 +73,9 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    : core_id( core_id )
 	    , benchmark( benchmark )
 	    , events( events )
-	    , measurement_scheds( )
+	    , measurement_scheds()
 	    , label()
-	    , printchk(printchk)
+	    , printchk( printchk )
 	{
 	}
 
@@ -86,7 +86,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label( label )
-        , printchk(false)
+	    , printchk( false )
 	{
 	}
 };
@@ -145,24 +145,24 @@ template<typename CntTyp> struct CounterBenchmark
 	                        int core_id, BenchTyp benchmark, int warmup = 5 )
 	{
 		// Wait for scheduler
-        std::unique_lock<std::mutex> lck( this->mtx );
-        auto not_paused = [this]() { return this->pause == false; };
-        this->cv.wait( lck, not_paused );
+		std::unique_lock<std::mutex> lck( this->mtx );
+		auto not_paused = [this]() { return this->pause == false; };
+		this->cv.wait( lck, not_paused );
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 
 		uint64_t start, end;
 		counter.core_id = core_id;
 
 		counter.add( events );
 
-
 		for( int i = 0; i < warmup; ++i )
 			benchmark( counter );
 
-		//counter.reset();
+		// counter.reset();
 
 		benchmark( counter );
 
-		//counter.end();
+		// counter.end();
 
 		// Wake up scheduler
 		this->ready = true;
@@ -171,17 +171,20 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	std::vector<CntTyp> counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec, int warmup = 5)
+	std::vector<CntTyp>
+	counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec,
+	                        int warmup = 5 )
 	{
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
-			counters[i].label = svec[i].label;
+			counters[i].label   = svec[i].label;
 			counters[i].collect = svec[i].printchk;
-			this->threads.push_back( std::thread( [this, &counters, &svec, i, warmup] {
+			this->threads.push_back( std::thread( [this, &counters, &svec, i,
+			                                       warmup] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
-				                                   svec[i].benchmark, warmup);
+				                                   svec[i].benchmark, warmup );
 			} ) );
 			pin_to_core( i, svec[i].core_id );
 		}
@@ -213,7 +216,7 @@ template<typename CntTyp> struct CounterBenchmark
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
-			counters[i].label = svec[i].label;
+			counters[i].label   = svec[i].label;
 			counters[i].collect = svec[i].printchk;
 			// Could use condition variable instead of futures here as well
 			this->threads.push_back(
