@@ -30,25 +30,9 @@ char** init_stride( uint64_t size )
 	for( int i = 0; i < size; ++i )
 		arr[i] = 0;
 
-	uint64_t stride = 64;
+	uint64_t stride = _32KB;
 
-	std::vector<char*> rndarray;
-	for( uint64_t i = 0; i < size; i += stride )
-	{
-		rndarray.push_back( (char*)&arr[i] );
-	}
-
-	char** head        = (char**)arr;
-	char** shared_iter = head;
-	shuffle_array<char*>( rndarray );
-
-	for( uint64_t i = 0; i < size; i += stride )
-	{
-		*shared_iter = *(char**)&rndarray[i / stride];
-
-		shared_iter += ( stride / sizeof( shared_iter ) );
-	}
-	*shared_iter = (char*)head;
+    set_shuffled_linked_list(arr, size, stride);
 
 	//	int i;
 	//	for( i = stride; i < size; i += stride )
@@ -60,7 +44,7 @@ char** init_stride( uint64_t size )
 	//	// Loop back end of linked list to the head
 	//	*(char**)&arr[i - stride] = (char*)&arr[0];
 
-	return shared_iter;
+	return (char**)arr;
 }
 
 uint64_t time_rd_latency( uint64_t size )
@@ -93,21 +77,12 @@ int main( int argc, char** argv )
 	             "with a predictable stride"
 	          << std::endl;
 
-	time_rd_latency( _64B );
-	time_rd_latency( _64B );
+	time_rd_latency( _32KB );
+	time_rd_latency( _32KB );
 	uint64_t start = rdtsc();
 	uint64_t end   = rdtsc();
 	printf( "Noise: %lu\n", end - start );
 
-	printf( "%f MB: %lu\n", B2MB( _64B ), time_rd_latency( _64B ) );
-	printf( "%f MB: %lu\n", B2MB( _128B ), time_rd_latency( _128B ) );
-	printf( "%f MB: %lu\n", B2MB( _256B ), time_rd_latency( _256B ) );
-	printf( "%f MB: %lu\n", B2MB( _512B ), time_rd_latency( _512B ) );
-	printf( "%f MB: %lu\n", B2MB( _1KB ), time_rd_latency( _1KB ) );
-	printf( "%f MB: %lu\n", B2MB( _2KB ), time_rd_latency( _2KB ) );
-	printf( "%f MB: %lu\n", B2MB( _4KB ), time_rd_latency( _4KB ) );
-	printf( "%f MB: %lu\n", B2MB( _8KB ), time_rd_latency( _8KB ) );
-	printf( "%f MB: %lu\n", B2MB( _16KB ), time_rd_latency( _16KB ) );
 	printf( "%f MB: %lu\n", B2MB( _32KB ), time_rd_latency( _32KB ) );
 	printf( "%f MB: %lu\n", B2MB( _64KB ), time_rd_latency( _64KB ) );
 	printf( "%f MB: %lu\n", B2MB( _128KB ), time_rd_latency( _128KB ) );
