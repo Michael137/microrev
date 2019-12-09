@@ -51,6 +51,12 @@ void OPT0 time_rd_latency( PAPILLCounter& pc, uint64_t size,
 }
 
 // Stride: 64 bytes
+void test64B_64( PAPILLCounter& pc ) { time_rd_latency( pc, _64B, 64 ); }
+void test128B_64( PAPILLCounter& pc ) { time_rd_latency( pc, _128B, 64 ); }
+void test256B_64( PAPILLCounter& pc ) { time_rd_latency( pc, _256KB, 64 ); }
+void test512B_64( PAPILLCounter& pc ) { time_rd_latency( pc, _512B, 64 ); }
+void test1_64( PAPILLCounter& pc ) { time_rd_latency( pc, _1KB, 64 ); }
+void test2_64( PAPILLCounter& pc ) { time_rd_latency( pc, _2KB, 64 ); }
 void test4_64( PAPILLCounter& pc ) { time_rd_latency( pc, _4KB, 64 ); }
 void test8_64( PAPILLCounter& pc ) { time_rd_latency( pc, _8KB, 64 ); }
 void test16_64( PAPILLCounter& pc ) { time_rd_latency( pc, _16KB, 64 ); }
@@ -62,15 +68,6 @@ void test512_64( PAPILLCounter& pc ) { time_rd_latency( pc, _512KB, 64 ); }
 void test1024_64( PAPILLCounter& pc ) { time_rd_latency( pc, _1MB, 64 ); }
 void test2048_64( PAPILLCounter& pc ) { time_rd_latency( pc, _2MB, 64 ); }
 
-// Stride: 128 bytes
-void test32_128( PAPILLCounter& pc ) { time_rd_latency( pc, _32KB, 128 ); }
-void test64_128( PAPILLCounter& pc ) { time_rd_latency( pc, _64KB, 128 ); }
-void test128_128( PAPILLCounter& pc ) { time_rd_latency( pc, _128KB, 128 ); }
-void test256_128( PAPILLCounter& pc ) { time_rd_latency( pc, _256KB, 128 ); }
-void test512_128( PAPILLCounter& pc ) { time_rd_latency( pc, _512KB, 128 ); }
-void test1024_128( PAPILLCounter& pc ) { time_rd_latency( pc, _1MB, 128 ); }
-void test2048_128( PAPILLCounter& pc ) { time_rd_latency( pc, _2MB, 128 ); }
-
 int main( int argc, char** argv )
 {
 	/* Should allow us to see cache sizes */
@@ -79,6 +76,12 @@ int main( int argc, char** argv )
 	using Sched = Schedule<std::vector<std::string>, PAPILLCounter>;
 
 	std::vector<Sched> vec{
+	    { 1, std::function<decltype( test32_64 )>{ test64B_64 }, {}, "64B" },
+	    { 1, std::function<decltype( test32_64 )>{ test128B_64 }, {}, "128B" },
+	    { 1, std::function<decltype( test32_64 )>{ test256B_64 }, {}, "256B" },
+	    { 1, std::function<decltype( test32_64 )>{ test512B_64 }, {}, "512B" },
+	    { 1, std::function<decltype( test32_64 )>{ test1_64 }, {}, "1KB" },
+	    { 1, std::function<decltype( test32_64 )>{ test2_64 }, {}, "2KB" },
 	    { 1, std::function<decltype( test32_64 )>{ test4_64 }, {}, "4KB" },
 	    { 1, std::function<decltype( test32_64 )>{ test8_64 }, {}, "8KB" },
 	    { 1, std::function<decltype( test32_64 )>{ test16_64 }, {}, "16KB" },
@@ -92,10 +95,10 @@ int main( int argc, char** argv )
 	    { 1, std::function<decltype( test32_64 )>{ test2048_64 }, {}, "4MB" } };
 	auto counters
 	    = cbench.counters_with_priority_schedule<std::vector<std::string>>(
-	        vec );
+	        vec, 5 );
 
 	for( auto& c: counters )
-		c.print_stats();
+		c.stats();
 
 	return 0;
 }

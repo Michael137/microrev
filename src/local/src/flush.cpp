@@ -38,10 +38,10 @@ void flusher_test( std::vector<std::string> counters,
 	// |-------|-------|    |-------|-------|
 	//
 	// Write on core 0 (setup)
-	// Read core 1 (core_src)
-	// Read on core 8 (global0)
-	// Flush on core 1
-	// Read on core 10 (global1) <--- Measure read latency
+	// Read core 2 (core_src)
+	// Read on core 7 (global0)
+	// Flush on core 2
+	// Read on core 9 (global1) <--- Measure read latency
 	core_b = core_global0;
 	core_c = core_global1;
 
@@ -81,9 +81,9 @@ void read_from_invalid_test( std::vector<std::string> counters,
 	int core_a = core_src, core_b, core_c;
 
 	// Write on core 0 <--- setup
-	// Flush on core 1 (core_src)
-	// Flush on core 10 (global1)
-	// Read on core 10 (global1) <--- Measure read latency
+	// Flush on core 2 (core_src)
+	// Flush on core 9 (global1)
+	// Read on core 9 (global1) <--- Measure read latency
 	core_b = core_global1;
 
 	// Flush cores on socket 0 and 1
@@ -137,7 +137,7 @@ int main( int argc, char* argv[] )
 	std::cout << ">>> Flushing on both sockets <<<\n";
 	for(auto size : shared_sizes)
 	{
-		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
+		INIT_ARCH_CFG( 2, 4, 6, 7, 9, _32KB, _64B, size )
 
 		setup( shared_data_size );
 
@@ -152,7 +152,7 @@ int main( int argc, char* argv[] )
 	std::cout << ">>> Flushing on one socket <<<\n";
 	for(auto size : shared_sizes)
 	{
-		INIT_ARCH_CFG( 1, 3, 5, 8, 10, _32KB, _64B, size )
+		INIT_ARCH_CFG( 2, 4, 6, 7, 9, _32KB, _64B, size )
 
 		setup( shared_data_size );
 
