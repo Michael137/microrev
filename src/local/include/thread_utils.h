@@ -47,6 +47,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	EventTyp events;
 	std::vector<Schedule<EventTyp, CntTyp>> measurement_scheds;
 	std::string label;
+    bool printchk;
 
 	Schedule( int core_id, BenchTyp benchmark, EventTyp events )
 	    : core_id( core_id )
@@ -54,6 +55,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label()
+	    , printchk(false)
 	{
 	}
 
@@ -63,16 +65,17 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label()
+	    , printchk(false)
 	{
 	}
 
-	Schedule( int core_id, BenchTyp benchmark, EventTyp events,
-	          std::vector<Schedule<EventTyp, CntTyp>> const& scheds )
+	Schedule( int core_id, BenchTyp benchmark, EventTyp events, bool printchk )
 	    : core_id( core_id )
 	    , benchmark( benchmark )
 	    , events( events )
-	    , measurement_scheds( scheds )
+	    , measurement_scheds( )
 	    , label()
+	    , printchk(printchk)
 	{
 	}
 
@@ -83,6 +86,7 @@ template<typename EventTyp, typename CntTyp> struct Schedule
 	    , events( events )
 	    , measurement_scheds()
 	    , label( label )
+        , printchk(false)
 	{
 	}
 };
@@ -154,11 +158,11 @@ template<typename CntTyp> struct CounterBenchmark
 		for( int i = 0; i < warmup; ++i )
 			benchmark( counter );
 
-		counter.reset();
+		//counter.reset();
 
 		benchmark( counter );
 
-		counter.end();
+		//counter.end();
 
 		// Wake up scheduler
 		this->ready = true;
@@ -173,6 +177,7 @@ template<typename CntTyp> struct CounterBenchmark
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			counters[i].label = svec[i].label;
+			counters[i].collect = svec[i].printchk;
 			this->threads.push_back( std::thread( [this, &counters, &svec, i, warmup] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
@@ -209,6 +214,7 @@ template<typename CntTyp> struct CounterBenchmark
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			counters[i].label = svec[i].label;
+			counters[i].collect = svec[i].printchk;
 			// Could use condition variable instead of futures here as well
 			this->threads.push_back(
 			    std::thread( [this, &counters, &svec, i, warmup] {

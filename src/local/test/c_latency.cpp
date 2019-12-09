@@ -49,7 +49,7 @@ char** init_stride( uint64_t size )
 
 uint64_t time_rd_latency( uint64_t size )
 {
-	const int accesses = 1000000;
+	const int accesses = 300;
 
 	// char* arr   = init_stride( size );
 	// char** iter = (char**)arr;

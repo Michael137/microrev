@@ -33,6 +33,13 @@
 #define O_STATE 4
 #define F_STATE 5
 
+#define FIVE( a ) a a a a a
+#define TEN( a ) FIVE( a ) FIVE( a )
+#define FIFTY( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a ) TEN( a )
+#define HUNDRED( a ) FIFTY( a ) FIFTY( a )
+#define R_512( a ) HUNDRED( a ) HUNDRED( a ) HUNDRED( a ) HUNDRED( a ) HUNDRED( a ) TEN( a ) a a 
+#define R_256( a ) HUNDRED( a ) HUNDRED( a ) FIFTY( a ) FIVE( a ) a
+
 uint64_t avg_no_overflow( std::vector<uint64_t> const& nums );
 
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
@@ -112,6 +119,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 producer_( PAPILLCounter& pc, uint64_t size,                     \
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
+        std::cout << "PRODUCING" << std::endl;          \
 		char** iter       = (char**)shared_iter;                               \
 		uint64_t line_cnt = shared_data_size / stride;                         \
 		pc.start();                                                            \
@@ -128,6 +136,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 consumer_( PAPILLCounter& pc, uint64_t size,                     \
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
+        std::cout << "CONSUMING" << std::endl;          \
 		char** iter       = (char**)shared_iter;                               \
 		uint64_t line_cnt = shared_data_size / stride;                         \
 		pc.start();                                                            \
@@ -147,15 +156,16 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter       = (char**)shared_iter;                               \
-		uint64_t line_cnt = shared_data_size / stride;                         \
+		char** iter       = (char**)shared_data;                               \
+		uint64_t line_cnt = shared_data_size / stride / 256;                         \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i++ )                               \
-		{                                                                      \
+        for (int i=0; i < line_cnt; i++) { /* line_cnt / 256 */                  \
+    		R_256(                                  \
 			iter          = ( (char**)*iter );                                 \
 			*( iter + 1 ) = (char*)1;                                          \
-		}                                                                      \
+            )                                       \
+        }                                           \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
@@ -164,14 +174,12 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void OPT0 reader_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
 	{                                                                          \
-		char** iter       = (char**)shared_iter;                               \
-		uint64_t line_cnt = shared_data_size / stride;                         \
+		char** iter       = (char**)shared_data;                               \
+		uint64_t line_cnt = shared_data_size / stride / 256;                         \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i++ )                               \
-		{                                                                      \
-			iter = ( (char**)*iter );                                          \
-		}                                                                      \
+        for (int i=0; i < line_cnt; i++) /* line_cnt / 256 */                  \
+    		R_256( iter = (char**)*iter; )                                          \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
@@ -370,65 +378,65 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 				vec.clear();                                                   \
 				vec.push_back( Sched{                                          \
 				    core_a, std::function<decltype( producer )>{ producer },   \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( consumer )>{ consumer },   \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case STORE_ON_MODIFIED:                                            \
 				init_state( vec, M_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case STORE_ON_EXCLUSIVE:                                           \
 				init_state( vec, E_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case STORE_ON_SHARED_OR_FORWARD:                                   \
 				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case STORE_ON_INVALID:                                             \
 				init_state( vec, I_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( writer )>{ writer },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case LOAD_FROM_MODIFIED:                                           \
 				init_state( vec, M_STATE, core_a, core_b );                    \
                                                                                \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true} );                                               \
 				break;                                                         \
 			case LOAD_FROM_EXCLUSIVE:                                          \
 				init_state( vec, E_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case LOAD_FROM_SHARED_OR_FORWARD:                                  \
 				init_state( vec, S_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case LOAD_FROM_INVALID:                                            \
 				init_state( vec, I_STATE, core_a, core_b );                    \
 				vec.push_back( Sched{                                          \
 				    core_c, std::function<decltype( reader )>{ reader },       \
-				    cnt_vec } );                                               \
+				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case FLUSH:                                                        \
 				vec.push_back(                                                 \
 				    Sched{ core_a,                                             \
 				           std::function<decltype( flusher )>{ flusher },      \
-				           {} } );                                             \
+				           {}, true } );                                             \
 				break;                                                         \
 			default: break;                                                    \
 		}                                                                      \
@@ -443,10 +451,8 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			    std::vector<std::string>>( vec );                              \
 		for( auto& cnt: counters )                                             \
 		{                                                                      \
-			if( cnt.cset.size() == 0 )                                         \
-				continue;                                                      \
-                                                                               \
-			cnt.stats();                                                       \
+            if(cnt.collect)                                                    \
+			    cnt.stats();                                                   \
 		}                                                                      \
 	}                                                                          \
 	void parse_cfg()                                                           \

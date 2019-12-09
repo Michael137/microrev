@@ -29,8 +29,8 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 	double cycles_measured;
 	std::vector<int64_t> vec_cycles_measured;
 	int core_id;
-	bool collect;
 	std::string label;
+	bool collect;
 
    public:
 	Counter();
