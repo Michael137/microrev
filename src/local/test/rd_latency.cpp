@@ -5,6 +5,7 @@
 #include <random>
 
 #include "constants.h"
+#include "shuffle.h"
 #include "thread_utils.h"
 
 using namespace pcnt;
@@ -16,13 +17,6 @@ using namespace pcnt;
 
 #define B2MB( b ) ( (double)b ) / 1024 / 1024
 
-static std::random_device rd;
-static std::mt19937 gen( rd() );
-static std::uniform_int_distribution<> dist( 1,
-                                             std::numeric_limits<int>::max() );
-
-int gen_num() { return dist( gen ); }
-
 /*
  * With predicatble stride i.e. pre-fetcher
  * will trigger
@@ -30,32 +24,52 @@ int gen_num() { return dist( gen ); }
  * From:
  * https://github.com/foss-for-synopsys-dwc-arc-processors/lmbench/blob/master/src/lib_mem.c#L177
  */
-char* init_stride( uint64_t size )
+char** init_stride( uint64_t size )
 {
 	char* arr = (char*)malloc( size * sizeof( char ) );
+	for( int i = 0; i < size; ++i )
+		arr[i] = 0;
 
 	uint64_t stride = 64;
 
-	int i;
-	for( i = stride; i < size; i += stride )
+	std::vector<char*> rndarray;
+	for( uint64_t i = 0; i < size; i += stride )
 	{
-		// Arrange linked list such that:
-		// Pointer at arr[i] == Pointer at arr[i + stride]
-		*(char**)&arr[i - stride] = (char*)&arr[i];
+		rndarray.push_back( (char*)&arr[i] );
 	}
 
-	// Loop back end of linked list to the head
-	*(char**)&arr[i - stride] = (char*)&arr[0];
+	char** head        = (char**)arr;
+	char** shared_iter = head;
+	shuffle_array<char*>( rndarray );
 
-	return arr;
+	for( uint64_t i = 0; i < size; i += stride )
+	{
+		*shared_iter = *(char**)&rndarray[i / stride];
+
+		shared_iter += ( stride / sizeof( shared_iter ) );
+	}
+	*shared_iter = (char*)head;
+
+	//	int i;
+	//	for( i = stride; i < size; i += stride )
+	//	{
+	//		// Arrange linked list such that:
+	//		// Pointer at arr[i] == Pointer at arr[i + stride]
+	//		*(char**)&arr[i - stride] = (char*)&arr[i];
+	//	}
+	//	// Loop back end of linked list to the head
+	//	*(char**)&arr[i - stride] = (char*)&arr[0];
+
+	return shared_iter;
 }
 
 uint64_t time_rd_latency( uint64_t size )
 {
 	const int accesses = 1000000;
 
-	char* arr   = init_stride( size );
-	char** iter = (char**)arr;
+	// char* arr   = init_stride( size );
+	// char** iter = (char**)arr;
+	char** iter = init_stride( size );
 
 	uint64_t start = rdtsc();
 
@@ -68,7 +82,7 @@ uint64_t time_rd_latency( uint64_t size )
 
 	uint64_t end = rdtsc();
 
-	free(arr);
+	// free( *iter );
 
 	return end - start;
 }
@@ -81,13 +95,16 @@ int main( int argc, char** argv )
 
 	time_rd_latency( _64B );
 	time_rd_latency( _64B );
+	uint64_t start = rdtsc();
+	uint64_t end   = rdtsc();
+	printf( "Noise: %lu\n", end - start );
 
 	printf( "%f MB: %lu\n", B2MB( _64B ), time_rd_latency( _64B ) );
 	printf( "%f MB: %lu\n", B2MB( _128B ), time_rd_latency( _128B ) );
 	printf( "%f MB: %lu\n", B2MB( _256B ), time_rd_latency( _256B ) );
 	printf( "%f MB: %lu\n", B2MB( _512B ), time_rd_latency( _512B ) );
-	printf( "%f MB: %lu\n", B2MB( _1KB), time_rd_latency( _1KB ) );
-	printf( "%f MB: %lu\n", B2MB( _2KB), time_rd_latency( _2KB ) );
+	printf( "%f MB: %lu\n", B2MB( _1KB ), time_rd_latency( _1KB ) );
+	printf( "%f MB: %lu\n", B2MB( _2KB ), time_rd_latency( _2KB ) );
 	printf( "%f MB: %lu\n", B2MB( _4KB ), time_rd_latency( _4KB ) );
 	printf( "%f MB: %lu\n", B2MB( _8KB ), time_rd_latency( _8KB ) );
 	printf( "%f MB: %lu\n", B2MB( _16KB ), time_rd_latency( _16KB ) );
