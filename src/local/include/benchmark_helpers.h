@@ -178,8 +178,9 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		uint64_t line_cnt = shared_data_size / stride / 256;                         \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-        for (int i=0; i < line_cnt; i++) /* line_cnt / 256 */                  \
+        for (int i=0; i < line_cnt; i++) { /* line_cnt / 256 */                  \
     		R_256( iter = (char**)*iter; )                                          \
+	} \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
