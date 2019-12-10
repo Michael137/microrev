@@ -35,8 +35,7 @@ int main( int argc, char* argv[] )
 
 	parse_cfg();
 
-	std::vector<uint64_t> size_vec{ _4KB,   _8KB,   _16KB,  _32KB, _64KB,
-	                                _128KB, _256KB, _512KB, _1MB,  _2MB };
+	std::vector<uint64_t> size_vec{ _128KB, _256KB, _512KB, _1MB,  _2MB };
 
 	for( auto s: size_vec )
 	{

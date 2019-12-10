@@ -114,6 +114,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 	volatile char* shared_data  = nullptr;                                     \
 	volatile int* wrflag        = nullptr;                                     \
+	volatile int ready        = 0;                                     \
 	volatile char** shared_iter = nullptr;                                     \
 	volatile uint64_t shared_data_size;                                        \
 	volatile uint64_t cache_line_size;                                         \
@@ -130,42 +131,63 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 			_mm_mfence();                                                      \
 		}                                                                      \
 	}                                                                          \
-	void OPT0 producer_( PAPILLCounter& pc, uint64_t size,                     \
+	void OPT0 cp_producer_( PAPILLCounter& pc, uint64_t size,                     \
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
-        std::cout << "PRODUCING" << std::endl;          \
+        std::cout << " COPY PRODUCING" << std::endl;          \
 		char** iter       = (char**)shared_iter;                               \
-		uint64_t line_cnt = shared_data_size / stride;                         \
-		pc.start();                                                            \
-		uint64_t start = rdtsc();                                              \
-		for( uint64_t i = 0; i < line_cnt; i++ )                               \
-		{                                                                      \
-			*( iter + 1 ) = (char*)1;                                          \
-			iter          = ( (char**)*iter );                                 \
-			__sync_fetch_and_add( &wrflag[i], -1 );                            \
-		}                                                                      \
-		pc.read();                                                             \
-		pc.vec_cycles_measured.push_back( start );                             \
-	}                                                                          \
-	void OPT0 consumer_( PAPILLCounter& pc, uint64_t size,                     \
+        char* local_arr = (char*)malloc( size * sizeof( char ) );                  \
+        char** local_iter = (char **)local_arr;             \
+        char* tmp;                \
+		uint64_t start;                                          \
+        uint64_t blksize = _128KB;                                \
+		uint64_t line_cnt = blksize / stride;                         \
+		uint64_t outer_line_cnt = size / blksize;                         \
+        int64_t addr_diff = (iter - local_iter);           \
+        for( uint64_t i = 0; i < size; ++i )                               \
+            local_arr[i] = 0;                               \
+        set_shuffled_linked_list(local_arr, size, stride);           \
+        start = rdtsc();                                                 \
+        for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
+            std::cout << "producing!" << std::endl;                            \
+            while( !__sync_bool_compare_and_swap( &ready, 0, -1 ) );                \
+            for( uint64_t j = 0; j < line_cnt; j++ )                               \
+            {                                                                      \
+                tmp = *( local_iter );                                         \
+                *( local_iter + addr_diff ) = tmp + addr_diff;                              \
+                local_iter          = (char**)tmp;                              \
+            }                                                                      \
+            __sync_bool_compare_and_swap(&ready, -1, 1);                \
+            std::cout << "produced!" << std::endl;                            \
+        }            \
+    }                              \
+	void OPT0 cp_consumer_( PAPILLCounter& pc, uint64_t size,                     \
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
-        std::cout << "CONSUMING" << std::endl;          \
+        std::cout << " COPY CONSUMING " << std::endl;          \
 		char** iter       = (char**)shared_iter;                               \
-		uint64_t line_cnt = shared_data_size / stride;                         \
-		pc.start();                                                            \
-		for( uint64_t i = 0; i < line_cnt; i++ )                               \
-		{                                                                      \
-			while( !__sync_lock_test_and_set( &wrflag[i], 1 ) )                \
-			{                                                                  \
-				_mm_pause();                                                   \
-			};                                                                 \
-			iter = ( (char**)*iter );                                          \
-		}                                                                      \
-		uint64_t end = rdtsc();                                                \
-		pc.read();                                                             \
-		pc.vec_cycles_measured.push_back( end );                               \
-	}                                                                          \
+        char* local_arr = (char*)malloc( size * sizeof( char ) );                  \
+        char** local_iter = (char **)local_arr;             \
+        uint64_t blksize = _128KB;                                \
+		uint64_t line_cnt = blksize / stride;                         \
+		uint64_t outer_line_cnt = size / blksize;                         \
+		uint64_t start;                                          \
+        char* tmp;                              \
+        int64_t addr_diff = ( local_iter - iter );                              \
+        start = rdtsc();                                                 \
+        for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
+            std::cout << "consuming!" << std::endl;                            \
+            while( !__sync_bool_compare_and_swap( &ready, 1, 2) );                \
+            for( uint64_t i = 0; i < line_cnt; i++ )                               \
+            {                                                                      \
+                tmp = *( iter );                              \
+                *( iter + addr_diff ) = tmp + addr_diff;                              \
+                iter = (char**)tmp;                                 \
+            }                                                                      \
+            __sync_bool_compare_and_swap( &ready, 2, 0 );                \
+            std::cout << "consumed!" << std::endl;                            \
+        }                       \
+    }                              \
                                                                                \
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
 	                   uint64_t stride = 64 )                                  \
@@ -192,13 +214,13 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
 	}                                                                          \
-	void producer( PAPILLCounter& pc )                                         \
+	void cp_producer( PAPILLCounter& pc )                                         \
 	{                                                                          \
-		producer_( pc, shared_data_size, cache_line_size );                    \
+		cp_producer_( pc, shared_data_size, cache_line_size );                    \
 	}                                                                          \
-	void consumer( PAPILLCounter& pc )                                         \
+	void cp_consumer( PAPILLCounter& pc )                                         \
 	{                                                                          \
-		consumer_( pc, shared_data_size, cache_line_size );                    \
+		cp_consumer_( pc, shared_data_size, cache_line_size );                    \
 	}                                                                          \
                                                                                \
 	void reader( PAPILLCounter& pc )                                           \
@@ -383,12 +405,11 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		switch( t )                                                            \
 		{                                                                      \
 			case PRODUCER_CONSUMER:                                            \
-				vec.clear();                                                   \
 				vec.push_back( Sched{                                          \
-				    core_a, std::function<decltype( producer )>{ producer },   \
+				    core_a, std::function<decltype( cp_producer )>{ cp_producer },   \
 				    cnt_vec, true } );                                               \
 				vec.push_back( Sched{                                          \
-				    core_c, std::function<decltype( consumer )>{ consumer },   \
+				    core_c, std::function<decltype( cp_consumer )>{ cp_consumer },   \
 				    cnt_vec, true } );                                               \
 				break;                                                         \
 			case STORE_ON_MODIFIED:                                            \

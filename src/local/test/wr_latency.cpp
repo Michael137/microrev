@@ -47,26 +47,22 @@ char** init_stride( uint64_t size )
 	return (char**)arr;
 }
 
-uint64_t time_rd_latency( uint64_t size )
+uint64_t time_wr_latency( uint64_t size )
 {
-	const int accesses = 10000;
+	const int accesses = 1000000;
 
 	// char* arr   = init_stride( size );
 	// char** iter = (char**)arr;
 	char** iter = init_stride( size );
-	
-    for( int i = 0; i < 10000; ++i ) {
-		HUNDRED( iter = ( (char**)*iter ); )
-		HUNDRED( iter = ( (char**)*iter ); )
-    }
 
 	uint64_t start = rdtsc();
-
+    
+    *(iter + 1) = (char *)1;
 	// Pointer-chase through linked list
 	for( int i = 0; i < accesses; ++i )
 	{
 		// Unroll loop partially to reduce loop overhead
-		HUNDRED( iter = ( (char**)*iter ); )
+		HUNDRED( *(iter + 1) = (char *)1; )
 	}
 
 	uint64_t end = rdtsc();
@@ -82,35 +78,31 @@ int main( int argc, char** argv )
 	             "with a predictable stride"
 	          << std::endl;
 
-	//time_rd_latency( _64B );
-	//time_rd_latency( _64B );
+	time_wr_latency( _64B );
+	time_wr_latency( _64B );
 	uint64_t start = rdtsc();
 	uint64_t end   = rdtsc();
 	printf( "Noise: %lu\n", end - start );
 
-    for (uint64_t i = 0; i< 1<<10; i ++ ) {
-        i =i + 1;
-    }
-	printf( "%f MB: %lu\n", B2MB( _64B ), time_rd_latency( _64B ) );
-	printf( "%f MB: %lu\n", B2MB( _128B ), time_rd_latency( _128B ) );
-	printf( "%f MB: %lu\n", B2MB( _256B ), time_rd_latency( _256B ) );
-	printf( "%f MB: %lu\n", B2MB( _512B ), time_rd_latency( _512B ) );
-	printf( "%f MB: %lu\n", B2MB( _1KB ), time_rd_latency( _1KB ) );
-	printf( "%f MB: %lu\n", B2MB( _2KB ), time_rd_latency( _2KB ) );
-	printf( "%f MB: %lu\n", B2MB( _4KB ), time_rd_latency( _4KB ) );
-	printf( "%f MB: %lu\n", B2MB( _8KB ), time_rd_latency( _8KB ) );
-	printf( "%f MB: %lu\n", B2MB( _16KB ), time_rd_latency( _16KB ) );
-	printf( "%f MB: %lu\n", B2MB( _32KB ), time_rd_latency( _32KB ) );
-	printf( "%f MB: %lu\n", B2MB( _64KB ), time_rd_latency( _64KB ) );
-	printf( "%f MB: %lu\n", B2MB( _128KB ), time_rd_latency( _128KB ) );
-	printf( "%f MB: %lu\n", B2MB( _256KB ), time_rd_latency( _256KB ) );
-	printf( "%f MB: %lu\n", B2MB( _512KB ), time_rd_latency( _512KB ) );
-	printf( "%f MB: %lu\n", B2MB( _64B ), time_rd_latency( _64B ) );
-	printf( "%f MB: %lu\n", B2MB( _1MB ), time_rd_latency( _1MB ) );
-//	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
-//	printf( "%f MB: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
-//	printf( "%f MB: %lu\n", B2MB( _8MB ), time_rd_latency( _8MB ) );
-//	printf( "%f MB: %lu\n", B2MB( _16MB ), time_rd_latency( _16MB ) );
+	printf( "%f MB: %lu\n", B2MB( _64B ), time_wr_latency( _64B ) );
+	printf( "%f MB: %lu\n", B2MB( _128B ), time_wr_latency( _128B ) );
+	printf( "%f MB: %lu\n", B2MB( _256B ), time_wr_latency( _256B ) );
+	printf( "%f MB: %lu\n", B2MB( _512B ), time_wr_latency( _512B ) );
+	printf( "%f MB: %lu\n", B2MB( _1KB ), time_wr_latency( _1KB ) );
+	printf( "%f MB: %lu\n", B2MB( _2KB ), time_wr_latency( _2KB ) );
+	printf( "%f MB: %lu\n", B2MB( _4KB ), time_wr_latency( _4KB ) );
+	printf( "%f MB: %lu\n", B2MB( _8KB ), time_wr_latency( _8KB ) );
+	printf( "%f MB: %lu\n", B2MB( _16KB ), time_wr_latency( _16KB ) );
+	printf( "%f MB: %lu\n", B2MB( _32KB ), time_wr_latency( _32KB ) );
+	printf( "%f MB: %lu\n", B2MB( _64KB ), time_wr_latency( _64KB ) );
+	printf( "%f MB: %lu\n", B2MB( _128KB ), time_wr_latency( _128KB ) );
+	printf( "%f MB: %lu\n", B2MB( _256KB ), time_wr_latency( _256KB ) );
+	printf( "%f MB: %lu\n", B2MB( _512KB ), time_wr_latency( _512KB ) );
+	printf( "%f MB: %lu\n", B2MB( _1MB ), time_wr_latency( _1MB ) );
+	printf( "%f MB: %lu\n", B2MB( _2MB ), time_wr_latency( _2MB ) );
+	printf( "%f MB: %lu\n", B2MB( _4MB ), time_wr_latency( _4MB ) );
+	printf( "%f MB: %lu\n", B2MB( _8MB ), time_wr_latency( _8MB ) );
+	printf( "%f MB: %lu\n", B2MB( _16MB ), time_wr_latency( _16MB ) );
 
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
 
