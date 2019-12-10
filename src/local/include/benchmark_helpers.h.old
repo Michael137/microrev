@@ -173,9 +173,80 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		char** iter       = (char**)shared_data;                               \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		R_131072( iter = (char**)*iter; \
-		      *( iter + 1 ) = (char*)1;                                          \
-		    ) \
+		switch(size) { \
+		case _4KB: \
+			{ \
+				R_64( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _8KB: \
+			{ \
+				R_128( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _16KB: \
+			{ \
+				R_256( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _32KB: \
+			{ \
+				R_512( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _64KB: \
+			{ \
+				R_1024( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _128KB: \
+			{ \
+				R_2048( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _256KB: \
+			{ \
+				R_4096( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _512KB: \
+			{ \
+				R_8192( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _1MB: \
+			{ \
+				R_16384( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		case _2MB: \
+			{ \
+				R_32768( iter = (char**)*iter; \
+				      *( iter + 1 ) = (char*)1;                                          \
+				    ) \
+			} \
+			break; \
+		default: \
+			break; \
+		} \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
@@ -187,7 +258,60 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		char** iter       = (char**)shared_data;                               \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		R_131072( iter = (char**)*iter; ) \
+		switch(size) { \
+		case _4KB: \
+			{ \
+				R_64( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _8KB: \
+			{ \
+				R_128( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _16KB: \
+			{ \
+				R_256( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _32KB: \
+			{ \
+				R_512( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _64KB: \
+			{ \
+				R_1024( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _128KB: \
+			{ \
+				R_2048( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _256KB: \
+			{ \
+				R_4096( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _512KB: \
+			{ \
+				R_8192( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _1MB: \
+			{ \
+				R_16384( iter = (char**)*iter; ) \
+			} \
+			break; \
+		case _2MB: \
+			{ \
+				R_32768( iter = (char**)*iter; ) \
+			} \
+			break; \
+		default: \
+			break; \
+		} \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
