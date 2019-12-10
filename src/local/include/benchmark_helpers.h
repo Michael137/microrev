@@ -161,13 +161,16 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
         start = rdtsc();                                                 \
         for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
             while( !__sync_bool_compare_and_swap( &ready, 0, -1 ) );                \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start );                       \
             for( uint64_t j = 0; j < line_cnt; j++ )                               \
             {                                                                      \
                 tmp = *( local_iter );                                         \
                 WRITE_BLOCK( local_iter, addr_diff, tmp );                   \
                 local_iter = (char**)tmp;                              \
             }                                                                      \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start );                       \
             __sync_bool_compare_and_swap(&ready, -1, 1);                \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start);                       \
         }            \
 		pc.vec_cycles_measured.push_back( start );                       \
     }                              \
@@ -183,15 +186,19 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		uint64_t start, end;                                          \
         char* tmp;                              \
         int64_t addr_diff = ( (char *)local_iter - (char *)iter );                              \
+        start = rdtsc();            \
         for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
             while( !__sync_bool_compare_and_swap( &ready, 1, 2) );                \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start );                       \
             for( uint64_t j = 0; j < line_cnt; j++ )                               \
             {                                                                      \
                 tmp = *( iter );                              \
                 WRITE_BLOCK( iter, addr_diff, tmp );                   \
                 iter = (char**)tmp;                                 \
             }                                                                      \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start );                       \
             __sync_bool_compare_and_swap( &ready, 2, 0 );                \
+		    pc.vec_cycles_measured.push_back( rdtsc() - start );                       \
         }                       \
 		end = rdtsc();                                                \
 		pc.vec_cycles_measured.push_back( end );                       \

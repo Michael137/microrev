@@ -247,12 +247,13 @@ void PAPILLCounter::stats_to_stream( std::ostream& os )
 		PAPI_event_code_to_name( cset[i], name );
 		os << name << ": " << this->measured[i] << '\n';
 	}
-	for( auto c: this->vec_cycles_measured )
+	for(int i = 0 ; i < this->vec_cycles_measured.size(); i++)
 	{
-		this->cycles_measured
-		    += ( (double)c ) / this->vec_cycles_measured.size();
+		this->cycles_measured = this->vec_cycles_measured[0];
+	    //+= ( (double)c ) / this->vec_cycles_measured.size();
+        os << "ith stamp Cycles: " << this->vec_cycles_measured[i] << '\n';
 	}
-	os << "Cycles: " << this->cycles_measured << '\n';
+	//os << "Cycles: " << this->cycles_measured << '\n';
 
 	os << std::endl;
 }
