@@ -53,6 +53,20 @@
 #define R_524288( a ) R_262144( a ) R_262144( a )
 #define R_1048576( a ) R_262144( a ) R_262144( a ) R_262144( a ) R_262144( a )
 #define R_2097152( a ) R_1048576( a ) R_1048576( a )
+#define WRITE_BLOCK( li, ad, tmp)       \
+do                                      \
+{                                       \
+    *( li + ad ) = tmp + ad;            \
+    *( li + ad + 1 ) = tmp + ad + 1;    \
+    *( li + ad + 2 ) = tmp + ad + 2;    \
+    *( li + ad + 3 ) = tmp + ad + 3;    \
+    *( li + ad + 4 ) = tmp + ad + 4;    \
+    *( li + ad + 5 ) = tmp + ad + 5;    \
+    *( li + ad + 6 ) = tmp + ad + 6;    \
+    *( li + ad + 7 ) = tmp + ad + 7;    \
+    *( li + ad + 8 ) = tmp + ad + 8;    \
+} while(0);
+    
 
 uint64_t avg_no_overflow( std::vector<uint64_t> const& nums );
 
@@ -135,11 +149,11 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
         std::cout << " COPY PRODUCING" << std::endl;          \
-		char** iter       = (char**)shared_iter;                               \
+		char** iter       = (char**)shared_data;                               \
         char* local_arr = (char*)malloc( size * sizeof( char ) );                  \
         char** local_iter = (char **)local_arr;             \
         char* tmp;                \
-		uint64_t start;                                          \
+		uint64_t start, end;                                          \
         uint64_t blksize = _128KB;                                \
 		uint64_t line_cnt = blksize / stride;                         \
 		uint64_t outer_line_cnt = size / blksize;                         \
@@ -149,44 +163,60 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
         set_shuffled_linked_list(local_arr, size, stride);           \
         start = rdtsc();                                                 \
         for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
-            std::cout << "producing!" << std::endl;                            \
             while( !__sync_bool_compare_and_swap( &ready, 0, -1 ) );                \
+            std::cout << "producing!" << std::endl;                            \
             for( uint64_t j = 0; j < line_cnt; j++ )                               \
             {                                                                      \
+                std::cout << j << std::endl;                            \
                 tmp = *( local_iter );                                         \
-                *( local_iter + addr_diff ) = tmp + addr_diff;                              \
-                local_iter          = (char**)tmp;                              \
+                if ( j < 3 ) { \
+                std::cout << (int *) local_iter << std::endl;                            \
+                std::cout << (int *) tmp << std::endl;                            \
+                std::cout << tmp - (char *)local_iter << std::endl;                            \
+                std::cout << (int *) iter << std::endl;                            \
+                } \
+                WRITE_BLOCK( local_iter, addr_diff, tmp );                   \
+                local_iter = (char**)tmp;                              \
             }                                                                      \
-            __sync_bool_compare_and_swap(&ready, -1, 1);                \
             std::cout << "produced!" << std::endl;                            \
+            __sync_bool_compare_and_swap(&ready, -1, 1);                \
         }            \
+		end = rdtsc();                                                \
+		pc.vec_cycles_measured.push_back( end - start );                       \
     }                              \
 	void OPT0 cp_consumer_( PAPILLCounter& pc, uint64_t size,                     \
 	                     uint64_t stride = 64 )                                \
 	{                                                                          \
         std::cout << " COPY CONSUMING " << std::endl;          \
-		char** iter       = (char**)shared_iter;                               \
+		char** iter       = (char**)shared_data;                               \
         char* local_arr = (char*)malloc( size * sizeof( char ) );                  \
         char** local_iter = (char **)local_arr;             \
         uint64_t blksize = _128KB;                                \
 		uint64_t line_cnt = blksize / stride;                         \
 		uint64_t outer_line_cnt = size / blksize;                         \
-		uint64_t start;                                          \
+		uint64_t start, end;                                          \
         char* tmp;                              \
         int64_t addr_diff = ( local_iter - iter );                              \
         start = rdtsc();                                                 \
         for( uint64_t i = 0; i < outer_line_cnt; i++ ) {                                 \
-            std::cout << "consuming!" << std::endl;                            \
             while( !__sync_bool_compare_and_swap( &ready, 1, 2) );                \
-            for( uint64_t i = 0; i < line_cnt; i++ )                               \
+            std::cout << "consuming!" << std::endl;                            \
+            for( uint64_t j = 0; j < line_cnt; j++ )                               \
             {                                                                      \
+                std::cout << j << std::endl;                            \
                 tmp = *( iter );                              \
+                std::cout << (int *) iter << std::endl;                            \
+                std::cout << (int *) tmp << std::endl;                            \
+                std::cout << tmp - (char *)iter << std::endl;                            \
+                std::cout << (int *) local_iter << std::endl;                            \
                 *( iter + addr_diff ) = tmp + addr_diff;                              \
                 iter = (char**)tmp;                                 \
             }                                                                      \
-            __sync_bool_compare_and_swap( &ready, 2, 0 );                \
             std::cout << "consumed!" << std::endl;                            \
+            __sync_bool_compare_and_swap( &ready, 2, 0 );                \
         }                       \
+		end = rdtsc();                                                \
+		pc.vec_cycles_measured.push_back( end - start );                       \
     }                              \
                                                                                \
 	void OPT0 writer_( PAPILLCounter& pc, uint64_t size,                       \
@@ -246,12 +276,7 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 	void pr_co_setup( uint64_t size, uint64_t stride = 64 )                    \
 	{                                                                          \
 		shared_data = (char*)malloc( size * sizeof( char ) );                  \
-		wrflag      = (int*)malloc( size / stride * sizeof( int ) );           \
                                                                                \
-		for( uint64_t i = 0; i < size / stride; i++ )                          \
-		{                                                                      \
-			wrflag[i] = 1;                                                     \
-		}                                                                      \
 		for( uint64_t i = 0; i < size; i++ )                                   \
 		{                                                                      \
 			shared_data[i] = 0;                                                \
@@ -259,22 +284,8 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
                                                                                \
 		volatile char** head = (volatile char**)shared_data;                   \
 		shared_iter          = head;                                           \
-                                                                               \
-		std::vector<char*> rndarray;                                           \
-		for( uint64_t i = 0; i < size; i += stride )                           \
-		{                                                                      \
-			rndarray.push_back( (char*)&shared_data[i] );                      \
-		}                                                                      \
-                                                                               \
-		shuffle_array<char*>( rndarray );                                      \
-                                                                               \
-		for( uint64_t i = 0; i < size; i += stride )                           \
-		{                                                                      \
-			*shared_iter = *(volatile char**)&rndarray[i / stride];            \
-                                                                               \
-			shared_iter += ( stride / sizeof( shared_iter ) );                 \
-		}                                                                      \
-		*shared_iter = (char*)head;                                            \
+        char *tmp = (char *)shared_data;                                       \
+        set_shuffled_linked_list(tmp, size, stride);                           \
 	}                                                                          \
                                                                                \
 	void setup( uint64_t size, uint64_t stride = 64 )                          \
