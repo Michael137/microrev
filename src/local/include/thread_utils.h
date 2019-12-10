@@ -142,13 +142,17 @@ template<typename CntTyp> struct CounterBenchmark
 
 	template<typename EventTyp>
 	void counter_thread_fn( CntTyp& counter, EventTyp& events, int th_id,
-	                        int core_id, BenchTyp benchmark, int warmup = 5 )
+	                        int core_id, BenchTyp benchmark, int warmup = 5,
+	                        bool sync = true )
 	{
-		// Wait for scheduler
 		std::unique_lock<std::mutex> lck( this->mtx );
+		// Wait for scheduler
 		auto not_paused = [this]() { return this->pause == false; };
 		this->cv.wait( lck, not_paused );
-		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+		if( !sync )
+		{
+			lck.unlock();
+		}
 
 		uint64_t start, end;
 		counter.core_id = core_id;
@@ -165,9 +169,12 @@ template<typename CntTyp> struct CounterBenchmark
 		// counter.end();
 
 		// Wake up scheduler
-		this->ready = true;
-		lck.unlock();
-		this->cv.notify_one();
+		if( sync )
+		{
+			this->ready = true;
+			lck.unlock();
+			this->cv.notify_one();
+		}
 	}
 
 	template<typename EventTyp>
@@ -180,15 +187,16 @@ template<typename CntTyp> struct CounterBenchmark
 		{
 			counters[i].label   = svec[i].label;
 			counters[i].collect = svec[i].printchk;
-			this->threads.push_back( std::thread( [this, &counters, &svec, i,
-			                                       warmup] {
-				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
-				                                   i, svec[i].core_id,
-				                                   svec[i].benchmark, warmup );
-			} ) );
+			this->threads.push_back(
+			    std::thread( [this, &counters, &svec, i, warmup] {
+				    this->counter_thread_fn<EventTyp>(
+				        counters[i], svec[i].events, i, svec[i].core_id,
+				        svec[i].benchmark, warmup, false );
+			    } ) );
 			pin_to_core( i, svec[i].core_id );
 		}
 
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 		{
 			std::lock_guard<std::mutex> lck( this->mtx );
 			this->pause = false;
