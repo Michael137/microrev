@@ -26,7 +26,7 @@ template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 
    public:
 	EventsVec cset;
-	double cycles_measured;
+	uint64_t cycles_measured;
 	std::vector<int64_t> vec_cycles_measured;
 	int core_id;
 	std::string label;
