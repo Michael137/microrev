@@ -58,22 +58,25 @@ int main( int argc, char* argv[] )
 	// "ix86arch:LLC_MISSES"}); cnt_vec_list.push_back(std::vector<std::string> {
 	// "OFFCORE_RESPONSE_0:ANY_DATA:LLC_HITE:SNP_ANY",
 	// "OFFCORE_RESPONSE_0:ANY_DATA:L3_MISS:SNP_ANY" });
-	std::vector<uint64_t> size_vec{ _16KB, _32KB, _64KB, _128KB,
+	std::vector<uint64_t> size_vec{ _4KB, _8KB, _16KB, _32KB, _64KB, _128KB,
 	                                _256KB, _512KB, _1MB,  _2MB };
 
 	for( auto s: size_vec )
 	{
 		shared_data_size = s;
 		setup( shared_data_size );
-        for( int j = 0; j < 3; j++ )
-        {
-            for( int i = 0; i < 1000; i++ )
-            {
-                for(int t = 1; t < 9; t++ ) { // STORE * LOAD *
-                    run_test( (mesi_type_t)t, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
-                }
-            }
-        }
+		for( int j = 0; j < 3; j++ )
+		{
+		    for( int i = 0; i < 20; i++ )
+		    {
+			    run_test( LOAD_FROM_SHARED_OR_FORWARD, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			    run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			    run_test( LOAD_FROM_EXCLUSIVE, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			    run_test( STORE_ON_SHARED_OR_FORWARD, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			    run_test( STORE_ON_MODIFIED, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			    run_test( STORE_ON_EXCLUSIVE, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
+			}
+		 }
 	}
 
 	free( (void*)shared_data );

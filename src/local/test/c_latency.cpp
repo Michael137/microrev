@@ -49,7 +49,7 @@ char** init_stride( uint64_t size )
 
 uint64_t time_rd_latency( uint64_t size )
 {
-	const int accesses = 300;
+	const int accesses = 10000;
 
 	// char* arr   = init_stride( size );
 	// char** iter = (char**)arr;
@@ -77,8 +77,8 @@ int main( int argc, char** argv )
 	             "with a predictable stride"
 	          << std::endl;
 
-	time_rd_latency( _64B );
-	time_rd_latency( _64B );
+	//time_rd_latency( _64B );
+	//time_rd_latency( _64B );
 	uint64_t start = rdtsc();
 	uint64_t end   = rdtsc();
 	printf( "Noise: %lu\n", end - start );
@@ -98,10 +98,10 @@ int main( int argc, char** argv )
 	printf( "%f MB: %lu\n", B2MB( _256KB ), time_rd_latency( _256KB ) );
 	printf( "%f MB: %lu\n", B2MB( _512KB ), time_rd_latency( _512KB ) );
 	printf( "%f MB: %lu\n", B2MB( _1MB ), time_rd_latency( _1MB ) );
-	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
-	printf( "%f MB: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
-	printf( "%f MB: %lu\n", B2MB( _8MB ), time_rd_latency( _8MB ) );
-	printf( "%f MB: %lu\n", B2MB( _16MB ), time_rd_latency( _16MB ) );
+//	printf( "%f MB: %lu\n", B2MB( _2MB ), time_rd_latency( _2MB ) );
+//	printf( "%f MB: %lu\n", B2MB( _4MB ), time_rd_latency( _4MB ) );
+//	printf( "%f MB: %lu\n", B2MB( _8MB ), time_rd_latency( _8MB ) );
+//	printf( "%f MB: %lu\n", B2MB( _16MB ), time_rd_latency( _16MB ) );
 
 	std::cout << ">>>> TEST COMPLETED <<<<" << std::endl;
 
