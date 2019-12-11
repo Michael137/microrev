@@ -53,7 +53,12 @@ df = pd.DataFrame(dictlist, columns = tmpdict.keys())
 
 df.to_csv("./result.csv", index=False)
 
-cyc_idx = list(df.columns).index("Cycles")
+cyc_idx = 0
+for i, c in enumerate(df.columns):
+    if "Cycles" in c:
+        cyc_idx = i
+        cyc_col =
+        break
 test_list = [
     "PRODUCER_CONSUMER",
     "STORE_ON_MODIFIED",
@@ -74,7 +79,8 @@ for t in test_list:
         tmp = df[(df['Test'] == t) & (df['Placement'] == pl)]
         if isinstance(tmp, pd.DataFrame):
             res = tmp.iloc[:,[2, cyc_idx]]
-            res = res.rename(columns={"Cycles": pl + " Cycles"})
+            cyc_cols = {c:pl+c if "Cycles" in c for c in list(res.columns)}
+            res = res.rename(columns=cyc_cols)
             if isinstance(joined_df, pd.DataFrame):
                 joined_df = joined_df.merge(res, on='Size', how='left')
 
