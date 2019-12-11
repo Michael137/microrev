@@ -1,0 +1,3240 @@
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 266481576
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244856004
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244837796
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 295205634
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263497690
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264333380
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 284044406
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244898610
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244853922
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 295659062
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264271144
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264431426
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 254051650
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244850654
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244829442
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 299766518
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264293518
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264515820
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 279224264
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 282052196
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 287000374
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 302872526
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 300775706
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 307706618
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283630236
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 282153918
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 280489288
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 298384964
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303723864
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 302143294
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285570178
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 280297390
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285328236
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 298182584
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 297914184
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 307793126
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 290185944
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 289558602
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 292352572
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 314548776
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320106828
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 313633314
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 289071032
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 281969488
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 282741792
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 322021282
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 322695836
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 319050548
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 291068832
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 292187372
+
+TEST RUN
+Working Set Size: 4096
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 291595074
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 322640092
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320457292
+
+TEST RUN
+Working Set Size: 4096
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 322656754
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 282986228
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244862910
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244833262
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 284175234
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263378272
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264463232
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 268909502
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244864804
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244875862
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 289522738
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263170480
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263600384
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 268468392
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244859936
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244849690
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 292310362
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263808858
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263919278
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 282581794
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 286593778
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285600194
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 296498010
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 296004022
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 298720076
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 278442714
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 284478202
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285972934
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 302868618
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 300563732
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303635924
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283258190
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 282562628
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 284229662
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303110506
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 308337468
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 297651130
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 290033652
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 289979492
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 286029976
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 322782358
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 318148060
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320975400
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 290563954
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293541402
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 282820574
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 323734104
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 317062148
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 315308726
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 291394466
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 287149240
+
+TEST RUN
+Working Set Size: 8192
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 289613346
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 314255266
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 315947604
+
+TEST RUN
+Working Set Size: 8192
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320996232
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 268157032
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244907474
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244912946
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 302217092
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264282178
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263452722
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 268069806
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244910054
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244906092
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 300549854
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263662598
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 263643496
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 283596660
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244910796
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 244932656
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 302821354
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264281708
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 264037102
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283476122
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 280897814
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 287081904
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303018518
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 300558946
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303664448
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283496902
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283809022
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 286197124
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 304517958
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 300727108
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 297825822
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283089276
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 284058390
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 279360250
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 298148126
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 299604996
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 296829132
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 285933926
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293467740
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 288982826
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 315627082
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 321014682
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320244884
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 286037952
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293246062
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 290029840
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 319289452
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 327842890
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 319712428
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 287291540
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293131614
+
+TEST RUN
+Working Set Size: 16384
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293059982
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 321520736
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 321774194
+
+TEST RUN
+Working Set Size: 16384
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 324579198
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 266229082
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251412590
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251293878
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 298163064
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 269829780
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 270236756
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 288028304
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251284456
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251304916
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 299813986
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 269295252
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 272042840
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 287810792
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251625150
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 251716882
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 298938888
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 269766216
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 269912456
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 291435572
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285077554
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285347092
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 307473674
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 304754752
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 306714308
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 288888610
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 283252912
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 291645218
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 304397402
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 304930904
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 308481436
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 285419584
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 289003406
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 291050672
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 302038984
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 303490540
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 309971420
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 293123896
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 298748044
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 300677760
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 323740544
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 326160182
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 325572324
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 299471282
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 287766528
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 288322632
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 327017082
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 329557880
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 320211620
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 296556460
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 298183332
+
+TEST RUN
+Working Set Size: 32768
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 295567064
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 328525286
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 324495050
+
+TEST RUN
+Working Set Size: 32768
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 324902656
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 494338898
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467347522
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467335864
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 506319570
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469842278
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469849734
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 507332800
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467107140
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467118164
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 505958488
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469787720
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469811118
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 490219378
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467352702
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467332460
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 503413968
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469552366
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 469846548
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510350500
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 501406916
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506336048
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511752242
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 512703880
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 509293142
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 508467880
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506999178
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 500999462
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511141332
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 513567924
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 508832418
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510623340
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506605092
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 501390924
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511005356
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510702070
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 501554836
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 508482372
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 506029940
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 514175342
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 531898964
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 530235382
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 536498450
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 506201862
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 514597918
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 507629904
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 534716474
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 531805880
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 528216394
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 512573222
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 515760482
+
+TEST RUN
+Working Set Size: 65536
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 515790940
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 535062290
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 529300468
+
+TEST RUN
+Working Set Size: 65536
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 526280874
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 502683910
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467394722
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467371376
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 498487804
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470128052
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470157314
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 497932902
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467387394
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467368078
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 506552360
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470188618
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470115540
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 504217068
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467378470
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 467337308
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 503411394
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470142612
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470165606
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506533476
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506602280
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510204400
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511625574
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 498623858
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506228312
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 509621752
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 501932542
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 504430254
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510596228
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 509409238
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510773674
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 509926782
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506566972
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 506485844
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510940438
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 498474176
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 502707154
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 515867814
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 506482280
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 519751004
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 531372196
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 527831366
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 534524152
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 515975256
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 513056026
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 511654874
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 536285026
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 538479852
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 529502910
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 514030222
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 513869030
+
+TEST RUN
+Working Set Size: 131072
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 511908400
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 537234812
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 537759040
+
+TEST RUN
+Working Set Size: 131072
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 528037888
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 494464128
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470670840
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470657060
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 512475634
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 474233246
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 473263406
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 502455480
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470712756
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470669664
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 498646762
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 473224568
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 473277396
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 501011976
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470664136
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 470671842
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 514909214
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 475526010
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 473261266
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510267116
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510653466
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510558804
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 518392514
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510605234
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511802940
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 509305934
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 500593200
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 505387046
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511655998
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 512182028
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 512227440
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 505070706
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 512601960
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 504644316
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 510269364
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 504910274
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 511825870
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 513823602
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 521023448
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 517253588
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 537114650
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 539534922
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 539286742
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 518404322
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 518077286
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 517377552
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 536268686
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 539431328
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 536193990
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 517108418
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 521700972
+
+TEST RUN
+Working Set Size: 262144
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 510156860
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 537675176
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 535045096
+
+TEST RUN
+Working Set Size: 262144
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 535624066
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 626295966
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 604902138
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 604801050
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 681471034
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640624772
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640584342
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 638290734
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 605007014
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 604949162
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 672255088
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640664714
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640690046
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 638195714
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 604890734
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 604834016
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 673683402
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640716052
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 640503044
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 644067882
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 644876200
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 643008948
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 668256962
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 679198686
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 668867768
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 646341570
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 626784994
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 640937150
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 667998776
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 659645878
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 667209014
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 634252636
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 631192586
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 644472342
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 666631948
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 655742452
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 671600046
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 655657272
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 660766582
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 661525586
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 701648128
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 714564158
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 706701282
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 650704924
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 656848120
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 653321878
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 707075300
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 708442716
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 709074024
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 654186870
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 658069280
+
+TEST RUN
+Working Set Size: 524288
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 650743364
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 705036666
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 701783612
+
+TEST RUN
+Working Set Size: 524288
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 713237280
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1278150620
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1263737908
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1264061276
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1460727446
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1441744914
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1442378432
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1294530482
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1265100394
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1263537090
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1468132622
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1442557452
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1442058658
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1283716064
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1264379064
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1263304760
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1469997720
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1440837090
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1440770208
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1223548148
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1213472106
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1224524058
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1388615136
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1393095032
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1392686516
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1229920332
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1226736760
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1230159494
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1393512172
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1379435486
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1389986524
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1223687348
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1216841710
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1227014746
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1386521132
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1387433646
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1386738522
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1339568566
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1334775866
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1334148362
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1530766396
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1535337942
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1539466248
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1337489904
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1336111780
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1331125002
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1535097198
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1528013542
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1531349100
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1336430124
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1335881132
+
+TEST RUN
+Working Set Size: 1048576
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1332033366
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1529281160
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1533868772
+
+TEST RUN
+Working Set Size: 1048576
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 1534858918
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1955666658
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1936575380
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1936508010
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1991564362
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1965828576
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1965902062
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1958983452
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1943891204
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1936540686
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1991094952
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1965837784
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1966010016
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1959439420
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1936565032
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1936629028
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1986752396
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1965793312
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: LOCAL 1 3 1
+0th_stamp_Cycles: 1965810634
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1827941484
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1817740918
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1832210374
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1860963584
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1858995092
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1863564092
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1827705186
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1830762944
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1833577854
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1860725126
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1852479498
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1861372758
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1829090032
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1832205462
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1835464758
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1857768686
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1858303568
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: SOCKET 1 3 9
+0th_stamp_Cycles: 1860071182
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2044238122
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2039018040
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2034000718
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2083826922
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2103169028
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2085447766
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2038641834
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2040424730
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2037369210
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2080150996
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2078616938
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2102932662
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2037731102
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2039940884
+
+TEST RUN
+Working Set Size: 2097152
+LOAD_FROM_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2036876232
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_SHARED_OR_FORWARD
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2080665412
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_MODIFIED
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2081113070
+
+TEST RUN
+Working Set Size: 2097152
+STORE_ON_EXCLUSIVE
+Core setting: GLOBAL 1 5 24
+0th_stamp_Cycles: 2084054282
+

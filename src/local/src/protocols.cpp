@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
 		setup( shared_data_size );
 		for( int j = 0; j < 3; j++ )
 		{
-		    for( int i = 0; i < 20; i++ )
+		    for( int i = 0; i < 3; i++ )
 		    {
 			    run_test( LOAD_FROM_SHARED_OR_FORWARD, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
 			    run_test( LOAD_FROM_MODIFIED, static_cast<core_placement_t>( j ), cnt_vec_list[0]);
