@@ -38,7 +38,7 @@
   - Are there optimizations for misses that come in a pattern. E.g., H M M M H M M M H ...
 - [x] (12th November): Devise which microbenchmarks could uncover above features
 - [x] (12th November): Write initial benchmarks and write measurement/benchmark infrastructure (likely using perf)
-- [ ] (17th November):
+- [x] (17th November):
   - Able to set coherence state programmatically
   - Benchmark suite for profiling coherence information
   
