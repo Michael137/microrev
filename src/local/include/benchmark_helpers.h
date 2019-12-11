@@ -210,9 +210,11 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		char** iter       = (char**)shared_data;                               \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		R_131072( iter = (char**)*iter; \
-		      *(char **)( (char *)iter + 8 ) = (char *)1;                                          \
-		    ) \
+		for(int i = 0; i < 200; ++i) { \
+			R_131072( iter = (char**)*iter; \
+			      *( iter + 1 ) = (char*)1;                                          \
+			    ) \
+		} \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
@@ -224,7 +226,9 @@ static const char* core_placement_des[] = { "LOCAL", "SOCKET", "GLOBAL" };
 		char** iter       = (char**)shared_data;                               \
 		pc.start();                                                            \
 		uint64_t start = rdtsc();                                              \
-		R_131072( iter = (char**)*iter; ) \
+		for(int i = 0; i < 200; ++i) { \
+			R_131072( iter = (char**)*iter; ) \
+		} \
 		uint64_t end = rdtsc();                                                \
 		pc.read();                                                             \
 		pc.vec_cycles_measured.push_back( end - start );                       \
