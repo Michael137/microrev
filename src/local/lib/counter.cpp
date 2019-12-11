@@ -251,7 +251,7 @@ void PAPILLCounter::stats_to_stream( std::ostream& os )
 	{
 		this->cycles_measured = this->vec_cycles_measured[0];
 	    //+= ( (double)c ) / this->vec_cycles_measured.size();
-        os << i << "th stamp Cycles: " << this->vec_cycles_measured[i] << '\n';
+        os << i << "th_stamp_Cycles: " << this->vec_cycles_measured[i] << '\n';
 	}
 	//os << "Cycles: " << this->cycles_measured << '\n';
 
