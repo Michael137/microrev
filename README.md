@@ -1,4 +1,6 @@
 # Reverse Engineering μ-architectures
+See INSTALL.md for installation instructions
+
 ## Cache coherence protocols
 - [Question about Intel's cache coherence](https://software.intel.com/en-us/forums/intel-moderncode-for-parallel-architectures/topic/777852)
 - [RSP](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/specifications/) runs on a ARM Cortex-A72
