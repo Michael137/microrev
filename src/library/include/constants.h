@@ -3,8 +3,6 @@
 
 namespace pcnt
 {
-// Number of simultaneous PMCs that
-// platform permits
 constexpr int max_pmc_num = 4;
 
 constexpr unsigned int default_phys_core_count = 4;

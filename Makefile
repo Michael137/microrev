@@ -1,4 +1,7 @@
-all: clean setup cmake
+all: build
+
+.PHONY:
+full: clean setup cmake
 
 .PHONY:
 clean:
@@ -17,3 +20,8 @@ cmake:
 			../src && \
 		make -j4 && \
 		make install
+
+.PHONY:
+build:
+	$(MAKE) -C build/
+	$(MAKE) -C build/ install

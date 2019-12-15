@@ -34,7 +34,6 @@
 #define F_STATE 5
 
 uint64_t avg_no_overflow( std::vector<uint64_t> const& nums );
-
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
 typedef enum

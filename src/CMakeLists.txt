@@ -17,7 +17,5 @@ endif(WITH_PAPI_LL)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};/home/gardei/papi/install")
-
 add_subdirectory(library)
 #add_subdirectory(benchmarks)

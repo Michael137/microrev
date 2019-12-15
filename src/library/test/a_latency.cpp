@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <iostream>
 #include <limits>
-#include <random>
 
 #include "constants.h"
 #include "shuffle.h"
@@ -32,7 +31,7 @@ char** init_stride( uint64_t size )
 
 	uint64_t stride = _32KB;
 
-    set_shuffled_linked_list(arr, size, stride);
+	set_shuffled_linked_list( arr, size, stride );
 
 	//	int i;
 	//	for( i = stride; i < size; i += stride )
