@@ -1,3 +1,5 @@
+include config.inc.defaults
+
 all: build
 
 .PHONY:
@@ -16,7 +18,7 @@ setup:
 .PHONY:
 cmake:
 	cd build && \
-		cmake -DPAPI_DIR=/home/gardei/Git/microrev/src/cmake -DCMAKE_INSTALL_PREFIX=/home/gardei/Git/microrev/install \
+		cmake -DCMAKE_INSTALL_PREFIX=$(MREV_INSTALL_PREFIX) \
 			../src && \
 		make -j4 && \
 		make install

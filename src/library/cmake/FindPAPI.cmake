@@ -14,6 +14,7 @@
 
 find_path(PAPI_PREFIX
     NAMES include/papi.h
+	HINTS /usr /usr/local
 )
 
 find_library(PAPI_LIBRARIES
