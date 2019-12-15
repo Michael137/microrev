@@ -22,7 +22,7 @@
 #include "shuffle.h"
 #include "thread_utils.h"
 
-#if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
+#ifdef WITH_PAPI_LL
 #	include <papi.h>
 #endif
 
@@ -34,7 +34,6 @@
 #define F_STATE 5
 
 uint64_t avg_no_overflow( std::vector<uint64_t> const& nums );
-
 using Sched = pcnt::Schedule<std::vector<std::string>, pcnt::PAPILLCounter>;
 
 typedef enum

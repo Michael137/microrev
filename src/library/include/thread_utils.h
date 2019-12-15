@@ -2,11 +2,9 @@
 #define THREAD_UTILS_H_IN
 
 #include <pthread.h>
-
 #ifdef __FreeBSD__
 #	include <pthread_np.h>
 #endif
-
 #include <immintrin.h>
 #include <sched.h>
 #include <stdlib.h>
@@ -141,15 +139,14 @@ template<typename CntTyp> struct CounterBenchmark
 	                        int core_id, BenchTyp benchmark, int warmup = 5 )
 	{
 		// Wait for scheduler
-        std::unique_lock<std::mutex> lck( this->mtx );
-        auto not_paused = [this]() { return this->pause == false; };
-        this->cv.wait( lck, not_paused );
+		std::unique_lock<std::mutex> lck( this->mtx );
+		auto not_paused = [this]() { return this->pause == false; };
+		this->cv.wait( lck, not_paused );
 
 		uint64_t start, end;
 		counter.core_id = core_id;
 
 		counter.add( events );
-
 
 		for( int i = 0; i < warmup; ++i )
 			benchmark( counter );
@@ -167,16 +164,19 @@ template<typename CntTyp> struct CounterBenchmark
 	}
 
 	template<typename EventTyp>
-	std::vector<CntTyp> counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec, int warmup = 5)
+	std::vector<CntTyp>
+	counters_with_schedule( std::vector<Schedule<EventTyp, CntTyp>>& svec,
+	                        int warmup = 5 )
 	{
 		std::vector<CntTyp> counters{ svec.size() };
 		for( int i = 0; i < svec.size(); ++i )
 		{
 			counters[i].label = svec[i].label;
-			this->threads.push_back( std::thread( [this, &counters, &svec, i, warmup] {
+			this->threads.push_back( std::thread( [this, &counters, &svec, i,
+			                                       warmup] {
 				this->counter_thread_fn<EventTyp>( counters[i], svec[i].events,
 				                                   i, svec[i].core_id,
-				                                   svec[i].benchmark, warmup);
+				                                   svec[i].benchmark, warmup );
 			} ) );
 			pin_to_core( i, svec[i].core_id );
 		}
