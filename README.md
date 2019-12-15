@@ -1,5 +1,5 @@
 # Reverse Engineering μ-architectures
-See INSTALL.md for installation instructions
+See [INSTALL.md](INSTALL.md) for installation instructions
 
 ## Cache coherence protocols
 - [Question about Intel's cache coherence](https://software.intel.com/en-us/forums/intel-moderncode-for-parallel-architectures/topic/777852)
