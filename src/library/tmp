@@ -1,9 +1,0 @@
-/* Follow the pointer 131072 times*/
-int accesses = _128KB;
-for( int i = 0; i < accesses; ++i )
-	iter = ( (char**)*iter );
-
-/* Unroll the above loop. R_131072 is a macro
-   that generates the statement passed to it
-   131072 times */
-R_131072( iter = (char**)*iter; )
