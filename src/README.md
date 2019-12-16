@@ -45,6 +45,18 @@ Depending on the virtual-to-physical address mapping scheme, different arrayaddr
 * ~~Parameterize benchmarks~~
 * ~~Benchmark result aggregation~~
 * ~~Measure from multiple cores~~
-* Measure LLC - L2 on core
+* ~~Measure LLC - L2 on core~~
+* ~~Graphs~~
+* Profile and quantify framework overheads:
+  + Loop overheads
+  + Scheduler synchronization/core pinning overheads
+  + rdtsc noise
+  + Cold start/warm start (including for state initialization)
+  + Turbo-boost
+  + Other HW/OS/compiler optimizations
+* Validate state initialization logic
+* Add pmc and libpfm support
 * Detecting protocol
-* Graphs
+  + Protocol transition map
+* Run on other platforms (ARM, AMD, more Intel micro-architectures)
+* Simplify/extend utility scripts
