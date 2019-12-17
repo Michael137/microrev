@@ -100,10 +100,30 @@ According to the IA64 optimization manual section 7.3.3.3 Cascade Lake processor
 
 This architecture has a larger than usual L2 and L3 cache and its L1 cache is split into data and instruction cache of 32KB each. The processor has 2 sockets with 24 cores each. In the Intel Xeon architecture this implies that 
 
-
 # Tools
 - [Emon](https://software.intel.com/sites/default/files/emon_user_guide_2019u3.pdf)
 - [Herd](https://github.com/herd/herdtools/)
+
+# TODO
+* ~~Parameterize benchmarks~~
+* ~~Benchmark result aggregation~~
+* ~~Measure from multiple cores~~
+* ~~Measure LLC - L2 on core~~
+* ~~Graphs~~
+* Profile and quantify framework overheads:
+  + Loop overheads
+  + Scheduler synchronization/core pinning overheads
+  + rdtsc noise
+  + Cold start/warm start (including for state initialization)
+  + Turbo-boost
+  + Other HW/OS/compiler optimizations
+* Validate state initialization logic
+* Add pmc and libpfm support
+* Detecting protocol
+  + Protocol transition map
+* Run on other platforms (ARM, AMD, more Intel micro-architectures)
+* Simplify/extend utility scripts
+* Measurement threads
 
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)
