@@ -2,6 +2,7 @@ project(mrev_lib VERSION 0.1 LANGUAGES CXX)
 
 add_library(lib
 	lib/counter.cpp
+	lib/time_utils.cpp
 	lib/thread_utils.cpp
 	lib/benchmark_helpers.cpp
 )

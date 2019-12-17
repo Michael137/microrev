@@ -8,10 +8,8 @@
 #include <immintrin.h>
 #include <sched.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-#include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <future>
@@ -32,7 +30,6 @@
 namespace pcnt
 {
 void pin_self_to_core( int core_id );
-uint64_t rdtsc();
 
 template<typename EventTyp, typename CntTyp> struct Schedule
 {

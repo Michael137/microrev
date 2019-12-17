@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "shuffle.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
 using namespace pcnt;
 

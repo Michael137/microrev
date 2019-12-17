@@ -13,7 +13,6 @@
 
 #include "benchmark_helpers.h"
 #include "counter.h"
-#include "counters.h"
 #include "shuffle.h"
 #include "thread_utils.h"
 

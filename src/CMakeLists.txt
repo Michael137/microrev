@@ -19,3 +19,4 @@ find_package(Threads REQUIRED)
 
 add_subdirectory(library)
 add_subdirectory(benchmarks)
+add_subdirectory(profiling)

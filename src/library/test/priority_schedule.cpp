@@ -9,10 +9,10 @@
 #include <vector>
 
 #include "counter.h"
-#include "counters.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
-#if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
+#if defined( WITH_PAPI_LL )
 #	include <papi.h>
 #endif
 
@@ -36,11 +36,7 @@ int main( int argc, char* argv[] )
 
 #	error "TODO: implement this test using PMC"
 
-#elif defined( WITH_PAPI_HL ) // !WITH_PMC
-
-#	error "TODO: implement this test using PAPI's HL interface"
-
-#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+#elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
 	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 

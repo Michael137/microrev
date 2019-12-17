@@ -124,6 +124,7 @@ This architecture has a larger than usual L2 and L3 cache and its L1 cache is sp
 * Run on other platforms (ARM, AMD, more Intel micro-architectures)
 * Simplify/extend utility scripts
 * Measurement threads
+* Convert rdtsc return to time unit (instead of cycles)
 
 ## Branch predictors
 - [ARM Cortex M3 Pipeline Forum Question](https://community.arm.com/developer/ip-products/processors/f/cortex-m-forum/3190/cortex-m3-pipeline-stages-branch-prediction)

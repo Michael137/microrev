@@ -18,9 +18,9 @@
 
 #include "constants.h"
 #include "counter.h"
-#include "counters.h"
 #include "shuffle.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
 #ifdef WITH_PAPI_LL
 #	include <papi.h>

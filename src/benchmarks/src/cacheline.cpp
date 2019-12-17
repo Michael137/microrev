@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "counter.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
 using namespace pcnt;
 

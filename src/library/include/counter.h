@@ -14,10 +14,10 @@
 #	include <papi.h>
 #endif
 
-#include "counters.h"
-
 namespace pcnt
 {
+using CounterSet = std::vector<std::string>;
+
 // List of counters: `pmccontrol -L`
 template<typename ResultVec, typename EventsVec = CounterSet> class Counter
 {

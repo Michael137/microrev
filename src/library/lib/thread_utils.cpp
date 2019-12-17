@@ -1,10 +1,6 @@
 #include <pthread.h>
 #include <cstdint>
 
-// TODO: this won't work on ARM
-#include <x86intrin.h>
-#include <immintrin.h>
-
 #ifdef __FreeBSD__
 #	include <pthread_np.h>
 #endif
@@ -27,25 +23,6 @@ void pin_self_to_core( int core_id )
 	CPU_SET( core_id, &cpuset );
 
 	pthread_setaffinity_np( pthread_self(), sizeof( CPUSET_T ), &cpuset );
-}
-
-// Returns number of cycles
-uint64_t rdtsc()
-{
-	_mm_lfence();
-	uint64_t ret = __rdtsc();
-	_mm_lfence();
-	return ret;
-#if 0
-	uint32_t hi, lo;
-
-	// lfence to serialize timer
-	// TODO: need to specify clobber list?
-	asm volatile( "lfence" ::: "eax", "ebx", "ecx", "edx" );
-	asm volatile( "rdtsc" : "=a"( lo ), "=d"( hi ) );
-
-	return ( static_cast<uint64_t>( hi ) << 32 ) | lo;
-#endif
 }
 
 } // namespace pcnt

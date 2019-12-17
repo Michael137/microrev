@@ -9,10 +9,10 @@
 #include <vector>
 
 #include "counter.h"
-#include "counters.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
-#if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
+#if defined( WITH_PAPI_LL )
 #	include <papi.h>
 #endif
 
@@ -68,29 +68,9 @@ int main( int argc, char* argv[] )
 	          << std::endl;
 #ifdef WITH_PMC
 
-	pcnt::CounterBenchmark<pcnt::PMCCounter> cbench;
+#	error "TODO: implement this test using FreeBSD's pmclib"
 
-	using Sched          = pcnt::Schedule<std::vector<std::string>>;
-	auto FreeBSDCounters = pcnt::CounterMap["FreeBSD"];
-
-	Sched core_1 = Sched{ 1, std::function<decltype( do_flops )>{ do_flops },
-	                      FreeBSDCounters["icache"] };
-	Sched core_2 = Sched{ 2, std::function<decltype( do_ints )>{ do_ints },
-	                      FreeBSDCounters["dcache"] };
-	Sched core_3 = Sched{
-	    3,
-	    std::function<decltype( do_ints )>{ do_ints },
-	    { "arith.fpu_div_active", "arith.fpu_div", "fp_comp_ops_exe.x87" } };
-
-	std::vector<Sched> vec{ core_1, core_2, core_3 };
-
-	cbench.counters_with_schedule<std::vector<std::string>>( vec );
-
-#elif defined( WITH_PAPI_HL ) // !WITH_PMC
-
-#	error "TODO: implement this test using PAPI's HL interface"
-
-#elif defined( WITH_PAPI_LL ) // !WITH_PAPI_HL
+#elif defined( WITH_PAPI_LL ) // !WITH_PMC
 
 	pcnt::CounterBenchmark<pcnt::PAPILLCounter> cbench;
 

@@ -11,6 +11,7 @@
 #include "counter.h"
 #include "counters.h"
 #include "thread_utils.h"
+#include "time_utils.h"
 
 #if defined( WITH_PAPI_HL ) || defined( WITH_PAPI_LL )
 #	include <papi.h>
