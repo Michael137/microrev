@@ -60,3 +60,4 @@ Depending on the virtual-to-physical address mapping scheme, different arrayaddr
   + Protocol transition map
 * Run on other platforms (ARM, AMD, more Intel micro-architectures)
 * Simplify/extend utility scripts
+* Measurement threads
