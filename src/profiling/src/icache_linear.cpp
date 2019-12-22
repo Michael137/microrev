@@ -28,7 +28,7 @@
 #define R65536( a ) R32768( a ) R32768( a )
 
 #define BENCH_FN( size )                                                       \
-	void __attribute__( ( optimize( "0" ) ) ) benchmark##size()                \
+	inline void __attribute__( ( optimize( "0" ) ) ) benchmark##size()         \
 	{                                                                          \
 		INST_INIT();                                                           \
 		R##size( INST_BODY() );                                                \
