@@ -3,26 +3,36 @@
  * Test likely/unlikely assumptions
  *
  * Compile using GCC and GNU assembler
+ *
+ * gcc branch_predictor.c -DDEBUGPRED
+ *
+ * Depending on GCC configuration need to add the "-no-pie" flag
  */
 
 #include <stdio.h>
 
-#ifdef __x86_64__
-#	define debugpred__( e, E )                                                \
-		( {                                                                    \
-			long int _e = !!( e );                                             \
-			asm volatile( ".pushsection predict_data\n"                        \
-			              "..predictcnt%=: .quad 0; .quad 0\n"                 \
-			              ".section predict_line; .quad %c1\n"                 \
-			              ".section predict_file; .quad %c2; .popsection\n"    \
-			              "addq $1,..predictcnt%=(,%0,8)" ::"r"( _e == E ),    \
-			              "i"( __LINE__ ), "i"( __FILE__ ) );                  \
-			__builtin_expect( _e, E );                                         \
-		} )
-#	define unlikely( expr ) debugpred__( ( expr ), 0 )
-#	define likely( expr ) debugpred__( ( expr ), 1 )
+#ifndef DEBUGPRED
+#	define unlikely( expr ) __builtin_expect( !!( expr ), 0 )
+#	define likely( expr ) __builtin_expect( !!( expr ), 1 )
 #else
-#	error "You're not on x86_64"
+#	ifdef __x86_64__
+#		define debugpred__( e, E )                                            \
+			( {                                                                \
+				long int _e = !!( e );                                         \
+				asm volatile(                                                  \
+				    ".pushsection predict_data\n"                              \
+				    "..predictcnt%=: .quad 0; .quad 0\n"                       \
+				    ".section predict_line; .quad %c1\n"                       \
+				    ".section predict_file; .quad %c2; .popsection\n"          \
+				    "addq $1,..predictcnt%=(,%0,8)" ::"r"( _e == E ),          \
+				    "i"( __LINE__ ), "i"( __FILE__ ) );                        \
+				__builtin_expect( _e, E );                                     \
+			} )
+#		define unlikely( expr ) debugpred__( ( expr ), 0 )
+#		define likely( expr ) debugpred__( ( expr ), 1 )
+#	else
+#		error "You're not on x86_64"
+#	endif
 #endif
 
 extern long int __start_predict_data;
